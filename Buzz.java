@@ -1,16 +1,23 @@
+// Importing required packages for specialized actions
+
 import java.io.*;
 import java.util.Scanner;
 import java.util.Random;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.io.PrintWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 
 public class Buzz
 {
 	public static void main(String[] args)
 	{
 
-		// Initialize flag to end game, action variable, money variable, sales variable, bee variables, upgrade variables, and random variable
+		// Initialize flag to end game, action variable, money variable, sales variable, bee variables, upgrade variables, load flag, gametime variables, off game time variable, resource/bee acquisition delays, random variable, terminal scanner object, username variable, and the all-important Hive object
+
 		int endflag = 0;
 		char action;
 		double money = 0;
@@ -22,29 +29,81 @@ public class Buzz
 		int beeUpgrade = 1;
 		int queenUpgrade = 1;
 		double valueUpgrade = 1;
+		char load;
+		long oldtime;
+		Date newtime;
+		long offgametime;
+		int resourceTime = 5000;
+		int beeTime = 18000;
 		Random rand = new Random();
 		int n;
-
-		// Enter username and explanation
-		System.out.println("Welcome! Please enter your name");
 		Scanner in = new Scanner(System.in);
-		String name = in.nextLine();
-		System.out.println("Welcome " + name + "! Let's get started. You will begin with a queen, 1 bee, and some pollen and honey. Collect pollen and honey to make more bees, and sell the honey for money to buy upgrades.\n");
-
-		// Initialize hive and resources (bees, honey, pollen)
+		String name = "";
 		Hive ronHive = new Hive(true);
-		ronHive.addBees(1);
-		ronHive.addHoney(5);
-		ronHive.addPollen(5);
+
+		// Enter username and explanation. Load game or new game options
+
+		System.out.println("Would you like to load a saved game (y/n)?");
+		load = in.next().charAt(0);
+		if (load == 'y')
+		{
+			File inFile = new File("/home/tyler/Documents/Java Code/Buzz/savefile.txt");
+			try
+			{
+				// Load game variables from file; add in resource/bee amounts corresponding to elapsed time since last game
+
+				Scanner sc = new Scanner(inFile);
+				name = sc.next();
+				ronHive.setHoney(sc.nextDouble());
+				ronHive.setPollen(sc.nextDouble());
+				ronHive.setBees(sc.nextInt());
+				money = sc.nextDouble();
+				beeUpgrade = sc.nextInt();
+				queenUpgrade = sc.nextInt();
+				oldtime = sc.nextLong();
+				newtime = new Date();
+				offgametime = (newtime.getTime()/1000 - oldtime);
+				int intoffgametime = (int) offgametime;
+				ronHive.setHoney(ronHive.getHoney() + (intoffgametime*1000/resourceTime) * beeUpgrade);
+				ronHive.setPollen(ronHive.getPollen() + (intoffgametime*1000/resourceTime) * beeUpgrade);
+				ronHive.setBees(ronHive.getBees() + (intoffgametime*1000/beeTime) * queenUpgrade);
+				sc.close();
+			}
+			catch (FileNotFoundException e)
+			{
+				System.out.println("Could not load file");
+			}
+		}
+		else if (load == 'n')
+		{
+
+			// New game
+
+			System.out.println("Welcome! Please enter your name");
+			name = in.nextLine(); // consume white space
+			name = in.nextLine();
+			System.out.println("Welcome " + name + "! Let's get started. You will begin with a queen, 1 bee, and some pollen and honey. Collect pollen and honey to make more bees, and sell the honey for money to buy upgrades.\n");
+
+			// Initialize hive resources (bees, honey, pollen)
+
+			ronHive.addBees(1);
+			ronHive.addHoney(5);
+			ronHive.addPollen(5);
+		}
+		else
+		{
+			System.out.println("Invalid entry");
+		}	
 
 		// Create timers for game
 
 		Timer resourceTimer = new Timer();
 		Timer beeTimer = new Timer();
-		startResourceTimer(ronHive, beeUpgrade, resourceTimer);
-		startBeeTimer(ronHive, queenUpgrade, beeTimer);	
+		startResourceTimer(ronHive, beeUpgrade, resourceTimer, resourceTime);
+		startBeeTimer(ronHive, queenUpgrade, beeTimer, beeTime);	
 		
 		// Loop to determine and define actions
+
 		while (endflag != 1)
 		{
 
@@ -54,14 +113,16 @@ public class Buzz
 			//System.out.println("Make Bees (m)");DEPRECATED
 			System.out.println("Sell (s)");
 			System.out.println("Upgrade (u)");
-			System.out.println("Quit (q)");
+			System.out.println("Save and Quit (q)");
 
 			action = in.next().charAt(0);
 			switch (action)
 			{
+
 				// Inspect case:  Reveal your current honey, pollen, bee, and money quantities
+
 				case 'i' :
-					System.out.println(name + "'s hive has " + ronHive.getBees() + " bees, " + ronHive.getHoney() + " mL of honey, " + ronHive.getPollen() + " units of pollen, and $" + money);
+					System.out.println(name + "'s hive has " + ronHive.getHoney() + " mL of honey, " + ronHive.getPollen() + " units of pollen, " + ronHive.getBees() + " bees, and $" + money);
 					break;
 				// Deploy case: Send bees out to collect honey and pollen. 1 bee = 1 mL honey and 1 unit pollen. Bees can be killed by predators (need to work on probabilistic model). DEPRECATED
 				/*case 'd' :
@@ -100,7 +161,9 @@ public class Buzz
 						System.out.println("Made " + newBees * beeUpgrade + " new bees");
 					}
 					break;*/
+
 				// Sell case: Sell bees, honey, and pollen. Amounts subject to change, but 1 bee = $2.50, while 1 pollen = 1 mL honey = $1.50 
+
 				case 's' :
 					System.out.println("What would you like to sell? Bees (b), Honey (h), or Pollen (p)?");
 				sellVar = in.next().charAt(0);
@@ -150,7 +213,9 @@ public class Buzz
 					}
 				}
 				break;	
+
 				// Upgrade case: Can purchase upgrades to bee carrying capacity, queen fertility, and commodity value. +1 to capacity and fertility, *1.2 to value
+
 				case 'u' :
 					System.out.println("Upgrades cost $100.00. Would you like to upgrade your bees carrying capacity (c), queens generating capacity (g), or commodity value (v)?");
 					upgrade = in.next().charAt(0);
@@ -194,15 +259,20 @@ public class Buzz
 					}
 				}					
 					break;
-				// Quit case: Quits game
+
+				// Quit case: Saves and Quits game
+
 				case 'q' :
 					endflag = 1;
 					beeTimer.cancel();
 					beeTimer.purge();
 					resourceTimer.cancel();
 					resourceTimer.purge();
+					saveGame(name, ronHive.getHoney(), ronHive.getPollen(), ronHive.getBees(), money, beeUpgrade, queenUpgrade);
 					break;
+
 				// If you enter a dumb variable, you get a dumb answer
+
 				default: 
 					System.out.println("Invalid entry");
 					break;
@@ -210,6 +280,7 @@ public class Buzz
 			if (ronHive.getBees() <= 0 )
 			{
 				// All your bees are dead. Game over
+
 				System.out.println("All your bees have died. Your queen has died of loneliness. Game Over\n");
 				System.out.println("You finished with " + ronHive.getHoney() + " ml of honey and " + ronHive.getPollen() + " units of pollen");
 				endflag = 1;
@@ -217,7 +288,9 @@ public class Buzz
 		}	
 	}
 
-	public static void startResourceTimer(Hive hive, int beeUpgrade, Timer timer)
+	// Method to start timer for gradually increasing resources (every 5 seconds)
+
+	public static void startResourceTimer(Hive hive, int beeUpgrade, Timer timer, int time)
 	{
 		TimerTask resourceTask = new TimerTask()
 		{
@@ -227,10 +300,12 @@ public class Buzz
 					hive.pollen = hive.pollen + beeUpgrade;
 			}
 		};
-		timer.scheduleAtFixedRate(resourceTask, new Date(), 5000);
+		timer.scheduleAtFixedRate(resourceTask, new Date(), time);
 	}
 
-	public static void startBeeTimer(Hive hive, int queenUpgrade, Timer timer)
+	// Method to start timer for gradually increasing bee quantities (every 18 seconds)
+
+	public static void startBeeTimer(Hive hive, int queenUpgrade, Timer timer, int time)
 	{
 		TimerTask beeTask = new TimerTask()
 		{
@@ -242,6 +317,32 @@ public class Buzz
 				hive.pollen = hive.pollen - 1;
 			}
 		};	
-		timer.scheduleAtFixedRate(beeTask, new Date(), 18000);
-	}	
+		timer.scheduleAtFixedRate(beeTask, new Date(), time);
+	}
+
+	// Method to save game variables to file for future load
+
+	public static void saveGame(String name, double honey, double pollen, int bees, double money, int bUpgrade, int qUpgrade)
+	{
+		File outFile = new File("/home/tyler/Documents/Java Code/Buzz/savefile.txt");
+		Date currentDate = new Date(); 
+		try
+		{
+			PrintWriter out = new PrintWriter(outFile);
+			out.println(name);
+			out.println(honey);
+			out.println(pollen);
+			out.println(bees);
+			out.println(money);
+			out.println(bUpgrade);
+			out.println(qUpgrade);
+			out.println(currentDate.getTime()/1000);
+			out.close();
+			System.out.println("Game saved");
+		}
+		catch (FileNotFoundException e)
+		{
+			System.out.println("Could not save file");
+		}
+	}
 }

@@ -1,14 +1,10 @@
-import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
-
 public class Hive
 {
 	public double honey;
 	public int bees;
 	public boolean queen;
 	public double pollen;
-
+	public int age;
 
 	public Hive(boolean q)
 	{
@@ -57,5 +53,20 @@ public class Hive
 		{
 			this.pollen = pollen + p;
 		}
+	}
+
+	public void setHoney(double h)
+	{
+		this.honey = h;
+	}
+
+	public void setPollen(double p)
+	{
+		this.pollen = p;
+	}
+
+	public void setBees(int b)
+	{
+		this.bees = b;
 	}
 }
