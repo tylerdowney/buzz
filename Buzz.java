@@ -24,25 +24,6 @@ public class Buzz
 		double valueUpgrade = 1;
 		Random rand = new Random();
 		int n;
-		
-		// Create timers for game
-		Timer resourceTimer = new Timer();
-		resourceTimer.scheduleAtFixedRate(new TimerTask()
-			{
-				ronHive.addHoney(beeUpgrade);
-				ronHive.addPollen(beeUpgrade);
-			}, new Date(), 5000);
-
-		Timer beeTimer = new Timer();
-		beeTimer.scheduleAtFixedRate(new TimerTask()
-		{
-			if (ronHive.getHoney() >= 1 && ronHive.getPollen() >= 1)
-			{
-				ronHive.addBees(queenUpgrade);
-				ronHive.addHoney(-1);
-				ronHive.addPollen(-1);
-			}
-		}, new Date(), 20000);
 
 		// Enter username and explanation
 		System.out.println("Welcome! Please enter your name");
@@ -56,15 +37,21 @@ public class Buzz
 		ronHive.addHoney(5);
 		ronHive.addPollen(5);
 
-		// Loop to determine and define actions, and set timers.
+		// Create timers for game
+
+		Timer resourceTimer = new Timer();
+		Timer beeTimer = new Timer();
+		startResourceTimer(ronHive, beeUpgrade, resourceTimer);
+		startBeeTimer(ronHive, queenUpgrade, beeTimer);	
+		
+		// Loop to determine and define actions
 		while (endflag != 1)
-		{	
-			new BeeTimer();
-			new ResourceTimer();
+		{
+
 			System.out.println("What do you want to do?\n");
 			System.out.println("Inspect (i)");
-			//System.out.println("Deploy Bees (d)");
-			//System.out.println("Make Bees (m)");
+			//System.out.println("Deploy Bees (d)");DEPRECATED
+			//System.out.println("Make Bees (m)");DEPRECATED
 			System.out.println("Sell (s)");
 			System.out.println("Upgrade (u)");
 			System.out.println("Quit (q)");
@@ -210,6 +197,10 @@ public class Buzz
 				// Quit case: Quits game
 				case 'q' :
 					endflag = 1;
+					beeTimer.cancel();
+					beeTimer.purge();
+					resourceTimer.cancel();
+					resourceTimer.purge();
 					break;
 				// If you enter a dumb variable, you get a dumb answer
 				default: 
@@ -225,4 +216,32 @@ public class Buzz
 			}
 		}	
 	}
+
+	public static void startResourceTimer(Hive hive, int beeUpgrade, Timer timer)
+	{
+		TimerTask resourceTask = new TimerTask()
+		{
+			public void run()
+			{
+					hive.honey = hive.honey + beeUpgrade;
+					hive.pollen = hive.pollen + beeUpgrade;
+			}
+		};
+		timer.scheduleAtFixedRate(resourceTask, new Date(), 5000);
+	}
+
+	public static void startBeeTimer(Hive hive, int queenUpgrade, Timer timer)
+	{
+		TimerTask beeTask = new TimerTask()
+		{
+			public void run()
+			{
+				
+				hive.bees = hive.bees + queenUpgrade;
+				hive.honey = hive.honey - 1;
+				hive.pollen = hive.pollen - 1;
+			}
+		};	
+		timer.scheduleAtFixedRate(beeTask, new Date(), 18000);
+	}	
 }

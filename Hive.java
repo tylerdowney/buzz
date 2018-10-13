@@ -1,9 +1,13 @@
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class Hive
 {
-	private double honey;
-	private int bees;
-	private boolean queen;
-	private double pollen;
+	public double honey;
+	public int bees;
+	public boolean queen;
+	public double pollen;
 
 
 	public Hive(boolean q)
@@ -36,7 +40,10 @@ public class Hive
 
 	public void addHoney(double h)
 	{
-		this.honey = honey + h;
+		if (this.honey >= 1 && this.pollen >= 1)
+		{
+			this.honey = honey + h;
+		}
 	}
 
 	public void addBees(int b)
@@ -46,6 +53,9 @@ public class Hive
 
 	public void addPollen(double p)
 	{
-		this.pollen = pollen + p;
+		if (this.honey >= 1 && this.pollen >= 1)
+		{
+			this.pollen = pollen + p;
+		}
 	}
 }
