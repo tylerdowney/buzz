@@ -5,6 +5,8 @@ public class Hive
 	public boolean queen;
 	public double pollen;
 	public int age;
+	public int beeUpgrade;
+	public int queenUpgrade;
 
 	public Hive(boolean q)
 	{
@@ -34,6 +36,21 @@ public class Hive
 		return pollen;
 	}
 
+	public int getAge()
+	{
+		return age;
+	}
+
+	public int getBeeUpgrade()
+	{
+		return beeUpgrade;
+	}
+
+	public int getQueenUpgrade()
+	{
+		return queenUpgrade;
+	}
+
 	public void addHoney(double h)
 	{
 		if (this.honey >= 1 && this.pollen >= 1)
@@ -55,6 +72,16 @@ public class Hive
 		}
 	}
 
+	public void addBeeUpgrade()
+	{
+		this.beeUpgrade = this.beeUpgrade + 1;
+	}
+
+	public void addQueenUpgrade()
+	{
+		this.queenUpgrade = this.queenUpgrade + 1;
+	}
+
 	public void setHoney(double h)
 	{
 		this.honey = h;
@@ -69,4 +96,14 @@ public class Hive
 	{
 		this.bees = b;
 	}
+
+	public void setBeeUpgrade(int bu)
+	{
+		this.beeUpgrade = bu;
+	}
+
+	public void setQueenUpgrade(int qu)
+	{
+		this.queenUpgrade = qu;
+	}	
 }

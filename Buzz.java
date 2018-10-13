@@ -26,8 +26,6 @@ public class Buzz
 		int deployBees;
 		int sell;
 		char upgrade;
-		int beeUpgrade = 1;
-		int queenUpgrade = 1;
 		double valueUpgrade = 1;
 		char load;
 		long oldtime;
@@ -40,6 +38,8 @@ public class Buzz
 		Scanner in = new Scanner(System.in);
 		String name = "";
 		Hive ronHive = new Hive(true);
+		ronHive.setBeeUpgrade(1);
+		ronHive.setQueenUpgrade(1);
 
 		// Enter username and explanation. Load game or new game options
 
@@ -58,15 +58,15 @@ public class Buzz
 				ronHive.setPollen(sc.nextDouble());
 				ronHive.setBees(sc.nextInt());
 				money = sc.nextDouble();
-				beeUpgrade = sc.nextInt();
-				queenUpgrade = sc.nextInt();
+				ronHive.setBeeUpgrade(sc.nextInt());
+				ronHive.setQueenUpgrade(sc.nextInt());
 				oldtime = sc.nextLong();
 				newtime = new Date();
 				offgametime = (newtime.getTime()/1000 - oldtime);
 				int intoffgametime = (int) offgametime;
-				ronHive.setHoney(ronHive.getHoney() + (intoffgametime*1000/resourceTime) * beeUpgrade);
-				ronHive.setPollen(ronHive.getPollen() + (intoffgametime*1000/resourceTime) * beeUpgrade);
-				ronHive.setBees(ronHive.getBees() + (intoffgametime*1000/beeTime) * queenUpgrade);
+				ronHive.setHoney(ronHive.getHoney() + (intoffgametime*1000/resourceTime) * ronHive.getBeeUpgrade());
+				ronHive.setPollen(ronHive.getPollen() + (intoffgametime*1000/resourceTime) * ronHive.getBeeUpgrade());
+				ronHive.setBees(ronHive.getBees() + (intoffgametime*1000/beeTime) * ronHive.getQueenUpgrade());
 				sc.close();
 			}
 			catch (FileNotFoundException e)
@@ -99,8 +99,8 @@ public class Buzz
 
 		Timer resourceTimer = new Timer();
 		Timer beeTimer = new Timer();
-		startResourceTimer(ronHive, beeUpgrade, resourceTimer, resourceTime);
-		startBeeTimer(ronHive, queenUpgrade, beeTimer, beeTime);	
+		startResourceTimer(ronHive, resourceTimer, resourceTime);
+		startBeeTimer(ronHive, beeTimer, beeTime);	
 		
 		// Loop to determine and define actions
 
@@ -228,8 +228,8 @@ public class Buzz
 					else
 					{
 						money = money - 100;
-						beeUpgrade = beeUpgrade + 1;
-						System.out.println("Congratulations! Your bees can now carry " + beeUpgrade + " units of pollen and " + beeUpgrade + " mLs of honey each");
+						ronHive.addBeeUpgrade();
+						System.out.println("Congratulations! Your bees can now carry " + ronHive.getBeeUpgrade() + " units of pollen and " + ronHive.getBeeUpgrade() + " mLs of honey each");
 					}
 				}
 				if (upgrade == 'g')
@@ -241,8 +241,8 @@ public class Buzz
 					else
 					{
 						money = money - 100;
-						queenUpgrade = queenUpgrade + 1;
-						System.out.println("Congratulations! Your queen can now generate " + queenUpgrade + " bees from 1 unit of pollen and 1 mL of honey");
+						ronHive.addQueenUpgrade();
+						System.out.println("Congratulations! Your queen can now generate " + ronHive.getQueenUpgrade() + " bees from 1 unit of pollen and 1 mL of honey");
 					}
 				}
 				if (upgrade == 'v')
@@ -268,7 +268,7 @@ public class Buzz
 					beeTimer.purge();
 					resourceTimer.cancel();
 					resourceTimer.purge();
-					saveGame(name, ronHive.getHoney(), ronHive.getPollen(), ronHive.getBees(), money, beeUpgrade, queenUpgrade);
+					saveGame(name, ronHive.getHoney(), ronHive.getPollen(), ronHive.getBees(), money, ronHive.getBeeUpgrade(), ronHive.getQueenUpgrade());
 					break;
 
 				// If you enter a dumb variable, you get a dumb answer
@@ -290,14 +290,14 @@ public class Buzz
 
 	// Method to start timer for gradually increasing resources (every 5 seconds)
 
-	public static void startResourceTimer(Hive hive, int beeUpgrade, Timer timer, int time)
+	public static void startResourceTimer(Hive hive, Timer timer, int time)
 	{
 		TimerTask resourceTask = new TimerTask()
 		{
 			public void run()
 			{
-					hive.honey = hive.honey + beeUpgrade;
-					hive.pollen = hive.pollen + beeUpgrade;
+					hive.honey = hive.honey + hive.getBeeUpgrade();
+					hive.pollen = hive.pollen + hive.getBeeUpgrade();
 			}
 		};
 		timer.scheduleAtFixedRate(resourceTask, new Date(), time);
@@ -305,14 +305,14 @@ public class Buzz
 
 	// Method to start timer for gradually increasing bee quantities (every 18 seconds)
 
-	public static void startBeeTimer(Hive hive, int queenUpgrade, Timer timer, int time)
+	public static void startBeeTimer(Hive hive, Timer timer, int time)
 	{
 		TimerTask beeTask = new TimerTask()
 		{
 			public void run()
 			{
 				
-				hive.bees = hive.bees + queenUpgrade;
+				hive.bees = hive.bees + hive.getQueenUpgrade();
 				hive.honey = hive.honey - 1;
 				hive.pollen = hive.pollen - 1;
 			}
