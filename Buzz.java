@@ -24,6 +24,7 @@ public class Buzz
 		Date newtime;
 		long offgametime;
 		int hiveCounter = 1;
+		int frameCounter = 1;
 		int resourceTime = 5000;
 		int beeTime = 18000;
 		Random rand = new Random();
@@ -32,7 +33,8 @@ public class Buzz
 		Hive[] hives = new Hive[1000];
 		hives[0] = new Hive(hiveCounter);
 		Frame[] frames = new Frame[framesPerHive * hives.length];
-		frames[0] = new Frame(true, hives[0].getHid());
+		frames[0] = new Frame(true, hives[0].getHid(), frameCounter);
+		frames[0].setFid(frameCounter);
 		Scanner in = new Scanner(System.in);
 		String name = "";
 
@@ -63,7 +65,7 @@ public class Buzz
 				int intoffgametime = (int) offgametime;
 				frames[0].setHoney(frames[0].getHoney() + (intoffgametime*1000/resourceTime) * frames[0].getBeeUpgrade());
 				frames[0].setPollen(frames[0].getPollen() + (intoffgametime*1000/resourceTime) * frames[0].getBeeUpgrade());
-				frames[0].setBees(frames[0].getBees() + (intoffgametime*1000/beeTime) * frames[0].getQueenUpgrade());
+				frames[0].setBees(frames[0].getBees() + (intoffgametime *1000/beeTime) * frames[0].getQueenUpgrade());
 				sc.close();
 			}
 			catch (FileNotFoundException e)
@@ -96,8 +98,8 @@ public class Buzz
 
 		Timer resourceTimer = new Timer();
 		Timer beeTimer = new Timer();
-		startResourceTimer(frames[0], resourceTimer, resourceTime);
-		startBeeTimer(frames[0], beeTimer, beeTime);	
+		startResourceTimer(frames, resourceTimer, resourceTime, frameCounter);
+		startBeeTimer(frames, beeTimer, beeTime, frameCounter);	
 		
 		// Loop to determine and define actions
 
@@ -262,14 +264,17 @@ public class Buzz
 				System.out.println("Which frame will you split?");
 				try
 				{
-					String frSplit = in.nextLine();
+					int frSplit = in.nextInt();
+					int val = 0;
+					splitHive(frames, hives, frSplit, frameCounter, hiveCounter);
+					hiveCounter++;
+					frames[val].setHid(hiveCounter);
 				}
 				catch (InputMismatchException e)
 				{
 					System.out.println("Invalid entry");
 				}
-				//System.out.println("
-				
+				break;
 				// Quit case: Saves and Quits game
 
 				case 'q' :
@@ -287,27 +292,31 @@ public class Buzz
 					System.out.println("Invalid entry");
 					break;
 			}
-			if (frames[0].getBees() <= 0 )
+
+			// Game Over screen. Possibly deprecated?
+			/*if (frames[0].getBees() <= 0 )
 			{
 				// All your bees are dead. Game over
 
 				System.out.println("All your bees have died. Your queen has died of loneliness. Game Over\n");
 				System.out.println("You finished with " + frames[0].getHoney() + " ml of honey and " + frames[0].getPollen() + " units of pollen");
-				endflag = 1;
-			}
+				endflag = 1;*/
 		}	
 	}
 
 	// Method to start timer for gradually increasing resources (every 5 seconds)
 
-	public static void startResourceTimer(Frame frame, Timer timer, int time)
+	public static void startResourceTimer(Frame[] frame, Timer timer, int time, int fcount)
 	{
 		TimerTask resourceTask = new TimerTask()
 		{
 			public void run()
 			{
-					frame.honey = frame.honey + frame.getBeeUpgrade();
-					frame.pollen = frame.pollen + frame.getBeeUpgrade();
+				for (int i = 0; i <= fcount; i++)
+				{
+					frame[i].honey = frame[i].honey + frame[i].getBeeUpgrade();
+					frame[i].pollen = frame[i].pollen + frame[i].getBeeUpgrade();
+				}
 			}
 		};
 		timer.scheduleAtFixedRate(resourceTask, new Date(), time);
@@ -315,16 +324,18 @@ public class Buzz
 
 	// Method to start timer for gradually increasing bee quantities (every 18 seconds)
 
-	public static void startBeeTimer(Frame frame, Timer timer, int time)
+	public static void startBeeTimer(Frame[] frame, Timer timer, int time, int fcount)
 	{
 		TimerTask beeTask = new TimerTask()
 		{
 			public void run()
 			{
-				
-				frame.bees = frame.bees + frame.getQueenUpgrade();
-				frame.honey = frame.honey - 1;
-				frame.pollen = frame.pollen - 1;
+				for (int i = 0; i <= fcount; i++)
+				{ 
+					frame[i].bees = frame[i].bees + frame[i].getQueenUpgrade();
+					frame[i].honey = frame[i].honey - 1;
+					frame[i].pollen = frame[i].pollen - 1;
+				}
 			}
 		};	
 		timer.scheduleAtFixedRate(beeTask, new Date(), time);
@@ -332,16 +343,21 @@ public class Buzz
 
 	// Method to create a new hive by splitting an old one
 
-	/*public static void splitHive(int numframes, int hiveId, int frameId)	
+	public static int splitHive(Frame[] fr, Hive[] hv, int fsplit, int fCounter, int hCounter)	
 	{
-		Hive[hiveCounter] = new Hive(hiveCounter + 1)
-		hiveCounter = hiveCounter + 1;
-		for (int i = 1; i <= numframes; i++)
+		hv[hCounter] = new Hive(hCounter + 1);
+		int tempframe;
+		int val = 0;
+		for (int i = 0; i <= fCounter; i++)
 		{
-			int tempframe;
-			System.out.println("Which frame do you want to move?")
-			tempframe = in.nextInt();*/
-			
+			if (fsplit == fr[i].getFid())
+			{
+				val = fr[i].getFid();
+				break;
+			}
+		}
+		return val;
+	}
 
 	// Method to save game variables to file for future load
 

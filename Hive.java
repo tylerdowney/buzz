@@ -19,6 +19,11 @@ public class Hive
 		return id;
 	}
 
+	public void setHid(int hid)
+	{
+		this.id = hid;
+	}
+
 	public void addFrames()
 	{
 		if (this.frames < 10)
