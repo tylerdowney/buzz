@@ -1,22 +1,14 @@
 // Importing required packages for specialized actions
 
 import java.io.*;
-import java.util.Scanner;
-import java.util.Random;
-import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.io.PrintWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
+import java.util.*;
 
 public class Buzz
 {
 	public static void main(String[] args)
 	{
 
-		// Initialize flag to end game, action variable, money variable, sales variable, bee variables, upgrade variables, load flag, gametime variables, off game time variable, resource/bee acquisition delays, random variable, terminal scanner object, username variable, and the all-important Hive object
+		// Initialize flag to end game, action variable, money variable, sales variable, bee variables, upgrade variables, load flag, gametime variables, off game time variable, resource/bee acquisition delays, random variable, terminal scanner object, username variable,Frame object
 
 		int endflag = 0;
 		char action;
@@ -31,15 +23,18 @@ public class Buzz
 		long oldtime;
 		Date newtime;
 		long offgametime;
+		int hiveCounter = 1;
 		int resourceTime = 5000;
 		int beeTime = 18000;
 		Random rand = new Random();
 		int n;
+		int framesPerHive = 10;
+		Hive[] hives = new Hive[1000];
+		hives[0] = new Hive(hiveCounter);
+		Frame[] frames = new Frame[framesPerHive * hives.length];
+		frames[0] = new Frame(true, hives[0].getHid());
 		Scanner in = new Scanner(System.in);
 		String name = "";
-		Hive ronHive = new Hive(true);
-		ronHive.setBeeUpgrade(1);
-		ronHive.setQueenUpgrade(1);
 
 		// Enter username and explanation. Load game or new game options
 
@@ -54,19 +49,21 @@ public class Buzz
 
 				Scanner sc = new Scanner(inFile);
 				name = sc.next();
-				ronHive.setHoney(sc.nextDouble());
-				ronHive.setPollen(sc.nextDouble());
-				ronHive.setBees(sc.nextInt());
+				frames[0].setBeeUpgrade(1);
+				frames[0].setQueenUpgrade(1);
+				frames[0].setHoney(sc.nextDouble());
+				frames[0].setPollen(sc.nextDouble());
+				frames[0].setBees(sc.nextInt());
 				money = sc.nextDouble();
-				ronHive.setBeeUpgrade(sc.nextInt());
-				ronHive.setQueenUpgrade(sc.nextInt());
+				frames[0].setBeeUpgrade(sc.nextInt());
+				frames[0].setQueenUpgrade(sc.nextInt());
 				oldtime = sc.nextLong();
 				newtime = new Date();
 				offgametime = (newtime.getTime()/1000 - oldtime);
 				int intoffgametime = (int) offgametime;
-				ronHive.setHoney(ronHive.getHoney() + (intoffgametime*1000/resourceTime) * ronHive.getBeeUpgrade());
-				ronHive.setPollen(ronHive.getPollen() + (intoffgametime*1000/resourceTime) * ronHive.getBeeUpgrade());
-				ronHive.setBees(ronHive.getBees() + (intoffgametime*1000/beeTime) * ronHive.getQueenUpgrade());
+				frames[0].setHoney(frames[0].getHoney() + (intoffgametime*1000/resourceTime) * frames[0].getBeeUpgrade());
+				frames[0].setPollen(frames[0].getPollen() + (intoffgametime*1000/resourceTime) * frames[0].getBeeUpgrade());
+				frames[0].setBees(frames[0].getBees() + (intoffgametime*1000/beeTime) * frames[0].getQueenUpgrade());
 				sc.close();
 			}
 			catch (FileNotFoundException e)
@@ -84,11 +81,11 @@ public class Buzz
 			name = in.nextLine();
 			System.out.println("Welcome " + name + "! Let's get started. You will begin with a queen, 1 bee, and some pollen and honey. Collect pollen and honey to make more bees, and sell the honey for money to buy upgrades.\n");
 
-			// Initialize hive resources (bees, honey, pollen)
+			//Initialize frame resources (bees, honey, pollen)
 
-			ronHive.addBees(1);
-			ronHive.addHoney(5);
-			ronHive.addPollen(5);
+			frames[0].addBees(1);
+			frames[0].addHoney(5);
+			frames[0].addPollen(5);
 		}
 		else
 		{
@@ -99,8 +96,8 @@ public class Buzz
 
 		Timer resourceTimer = new Timer();
 		Timer beeTimer = new Timer();
-		startResourceTimer(ronHive, resourceTimer, resourceTime);
-		startBeeTimer(ronHive, beeTimer, beeTime);	
+		startResourceTimer(frames[0], resourceTimer, resourceTime);
+		startBeeTimer(frames[0], beeTimer, beeTime);	
 		
 		// Loop to determine and define actions
 
@@ -113,6 +110,7 @@ public class Buzz
 			//System.out.println("Make Bees (m)");DEPRECATED
 			System.out.println("Sell (s)");
 			System.out.println("Upgrade (u)");
+			System.out.println("Split (p)");
 			System.out.println("Save and Quit (q)");
 
 			action = in.next().charAt(0);
@@ -122,7 +120,7 @@ public class Buzz
 				// Inspect case:  Reveal your current honey, pollen, bee, and money quantities
 
 				case 'i' :
-					System.out.println(name + "'s hive has " + ronHive.getHoney() + " mL of honey, " + ronHive.getPollen() + " units of pollen, " + ronHive.getBees() + " bees, and $" + money);
+					System.out.println(name + "'s hive has " + frames[0].getHoney() + " mL of honey, " + frames[0].getPollen() + " units of pollen, " + frames[0].getBees() + " bees, and $" + money);
 					break;
 				// Deploy case: Send bees out to collect honey and pollen. 1 bee = 1 mL honey and 1 unit pollen. Bees can be killed by predators (need to work on probabilistic model). DEPRECATED
 				/*case 'd' :
@@ -171,11 +169,11 @@ public class Buzz
 				{
 					System.out.println("How many bees would you like to sell?");
 					sell = in.nextInt();
-					if (sell <= ronHive.getBees())
+					if (sell <= frames[0].getBees())
 					{
 						System.out.println("At $" + 2.50 * valueUpgrade + " per bee, that comes to $" + 2.50 * valueUpgrade * sell + ". Thank you!");
 						money = money + 2.50 * valueUpgrade * sell;
-						ronHive.addBees(-sell);
+						frames[0].addBees(-sell);
 					}
 					else
 					{
@@ -186,11 +184,11 @@ public class Buzz
 				{
 					System.out.println("How much honey would you like to sell?");
 					sell = in.nextInt();
-					if (sell <= ronHive.getHoney())
+					if (sell <= frames[0].getHoney())
 					{
 						System.out.println("At $" + 1.50 * valueUpgrade + " per mL of Honey, that comes to $" +1.50 * valueUpgrade *sell + ". Thank you!");
 						money = money + 1.50 * valueUpgrade * sell;
-						ronHive.addHoney(-sell);
+						frames[0].addHoney(-sell);
 					}
 					else
 					{
@@ -201,11 +199,11 @@ public class Buzz
 				{
 					System.out.println("How much pollen would you like to sell?");
 					sell = in.nextInt();
-					if (sell <= ronHive.getPollen())
+					if (sell <= frames[0].getPollen())
 					{
 						System.out.println("At $" + 1.50 * valueUpgrade + " per unit of pollen, that comes to $" + 1.50 * valueUpgrade * sell + ". Thank you!");
 						money = money + 1.50 * valueUpgrade * sell;
-						ronHive.addPollen(-sell);
+						frames[0].addPollen(-sell);
 					}
 					else
 					{
@@ -228,8 +226,8 @@ public class Buzz
 					else
 					{
 						money = money - 100;
-						ronHive.addBeeUpgrade();
-						System.out.println("Congratulations! Your bees can now carry " + ronHive.getBeeUpgrade() + " units of pollen and " + ronHive.getBeeUpgrade() + " mLs of honey each");
+						frames[0].addBeeUpgrade();
+						System.out.println("Congratulations! Your bees can now carry " + frames[0].getBeeUpgrade() + " units of pollen and " + frames[0].getBeeUpgrade() + " mLs of honey each");
 					}
 				}
 				if (upgrade == 'g')
@@ -241,8 +239,8 @@ public class Buzz
 					else
 					{
 						money = money - 100;
-						ronHive.addQueenUpgrade();
-						System.out.println("Congratulations! Your queen can now generate " + ronHive.getQueenUpgrade() + " bees from 1 unit of pollen and 1 mL of honey");
+						frames[0].addQueenUpgrade();
+						System.out.println("Congratulations! Your queen can now generate " + frames[0].getQueenUpgrade() + " bees from 1 unit of pollen and 1 mL of honey");
 					}
 				}
 				if (upgrade == 'v')
@@ -259,7 +257,19 @@ public class Buzz
 					}
 				}					
 					break;
-
+				// Split case: Move resources to new Frame
+				case 'p' :
+				System.out.println("Which frame will you split?");
+				try
+				{
+					String frSplit = in.nextLine();
+				}
+				catch (InputMismatchException e)
+				{
+					System.out.println("Invalid entry");
+				}
+				//System.out.println("
+				
 				// Quit case: Saves and Quits game
 
 				case 'q' :
@@ -268,7 +278,7 @@ public class Buzz
 					beeTimer.purge();
 					resourceTimer.cancel();
 					resourceTimer.purge();
-					saveGame(name, ronHive.getHoney(), ronHive.getPollen(), ronHive.getBees(), money, ronHive.getBeeUpgrade(), ronHive.getQueenUpgrade());
+					saveGame(name, frames[0].getHoney(), frames[0].getPollen(), frames[0].getBees(), money, frames[0].getBeeUpgrade(), frames[0].getQueenUpgrade());
 					break;
 
 				// If you enter a dumb variable, you get a dumb answer
@@ -277,12 +287,12 @@ public class Buzz
 					System.out.println("Invalid entry");
 					break;
 			}
-			if (ronHive.getBees() <= 0 )
+			if (frames[0].getBees() <= 0 )
 			{
 				// All your bees are dead. Game over
 
 				System.out.println("All your bees have died. Your queen has died of loneliness. Game Over\n");
-				System.out.println("You finished with " + ronHive.getHoney() + " ml of honey and " + ronHive.getPollen() + " units of pollen");
+				System.out.println("You finished with " + frames[0].getHoney() + " ml of honey and " + frames[0].getPollen() + " units of pollen");
 				endflag = 1;
 			}
 		}	
@@ -290,14 +300,14 @@ public class Buzz
 
 	// Method to start timer for gradually increasing resources (every 5 seconds)
 
-	public static void startResourceTimer(Hive hive, Timer timer, int time)
+	public static void startResourceTimer(Frame frame, Timer timer, int time)
 	{
 		TimerTask resourceTask = new TimerTask()
 		{
 			public void run()
 			{
-					hive.honey = hive.honey + hive.getBeeUpgrade();
-					hive.pollen = hive.pollen + hive.getBeeUpgrade();
+					frame.honey = frame.honey + frame.getBeeUpgrade();
+					frame.pollen = frame.pollen + frame.getBeeUpgrade();
 			}
 		};
 		timer.scheduleAtFixedRate(resourceTask, new Date(), time);
@@ -305,20 +315,33 @@ public class Buzz
 
 	// Method to start timer for gradually increasing bee quantities (every 18 seconds)
 
-	public static void startBeeTimer(Hive hive, Timer timer, int time)
+	public static void startBeeTimer(Frame frame, Timer timer, int time)
 	{
 		TimerTask beeTask = new TimerTask()
 		{
 			public void run()
 			{
 				
-				hive.bees = hive.bees + hive.getQueenUpgrade();
-				hive.honey = hive.honey - 1;
-				hive.pollen = hive.pollen - 1;
+				frame.bees = frame.bees + frame.getQueenUpgrade();
+				frame.honey = frame.honey - 1;
+				frame.pollen = frame.pollen - 1;
 			}
 		};	
 		timer.scheduleAtFixedRate(beeTask, new Date(), time);
 	}
+
+	// Method to create a new hive by splitting an old one
+
+	/*public static void splitHive(int numframes, int hiveId, int frameId)	
+	{
+		Hive[hiveCounter] = new Hive(hiveCounter + 1)
+		hiveCounter = hiveCounter + 1;
+		for (int i = 1; i <= numframes; i++)
+		{
+			int tempframe;
+			System.out.println("Which frame do you want to move?")
+			tempframe = in.nextInt();*/
+			
 
 	// Method to save game variables to file for future load
 

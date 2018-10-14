@@ -1,109 +1,33 @@
 public class Hive
 {
-	public double honey;
-	public int bees;
-	public boolean queen;
-	public double pollen;
-	public int age;
-	public int beeUpgrade;
-	public int queenUpgrade;
+	public int frames;
+	public int id;
 
-	public Hive(boolean q)
+	public Hive(int n)
 	{
-		honey = 0;
-		bees = 0;
-		queen = q;
-		pollen = 0;
+		frames = 1;
+		id = n;
 	}
 
-	public double getHoney()
+	public int getFrames()
 	{
-		return honey;
+		return frames;
 	}
 
-	public int getBees()
+	public int getHid()
 	{
-		return bees;
+		return id;
 	}
 
-	public boolean isQueen()
+	public void addFrames()
 	{
-		return queen;
-	}
-
-	public double getPollen()
-	{
-		return pollen;
-	}
-
-	public int getAge()
-	{
-		return age;
-	}
-
-	public int getBeeUpgrade()
-	{
-		return beeUpgrade;
-	}
-
-	public int getQueenUpgrade()
-	{
-		return queenUpgrade;
-	}
-
-	public void addHoney(double h)
-	{
-		if (this.honey >= 1 && this.pollen >= 1)
+		if (this.frames < 10)
 		{
-			this.honey = honey + h;
+			this.frames = this.frames + 1;
+		}
+		else
+		{
+			System.out.println("Hive is full. Create a new hive");
 		}
 	}
-
-	public void addBees(int b)
-	{
-		this.bees = bees + b;
-	}
-
-	public void addPollen(double p)
-	{
-		if (this.honey >= 1 && this.pollen >= 1)
-		{
-			this.pollen = pollen + p;
-		}
-	}
-
-	public void addBeeUpgrade()
-	{
-		this.beeUpgrade = this.beeUpgrade + 1;
-	}
-
-	public void addQueenUpgrade()
-	{
-		this.queenUpgrade = this.queenUpgrade + 1;
-	}
-
-	public void setHoney(double h)
-	{
-		this.honey = h;
-	}
-
-	public void setPollen(double p)
-	{
-		this.pollen = p;
-	}
-
-	public void setBees(int b)
-	{
-		this.bees = b;
-	}
-
-	public void setBeeUpgrade(int bu)
-	{
-		this.beeUpgrade = bu;
-	}
-
-	public void setQueenUpgrade(int qu)
-	{
-		this.queenUpgrade = qu;
-	}	
 }
