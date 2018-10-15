@@ -2,6 +2,7 @@
 
 import java.io.*;
 import java.util.*;
+import java.lang.*;
 
 public class Buzz
 {
@@ -18,6 +19,9 @@ public class Buzz
 		int deployBees;
 		int sell;
 		char upgrade;
+		double cUpCost = 1000;
+		double gUpCost = 1000;
+		double vUpCost = 1000;
 		double valueUpgrade = 1;
 		char load;
 		long oldtime;
@@ -122,8 +126,36 @@ public class Buzz
 				// Inspect case:  Reveal your current honey, pollen, bee, and money quantities
 
 				case 'i' :
-					System.out.println(name + "'s hive has " + frames[0].getHoney() + " mL of honey, " + frames[0].getPollen() + " units of pollen, " + frames[0].getBees() + " bees, and $" + money);
+					Integer h;
+					Integer f;
+					for (int i = 0; i < hiveCounter; i++)
+					{
+						System.out.println(hives[i].getHid());
+					}
+					System.out.println("Which hive?");
+					h = in.nextInt();
+					if (h.equals(null) || h > hiveCounter || h <= 0)
+					{
+						System.out.println("Invalid selection");
+						break;
+					}
+					for (int i = 0; i < frameCounter; i++)
+					{
+						if (frames[i].getHid() == h)
+						{
+							System.out.println(frames[i].getFid());
+						}
+					}
+					System.out.println("Which frame?");
+					f = in.nextInt();
+					if (f.equals(null) || f > frameCounter || f <= 0)
+					{
+						System.out.println("Invalid selection");
+						break;
+					}
+					System.out.println(name + "'s hive has " + frames[f-1].getHoney() + " mL of honey, " + frames[f-1].getPollen() + " units of pollen, and " + frames[f-1].getBees() + " bees. You also have $" + money + " in total");
 					break;
+
 				// Deploy case: Send bees out to collect honey and pollen. 1 bee = 1 mL honey and 1 unit pollen. Bees can be killed by predators (need to work on probabilistic model). DEPRECATED
 				/*case 'd' :
 					System.out.println("How many bees do you want to deploy?");
@@ -214,46 +246,49 @@ public class Buzz
 				}
 				break;	
 
-				// Upgrade case: Can purchase upgrades to bee carrying capacity, queen fertility, and commodity value. +1 to capacity and fertility, *1.2 to value
+				// Upgrade case: Can purchase upgrades to bee carrying capacity, queen fertility, and commodity value. +1 to capacity and fertility, * 1.2 to value. Cost rises by factor of 1.5 
 
 				case 'u' :
-					System.out.println("Upgrades cost $100.00. Would you like to upgrade your bees carrying capacity (c), queens generating capacity (g), or commodity value (v)?");
+					System.out.println("Would you like to upgrade your bees carrying capacity (c) for $" + cUpCost + ", queens generating capacity (g) for $" + gUpCost + ", or commodity value (v) for $ " + vUpCost + "?");
 					upgrade = in.next().charAt(0);
 				if (upgrade == 'c')
 				{
-					if (money < 100)
+					if (money < cUpCost)
 					{
 						System.out.println("Not enough money");
 					}
 					else
 					{
-						money = money - 100;
+						money = money - cUpCost;
+						cUpCost = 1.5 * cUpCost;
 						frames[0].addBeeUpgrade();
 						System.out.println("Congratulations! Your bees can now carry " + frames[0].getBeeUpgrade() + " units of pollen and " + frames[0].getBeeUpgrade() + " mLs of honey each");
 					}
 				}
 				if (upgrade == 'g')
 				{
-					if (money < 100)
+					if (money < gUpCost)
 					{
 						System.out.println("Not enough money");
 					}
 					else
 					{
-						money = money - 100;
+						money = money - gUpCost;
+						gUpCost = 1.5 * gUpCost;
 						frames[0].addQueenUpgrade();
 						System.out.println("Congratulations! Your queen can now generate " + frames[0].getQueenUpgrade() + " bees from 1 unit of pollen and 1 mL of honey");
 					}
 				}
 				if (upgrade == 'v')
 				{
-					if (money < 100)
+					if (money < vUpCost)
 					{
 						System.out.println("Not enough money");
 					}
 					else
 					{
-						money = money - 100;
+						money = money - vUpCost;
+						vUpCost = 1.5 * vUpCost;
 						valueUpgrade = 1.2 * valueUpgrade;
 						System.out.println("Congratulations! Bees are now worth $" + 2.50 * valueUpgrade + " and 1 unit of pollen and 1 mL of honey are now worth $" + 1.50 * valueUpgrade);
 					}
