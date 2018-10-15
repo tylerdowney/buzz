@@ -57,8 +57,8 @@ public class Buzz
 
 				Scanner sc = new Scanner(inFile);
 				name = sc.next();
-				frameCounter = in.nextInt();
-				hiveCounter = in.nextInt();
+				frameCounter = sc.nextInt();
+				hiveCounter = sc.nextInt();
 				money = sc.nextDouble();
 				oldtime = sc.nextLong();
 				newtime = new Date();
@@ -125,6 +125,7 @@ public class Buzz
 			System.out.println("Sell (s)");
 			System.out.println("Upgrade (u)");
 			System.out.println("Split (p)");
+			System.out.println("Make new frame (f)");
 			System.out.println("Save and Quit (q)");
 
 			action = in.next().charAt(0);
@@ -343,6 +344,12 @@ public class Buzz
 					System.out.println("Invalid entry");
 				}
 				break;
+				// Make new frame
+				case 'f' :
+					frameCounter = makeNewFrame(hives, frames, hiveCounter, frameCounter);
+					startResourceTimer(frames, resourceTimer, resourceTime, frameCounter);
+					startBeeTimer(frames, beeTimer, beeTime, frameCounter);	
+					break;
 				// Quit case: Saves and Quits game
 
 				case 'q' :
@@ -354,7 +361,6 @@ public class Buzz
 					saveGame(frames, name, money, frameCounter, hiveCounter);
 
 					break;
-
 				// If you enter a dumb variable, you get a dumb answer
 
 				default: 
@@ -422,6 +428,37 @@ public class Buzz
 		return val;
 	}
 
+	public static int makeNewFrame(Hive[] hive, Frame[] fr, int hcount, int fcount)
+	{
+		Scanner in = new Scanner(System.in);
+		System.out.println("New frame in which hive?");
+		for (int i = 1; i <= hcount; i++)
+		{
+			System.out.println(hive[i-1].getHid());
+		}
+		int hid = in.nextInt();
+		if (hid > hcount)
+		{
+			System.out.println("Invalid selection");
+			return fcount;
+		}
+		if (hive[hid-1].frames >= 10)
+		{
+			System.out.println("Hive is full");
+			return fcount;
+		}
+		else
+		{
+			hive[hid-1].frames++;
+			fcount++;
+			fr[fcount-1] = new Frame(true, hid, fcount);
+			fr[fcount-1].setHoney(5);
+			fr[fcount-1].setPollen(5);
+			fr[fcount-1].setBees(1);
+			return fcount;
+		}
+	}
+
 	// Method to save game variables to file for future load
 
 	public static void saveGame(Frame[] fr, String name, double money, int fcount, int hcount)
@@ -443,8 +480,8 @@ public class Buzz
 				out.println(fr[i-1].bees);
 				out.println(fr[i-1].beeUpgrade);
 				out.println(fr[i-1].queenUpgrade);
-				out.close();
 			}
+			out.close();
 			System.out.println("Game saved");
 		}
 		catch (FileNotFoundException e)
