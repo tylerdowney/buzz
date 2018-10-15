@@ -27,6 +27,8 @@ public class Buzz
 		long oldtime;
 		Date newtime;
 		long offgametime;
+		int resourceOffset = 0;
+		int beeOffset = 0;
 		int hiveCounter = 1;
 		int frameCounter = 1;
 		int resourceTime = 5000;
@@ -55,19 +57,27 @@ public class Buzz
 
 				Scanner sc = new Scanner(inFile);
 				name = sc.next();
-				frames[0].setHoney(sc.nextDouble());
-				frames[0].setPollen(sc.nextDouble());
-				frames[0].setBees(sc.nextInt());
+				frameCounter = in.nextInt();
+				hiveCounter = in.nextInt();
 				money = sc.nextDouble();
-				frames[0].setBeeUpgrade(sc.nextInt());
-				frames[0].setQueenUpgrade(sc.nextInt());
 				oldtime = sc.nextLong();
 				newtime = new Date();
 				offgametime = (newtime.getTime()/1000 - oldtime);
 				int intoffgametime = (int) offgametime;
-				frames[0].setHoney(frames[0].getHoney() + (intoffgametime*1000/resourceTime) * frames[0].getBeeUpgrade());
-				frames[0].setPollen(frames[0].getPollen() + (intoffgametime*1000/resourceTime) * frames[0].getBeeUpgrade());
-				frames[0].setBees(frames[0].getBees() + (intoffgametime *1000/beeTime) * frames[0].getQueenUpgrade());
+				resourceOffset = intoffgametime*1000/resourceTime;
+				beeOffset = intoffgametime*1000/beeTime;
+
+				for (int i = 1; i <= frameCounter; i++)
+				{
+					frames[i-1].setHoney(sc.nextDouble());
+					frames[i-1].setPollen(sc.nextDouble());
+					frames[i-1].setBees(sc.nextInt());
+					frames[i-1].setBeeUpgrade(sc.nextInt());
+					frames[i-1].setQueenUpgrade(sc.nextInt());
+					frames[i-1].setHoney(frames[i-1].getHoney() + resourceOffset * frames[i-1].getBeeUpgrade());
+					frames[i-1].setPollen(frames[i-1].getPollen() + resourceOffset * frames[i-1].getBeeUpgrade());
+					frames[i-1].setBees(frames[i-1].getBees() + beeOffset * frames[i-1].getQueenUpgrade());
+				}
 				sc.close();
 			}
 			catch (FileNotFoundException e)
@@ -341,7 +351,8 @@ public class Buzz
 					beeTimer.purge();
 					resourceTimer.cancel();
 					resourceTimer.purge();
-					saveGame(name, frames[0].getHoney(), frames[0].getPollen(), frames[0].getBees(), money, frames[0].getBeeUpgrade(), frames[0].getQueenUpgrade());
+					saveGame(frames, name, money, frameCounter, hiveCounter);
+
 					break;
 
 				// If you enter a dumb variable, you get a dumb answer
@@ -372,7 +383,6 @@ public class Buzz
 			{
 					frame[fcount-1].honey = frame[fcount-1].honey + frame[fcount-1].getBeeUpgrade();
 					frame[fcount-1].pollen = frame[fcount-1].pollen + frame[fcount-1].getBeeUpgrade();
-			System.out.println(frame[fcount-1].getBeeUpgrade());
 			}
 		};
 		timer.scheduleAtFixedRate(resourceTask, new Date(), time);
@@ -414,7 +424,7 @@ public class Buzz
 
 	// Method to save game variables to file for future load
 
-	public static void saveGame(String name, double honey, double pollen, int bees, double money, int bUpgrade, int qUpgrade)
+	public static void saveGame(Frame[] fr, String name, double money, int fcount, int hcount)
 	{
 		File outFile = new File("/home/tyler/Documents/Java Code/Buzz/savefile.txt");
 		Date currentDate = new Date(); 
@@ -422,14 +432,19 @@ public class Buzz
 		{
 			PrintWriter out = new PrintWriter(outFile);
 			out.println(name);
-			out.println(honey);
-			out.println(pollen);
-			out.println(bees);
+			out.println(fcount);
+			out.println(hcount);
 			out.println(money);
-			out.println(bUpgrade);
-			out.println(qUpgrade);
 			out.println(currentDate.getTime()/1000);
-			out.close();
+		for (int i = 1; i <= fcount; i++)
+			{
+				out.println(fr[i-1].honey);
+				out.println(fr[i-1].pollen);
+				out.println(fr[i-1].bees);
+				out.println(fr[i-1].beeUpgrade);
+				out.println(fr[i-1].queenUpgrade);
+				out.close();
+			}
 			System.out.println("Game saved");
 		}
 		catch (FileNotFoundException e)
