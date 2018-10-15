@@ -123,7 +123,7 @@ public class Buzz
 			switch (action)
 			{
 
-				// Inspect case:  Reveal your current honey, pollen, bee, and money quantities
+				// Inspect case:  Select a hive and frame, and reveal their current honey, pollen, and bee quantities. Also reveals money.
 
 				case 'i' :
 					Integer h;
@@ -153,7 +153,7 @@ public class Buzz
 						System.out.println("Invalid selection");
 						break;
 					}
-					System.out.println(name + "'s hive has " + frames[f-1].getHoney() + " mL of honey, " + frames[f-1].getPollen() + " units of pollen, and " + frames[f-1].getBees() + " bees. You also have $" + money + " in total");
+					System.out.println("Hive " + h + ", Frame " + f + " has " + frames[f-1].getHoney() + " mL of honey, " + frames[f-1].getPollen() + " units of pollen, and " + frames[f-1].getBees() + " bees. " + name + " also has $" + money + " in total");
 					break;
 
 				// Deploy case: Send bees out to collect honey and pollen. 1 bee = 1 mL honey and 1 unit pollen. Bees can be killed by predators (need to work on probabilistic model). DEPRECATED
@@ -197,51 +197,76 @@ public class Buzz
 				// Sell case: Sell bees, honey, and pollen. Amounts subject to change, but 1 bee = $2.50, while 1 pollen = 1 mL honey = $1.50 
 
 				case 's' :
+					for (int i = 0; i < hiveCounter; i++)
+					{
+						System.out.println(hives[i].getHid());
+					}
+					System.out.println("Sell from which hive?");
+					h = in.nextInt();
+					if (h.equals(null) || h > hiveCounter || h <= 0)
+					{
+						System.out.println("Invalid selection");
+						break;
+					}
+					for (int i = 0; i < frameCounter; i++)
+					{
+						if (frames[i].getHid() == h)
+						{
+							System.out.println(frames[i].getFid());
+						}
+					}
+					System.out.println("Sell from which frame?");
+					f = in.nextInt();
+					if (f.equals(null) || f > frameCounter || f <= 0)
+					{
+						System.out.println("Invalid selection");
+						break;
+					}
 					System.out.println("What would you like to sell? Bees (b), Honey (h), or Pollen (p)?");
 				sellVar = in.next().charAt(0);
 				if (sellVar == 'b')
 				{
 					System.out.println("How many bees would you like to sell?");
 					sell = in.nextInt();
-					if (sell <= frames[0].getBees())
+					if (sell <= frames[f-1].getBees())
 					{
 						System.out.println("At $" + 2.50 * valueUpgrade + " per bee, that comes to $" + 2.50 * valueUpgrade * sell + ". Thank you!");
 						money = money + 2.50 * valueUpgrade * sell;
-						frames[0].addBees(-sell);
+						frames[f-1].addBees(-sell);
 					}
 					else
 					{
-						System.out.println("Not enough bees to sell");
+						System.out.println("Not enough bees in this frame to sell");
 					}
 				}	
 				if (sellVar == 'h')
 				{
 					System.out.println("How much honey would you like to sell?");
 					sell = in.nextInt();
-					if (sell <= frames[0].getHoney())
+					if (sell <= frames[f-1].getHoney())
 					{
 						System.out.println("At $" + 1.50 * valueUpgrade + " per mL of Honey, that comes to $" +1.50 * valueUpgrade *sell + ". Thank you!");
 						money = money + 1.50 * valueUpgrade * sell;
-						frames[0].addHoney(-sell);
+						frames[f-1].addHoney(-sell);
 					}
 					else
 					{
-						System.out.println("Not enough honey to sell");
+						System.out.println("Not enough honey in this frame to sell");
 					}
 				}		
 				if (sellVar == 'p')
 				{
 					System.out.println("How much pollen would you like to sell?");
 					sell = in.nextInt();
-					if (sell <= frames[0].getPollen())
+					if (sell <= frames[f-1].getPollen())
 					{
 						System.out.println("At $" + 1.50 * valueUpgrade + " per unit of pollen, that comes to $" + 1.50 * valueUpgrade * sell + ". Thank you!");
 						money = money + 1.50 * valueUpgrade * sell;
-						frames[0].addPollen(-sell);
+						frames[f-1].addPollen(-sell);
 					}
 					else
 					{
-						System.out.println("Not enough pollen to sell");
+						System.out.println("Not enough pollen in this frame to sell");
 					}
 				}
 				break;	
