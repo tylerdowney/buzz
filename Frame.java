@@ -19,6 +19,8 @@ public class Frame
 		hiveId = hid;
 		frameId = fid;
 		age = 0;
+		queenUpgrade = 1;
+		beeUpgrade = 1;
 	}
 
 	public double getHoney()

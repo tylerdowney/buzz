@@ -55,8 +55,6 @@ public class Buzz
 
 				Scanner sc = new Scanner(inFile);
 				name = sc.next();
-				frames[0].setBeeUpgrade(1);
-				frames[0].setQueenUpgrade(1);
 				frames[0].setHoney(sc.nextDouble());
 				frames[0].setPollen(sc.nextDouble());
 				frames[0].setBees(sc.nextInt());
@@ -372,11 +370,9 @@ public class Buzz
 		{
 			public void run()
 			{
-				for (int i = 0; i <= fcount; i++)
-				{
-					frame[i].honey = frame[i].honey + frame[i].getBeeUpgrade();
-					frame[i].pollen = frame[i].pollen + frame[i].getBeeUpgrade();
-				}
+					frame[fcount-1].honey = frame[fcount-1].honey + frame[fcount-1].getBeeUpgrade();
+					frame[fcount-1].pollen = frame[fcount-1].pollen + frame[fcount-1].getBeeUpgrade();
+			System.out.println(frame[fcount-1].getBeeUpgrade());
 			}
 		};
 		timer.scheduleAtFixedRate(resourceTask, new Date(), time);
@@ -390,12 +386,9 @@ public class Buzz
 		{
 			public void run()
 			{
-				for (int i = 0; i <= fcount; i++)
-				{ 
-					frame[i].bees = frame[i].bees + frame[i].getQueenUpgrade();
-					frame[i].honey = frame[i].honey - 1;
-					frame[i].pollen = frame[i].pollen - 1;
-				}
+					frame[fcount-1].bees = frame[fcount-1].bees + frame[fcount-1].getQueenUpgrade();
+					frame[fcount-1].honey = frame[fcount-1].honey - 1;
+					frame[fcount-1].pollen = frame[fcount-1].pollen - 1;
 			}
 		};	
 		timer.scheduleAtFixedRate(beeTask, new Date(), time);
