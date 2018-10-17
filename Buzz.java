@@ -22,7 +22,7 @@ public class Buzz
 		double cUpCost = 1000;
 		double gUpCost = 1000;
 		double vUpCost = 1000;
-		double frameCost = 0;
+		double frameCost = 5000;
 		double valueUpgrade = 1;
 		char load;
 		long oldtime;
@@ -106,6 +106,7 @@ public class Buzz
 			//Initialize frame resources (bees, honey, pollen)
 
 			hives[0] = new Hive(hiveCounter);
+			hives[0].addFrames();
 			frames[0] = new Frame(true, hives[0].getHid(), hives[0].getFrames());
 
 			frames[0].addBees(1);
@@ -437,6 +438,16 @@ public class Buzz
 				break;
 				// Make new frame
 				case 'f' :
+				System.out.println("This will create a new frame in the same hive. It costs $10000 for the materials");
+				if (money < frameCost)
+				{
+					System.out.println("Not enough money");
+					break;
+				}
+				else
+				{
+					money = money - 2 * frameCost;
+				}
 					frameCounter = makeNewFrame(hives, frames, hiveCounter, frameCounter);
 					// Start new timers
 					startResourceTimer(frames, resourceTimer, resourceTime, frameCounter);
