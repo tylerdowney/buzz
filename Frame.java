@@ -1,14 +1,14 @@
 public class Frame
 {
-	public double honey;
-	public int bees;
-	public boolean queen;
-	public double pollen;
-	public int age;
-	public int beeUpgrade;
-	public int queenUpgrade;
-	public int hiveId;
-	public int frameId;
+	private double honey;
+	private int bees;
+	private boolean queen;
+	private double pollen;
+	private int age;
+	private int beeUpgrade;
+	private int queenUpgrade;
+	private int hiveId;
+	private int frameId;
 
 	public Frame(boolean q, int hid, int fid)
 	{

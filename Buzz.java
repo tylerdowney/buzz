@@ -22,6 +22,7 @@ public class Buzz
 		double cUpCost = 1000;
 		double gUpCost = 1000;
 		double vUpCost = 1000;
+		double frameCost = 0;
 		double valueUpgrade = 1;
 		char load;
 		long oldtime;
@@ -37,11 +38,10 @@ public class Buzz
 		int n;
 		int framesPerHive = 10;
 		Hive[] hives = new Hive[1000];
-		hives[0] = new Hive(hiveCounter);
 		Frame[] frames = new Frame[framesPerHive * hives.length];
-		frames[0] = new Frame(true, hives[0].getHid(), frameCounter);
-		frames[0].setFid(frameCounter);
 		Scanner in = new Scanner(System.in);
+		Timer resourceTimer = new Timer();
+		Timer beeTimer = new Timer();
 		String name = "";
 
 		// Enter username and explanation. Load game or new game options
@@ -67,17 +67,25 @@ public class Buzz
 				resourceOffset = intoffgametime*1000/resourceTime;
 				beeOffset = intoffgametime*1000/beeTime;
 
-				for (int i = 1; i <= frameCounter; i++)
+				for (int i = 1; i <= hiveCounter; i++)
 				{
-					frames[i-1].setHoney(sc.nextDouble());
-					frames[i-1].setPollen(sc.nextDouble());
-					frames[i-1].setBees(sc.nextInt());
-					frames[i-1].setBeeUpgrade(sc.nextInt());
-					frames[i-1].setQueenUpgrade(sc.nextInt());
-					frames[i-1].setHoney(frames[i-1].getHoney() + resourceOffset * frames[i-1].getBeeUpgrade());
-					frames[i-1].setPollen(frames[i-1].getPollen() + resourceOffset * frames[i-1].getBeeUpgrade());
-					frames[i-1].setBees(frames[i-1].getBees() + beeOffset * frames[i-1].getQueenUpgrade());
+					hives[i-1] = new Hive(i);
 				}
+					for (int j = 1; j <= frameCounter; j++)
+					{
+						int tempHid = -1;
+						tempHid = sc.nextInt();
+						frames[j-1] = new Frame(true, tempHid, hives[tempHid - 1].getFrames());
+						hives[tempHid - 1].addFrames();
+						frames[j-1].setHoney(sc.nextDouble());
+						frames[j-1].setPollen(sc.nextDouble());
+						frames[j-1].setBees(sc.nextInt());
+						frames[j-1].setBeeUpgrade(sc.nextInt());
+						frames[j-1].setQueenUpgrade(sc.nextInt());
+						frames[j-1].setHoney(frames[j-1].getHoney() + resourceOffset * frames[j-1].getBeeUpgrade());
+						frames[j-1].setPollen(frames[j-1].getPollen() + resourceOffset * frames[j-1].getBeeUpgrade());
+						frames[j-1].setBees(frames[j-1].getBees() + beeOffset * frames[j-1].getQueenUpgrade());	
+					}
 				sc.close();
 			}
 			catch (FileNotFoundException e)
@@ -97,6 +105,9 @@ public class Buzz
 
 			//Initialize frame resources (bees, honey, pollen)
 
+			hives[0] = new Hive(hiveCounter);
+			frames[0] = new Frame(true, hives[0].getHid(), hives[0].getFrames());
+
 			frames[0].addBees(1);
 			frames[0].addHoney(5);
 			frames[0].addPollen(5);
@@ -106,12 +117,10 @@ public class Buzz
 			System.out.println("Invalid entry");
 		}	
 
-		// Create timers for game
+			//Start game timers
 
-		Timer resourceTimer = new Timer();
-		Timer beeTimer = new Timer();
-		startResourceTimer(frames, resourceTimer, resourceTime, frameCounter);
-		startBeeTimer(frames, beeTimer, beeTime, frameCounter);	
+			startResourceTimer(frames, resourceTimer, resourceTime, frameCounter);
+			startBeeTimer(frames, beeTimer, beeTime, frameCounter);	
 		
 		// Loop to determine and define actions
 
@@ -137,9 +146,9 @@ public class Buzz
 				case 'i' :
 					Integer h;
 					Integer f;
-					for (int i = 0; i < hiveCounter; i++)
+					for (int i = 1; i <= hiveCounter; i++)
 					{
-						System.out.println(hives[i].getHid());
+						System.out.println("Hive " + hives[i-1].getHid());
 					}
 					System.out.println("Which hive?");
 					h = in.nextInt();
@@ -148,16 +157,16 @@ public class Buzz
 						System.out.println("Invalid selection");
 						break;
 					}
-					for (int i = 0; i < frameCounter; i++)
+					for (int i = 1; i <= frameCounter; i++)
 					{
-						if (frames[i].getHid() == h)
+						if (frames[i-1].getHid() == h)
 						{
-							System.out.println(frames[i].getFid());
+							System.out.println("Frame " + frames[i-1].getFid());
 						}
 					}
 					System.out.println("Which frame?");
 					f = in.nextInt();
-					if (f.equals(null) || f > frameCounter || f <= 0)
+					if (f.equals(null) || f > hives[h-1].getFrames() || f <= 0)
 					{
 						System.out.println("Invalid selection");
 						break;
@@ -221,7 +230,7 @@ public class Buzz
 					{
 						if (frames[i].getHid() == h)
 						{
-							System.out.println(frames[i].getFid());
+							System.out.println("Frame " + frames[i].getFid());
 						}
 					}
 					System.out.println("Sell from which frame?");
@@ -283,6 +292,32 @@ public class Buzz
 				// Upgrade case: Can purchase upgrades to bee carrying capacity, queen fertility, and commodity value. +1 to capacity and fertility, * 1.2 to value. Cost rises by factor of 1.5 
 
 				case 'u' :
+
+					for (int i = 0; i < hiveCounter; i++)
+					{
+						System.out.println("Hive " + hives[i].getHid());
+					}
+					System.out.println("Select a hive");
+					h = in.nextInt();
+					if (h.equals(null) || h > hiveCounter || h <= 0)
+					{
+						System.out.println("Invalid selection");
+						break;
+					}
+					for (int i = 0; i < frameCounter; i++)
+					{
+						if (frames[i].getHid() == h)
+						{
+							System.out.println("Frame " + frames[i].getFid());
+						}
+					}
+					System.out.println("Upgrade which frame?");
+					f = in.nextInt();
+					if (f.equals(null) || f > frameCounter || f <= 0)
+					{
+						System.out.println("Invalid selection");
+						break;
+					}
 					System.out.println("Would you like to upgrade your bees carrying capacity (c) for $" + cUpCost + ", queens generating capacity (g) for $" + gUpCost + ", or commodity value (v) for $ " + vUpCost + "?");
 					upgrade = in.next().charAt(0);
 				if (upgrade == 'c')
@@ -328,16 +363,62 @@ public class Buzz
 					}
 				}					
 					break;
-				// Split case: Move resources to new Frame
+				// Split case: Make a new hive by moving a frame
 				case 'p' :
-				System.out.println("Which frame will you split?");
+				System.out.println("This will move half the contents of a frame to a new frame and hive. It also costs $5000 for the materials");
+				if ( money < frameCost)
+				{
+					System.out.println("Not enough money");
+					break;
+				}
+				else
+				{
+					money = money - frameCost;
+				}
+				System.out.println("Choose a hive");
+				int hiSplit = -1;
+				for (int i = 1; i <= hiveCounter; i++)
+				{
+					System.out.println("Hive " + hives[i-1].getHid());
+				}
 				try
 				{
+					hiSplit = in.nextInt();
+					if (hiSplit > hiveCounter || hiSplit <= 0)
+					{
+						throw new InputMismatchException();
+					}
+					System.out.println("Which frame will you split?");
+					for (int i = 1; i <= hives[hiSplit-1].getFrames(); i++)
+					{
+						System.out.println("Frame " + i);
+					}
 					int frSplit = in.nextInt();
-					int val = 0;
-					splitHive(frames, hives, frSplit, frameCounter, hiveCounter);
-					hiveCounter++;
-					frames[val].setHid(hiveCounter);
+					int found = 0;
+					for (int i = 1; i <= frameCounter; i++)
+					{
+						if (frames[i-1].getHid() == hiSplit && frames[i-1].getFid() == frSplit)
+						{
+							hives[hiveCounter] = new Hive(hiveCounter + 1);
+							frames[frameCounter] = new Frame(true, hiveCounter + 1, hives[hiveCounter].getFrames());
+							hiveCounter++;
+							frameCounter++;
+							frames[i-1].setHoney(frames[i-1].getHoney()/2.0);
+							frames[i-1].setPollen(frames[i-1].getPollen()/2.0);
+							frames[i-1].setBees(frames[i-1].getBees()/2);
+							frames[frameCounter-1].setHoney(frames[i-1].getHoney());
+							frames[frameCounter-1].setPollen(frames[i-1].getPollen());
+							frames[frameCounter-1].setBees(frames[i-1].getBees());
+							startResourceTimer(frames, resourceTimer, resourceTime, frameCounter);
+							startBeeTimer(frames, beeTimer, beeTime, frameCounter);	
+							found = 1;
+						}
+					}
+					if (found != 1)
+					{
+						System.out.println("Could not find frame");
+						frameCounter--;
+					}
 				}
 				catch (InputMismatchException e)
 				{
@@ -347,6 +428,7 @@ public class Buzz
 				// Make new frame
 				case 'f' :
 					frameCounter = makeNewFrame(hives, frames, hiveCounter, frameCounter);
+					// Start new timers
 					startResourceTimer(frames, resourceTimer, resourceTime, frameCounter);
 					startBeeTimer(frames, beeTimer, beeTime, frameCounter);	
 					break;
@@ -387,8 +469,11 @@ public class Buzz
 		{
 			public void run()
 			{
-					frame[fcount-1].honey = frame[fcount-1].honey + frame[fcount-1].getBeeUpgrade();
-					frame[fcount-1].pollen = frame[fcount-1].pollen + frame[fcount-1].getBeeUpgrade();
+				for (int i = 1; i <= fcount; i++)
+				{
+					frame[i-1].setHoney(frame[i-1].getHoney() + frame[i-1].getBeeUpgrade());
+					frame[i-1].setPollen(frame[i-1].getPollen() + frame[i-1].getBeeUpgrade());
+				}
 			}
 		};
 		timer.scheduleAtFixedRate(resourceTask, new Date(), time);
@@ -402,30 +487,15 @@ public class Buzz
 		{
 			public void run()
 			{
-					frame[fcount-1].bees = frame[fcount-1].bees + frame[fcount-1].getQueenUpgrade();
-					frame[fcount-1].honey = frame[fcount-1].honey - 1;
-					frame[fcount-1].pollen = frame[fcount-1].pollen - 1;
+				for (int i = 1; i <= fcount; i++)
+				{
+					frame[i-1].setBees(frame[i-1].getBees() + frame[i-1].getQueenUpgrade());
+					frame[i-1].setHoney(frame[i-1].getHoney() - 1);
+					frame[i-1].setPollen(frame[i-1].getPollen() - 1);
+				}
 			}
 		};	
 		timer.scheduleAtFixedRate(beeTask, new Date(), time);
-	}
-
-	// Method to create a new hive by splitting an old one
-
-	public static int splitHive(Frame[] fr, Hive[] hv, int fsplit, int fCounter, int hCounter)	
-	{
-		hv[hCounter] = new Hive(hCounter + 1);
-		int tempframe;
-		int val = 0;
-		for (int i = 0; i <= fCounter; i++)
-		{
-			if (fsplit == fr[i].getFid())
-			{
-				val = fr[i].getFid();
-				break;
-			}
-		}
-		return val;
 	}
 
 	public static int makeNewFrame(Hive[] hive, Frame[] fr, int hcount, int fcount)
@@ -434,7 +504,7 @@ public class Buzz
 		System.out.println("New frame in which hive?");
 		for (int i = 1; i <= hcount; i++)
 		{
-			System.out.println(hive[i-1].getHid());
+			System.out.println("Hive " + hive[i-1].getHid());
 		}
 		int hid = in.nextInt();
 		if (hid > hcount)
@@ -442,19 +512,19 @@ public class Buzz
 			System.out.println("Invalid selection");
 			return fcount;
 		}
-		if (hive[hid-1].frames >= 10)
+		if (hive[hid-1].getFrames() >= 10)
 		{
 			System.out.println("Hive is full");
 			return fcount;
 		}
 		else
 		{
-			hive[hid-1].frames++;
-			fcount++;
-			fr[fcount-1] = new Frame(true, hid, fcount);
+			hive[hid-1].addFrames();
+			fr[fcount-1] = new Frame(true, hid, hive[hid-1].getFrames());
 			fr[fcount-1].setHoney(5);
 			fr[fcount-1].setPollen(5);
 			fr[fcount-1].setBees(1);
+			fcount++;
 			return fcount;
 		}
 	}
@@ -475,11 +545,12 @@ public class Buzz
 			out.println(currentDate.getTime()/1000);
 		for (int i = 1; i <= fcount; i++)
 			{
-				out.println(fr[i-1].honey);
-				out.println(fr[i-1].pollen);
-				out.println(fr[i-1].bees);
-				out.println(fr[i-1].beeUpgrade);
-				out.println(fr[i-1].queenUpgrade);
+				out.println(fr[i-1].getHid());
+				out.println(fr[i-1].getHoney());
+				out.println(fr[i-1].getPollen());
+				out.println(fr[i-1].getBees());
+				out.println(fr[i-1].getBeeUpgrade());
+				out.println(fr[i-1].getQueenUpgrade());
 			}
 			out.close();
 			System.out.println("Game saved");
