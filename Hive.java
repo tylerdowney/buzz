@@ -5,7 +5,7 @@ public class Hive
 
 	public Hive(int n)
 	{
-		frames = 1;
+		frames = 0;
 		id = n;
 	}
 

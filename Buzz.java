@@ -75,8 +75,8 @@ public class Buzz
 					{
 						int tempHid = -1;
 						tempHid = sc.nextInt();
-						frames[j-1] = new Frame(true, tempHid, hives[tempHid - 1].getFrames());
 						hives[tempHid - 1].addFrames();
+						frames[j-1] = new Frame(true, tempHid, hives[tempHid - 1].getFrames());
 						frames[j-1].setHoney(sc.nextDouble());
 						frames[j-1].setPollen(sc.nextDouble());
 						frames[j-1].setBees(sc.nextInt());
@@ -409,7 +409,8 @@ public class Buzz
 						if (frames[i-1].getHid() == hiSplit && frames[i-1].getFid() == frSplit)
 						{
 							hives[hiveCounter] = new Hive(hiveCounter + 1);
-							frames[frameCounter] = new Frame(true, hiveCounter + 1, hives[hiveCounter].getFrames());
+							hives[hiveCounter].addFrames();
+							frames[frameCounter] = new Frame(true, hives[hiveCounter].getHid(), hives[hiveCounter].getFrames());
 							hiveCounter++;
 							frameCounter++;
 							frames[i-1].setHoney(frames[i-1].getHoney()/2.0);
