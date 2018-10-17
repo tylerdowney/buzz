@@ -22,7 +22,7 @@ public class Buzz
 		double cUpCost = 1000;
 		double gUpCost = 1000;
 		double vUpCost = 1000;
-		double frameCost = 5000;
+		double frameCost = 500;
 		double valueUpgrade = 1;
 		char load;
 		long oldtime;
@@ -245,13 +245,13 @@ public class Buzz
 							sellVar = in.next().charAt(0);
 							if (sellVar == 'b')
 							{
-								System.out.println("How many bees would you like to sell?");
+								System.out.println("Hive " + frames[i-1].getHid() + ", Frame " + frames[i-1].getFid() + " has " + frames[i-1].getBees() + " bees. How many bees would you like to sell?");
 								sell = in.nextInt();
-								if (sell <= frames[f-1].getBees())
+								if (sell <= frames[i-1].getBees())
 								{
 									System.out.println("At $" + 2.50 * valueUpgrade + " per bee, that comes to $" + 2.50 * valueUpgrade * sell + ". Thank you!");
 									money = money + 2.50 * valueUpgrade * sell;
-									frames[f-1].addBees(-sell);
+									frames[i-1].addBees(-sell);
 								}
 								else
 								{
@@ -260,13 +260,13 @@ public class Buzz
 							}	
 							if (sellVar == 'h')
 							{
-								System.out.println("How much honey would you like to sell?");
+								System.out.println("Hive " + frames[i-1].getHid() + ", Frame " + frames[i-1].getFid() + " has " + frames[i-1].getHoney() + " mL of honey. How much honey would you like to sell?");
 								sell = in.nextInt();
-								if (sell <= frames[f-1].getHoney())
+								if (sell <= frames[i-1].getHoney())
 								{
 									System.out.println("At $" + 1.50 * valueUpgrade + " per mL of Honey, that comes to $" +1.50 * valueUpgrade *sell + ". Thank you!");
 									money = money + 1.50 * valueUpgrade * sell;
-									frames[f-1].addHoney(-sell);
+									frames[i-1].addHoney(-sell);
 								}
 								else
 								{
@@ -275,13 +275,13 @@ public class Buzz
 							}		
 							if (sellVar == 'p')
 							{
-								System.out.println("How much pollen would you like to sell?");
+								System.out.println("Hive " + frames[i-1].getHid() + ", Frame " + frames[i-1].getFid() + " has " + frames[i-1].getPollen() + ". units of pollen. How much pollen would you like to sell?");
 								sell = in.nextInt();
-								if (sell <= frames[f-1].getPollen())
+								if (sell <= frames[i-1].getPollen())
 								{
 									System.out.println("At $" + 1.50 * valueUpgrade + " per unit of pollen, that comes to $" + 1.50 * valueUpgrade * sell + ". Thank you!");
 									money = money + 1.50 * valueUpgrade * sell;
-									frames[f-1].addPollen(-sell);
+									frames[i-1].addPollen(-sell);
 								}
 								else
 								{
