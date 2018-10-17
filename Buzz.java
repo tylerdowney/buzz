@@ -117,10 +117,10 @@ public class Buzz
 			System.out.println("Invalid entry");
 		}	
 
-			//Start game timers
+		//Start game timers
 
-			startResourceTimer(frames, resourceTimer, resourceTime, frameCounter);
-			startBeeTimer(frames, beeTimer, beeTime, frameCounter);	
+		startResourceTimer(frames, resourceTimer, resourceTime, frameCounter);
+		startBeeTimer(frames, beeTimer, beeTime, frameCounter);	
 		
 		// Loop to determine and define actions
 
@@ -215,9 +215,9 @@ public class Buzz
 				// Sell case: Sell bees, honey, and pollen. Amounts subject to change, but 1 bee = $2.50, while 1 pollen = 1 mL honey = $1.50 
 
 				case 's' :
-					for (int i = 0; i < hiveCounter; i++)
+					for (int i = 1; i <= hiveCounter; i++)
 					{
-						System.out.println(hives[i].getHid());
+						System.out.println("Hive " + hives[i-1].getHid());
 					}
 					System.out.println("Sell from which hive?");
 					h = in.nextInt();
@@ -226,69 +226,71 @@ public class Buzz
 						System.out.println("Invalid selection");
 						break;
 					}
-					for (int i = 0; i < frameCounter; i++)
+					for (int j = 1; j <= hives[h-1].getFrames(); j++)
 					{
-						if (frames[i].getHid() == h)
-						{
-							System.out.println("Frame " + frames[i].getFid());
-						}
+						System.out.println("Frame " + j);
 					}
 					System.out.println("Sell from which frame?");
 					f = in.nextInt();
-					if (f.equals(null) || f > frameCounter || f <= 0)
+					if (f.equals(null) || f > hives[h-1].getFrames() || f <= 0)
 					{
 						System.out.println("Invalid selection");
-						break;
 					}
-					System.out.println("What would you like to sell? Bees (b), Honey (h), or Pollen (p)?");
-				sellVar = in.next().charAt(0);
-				if (sellVar == 'b')
-				{
-					System.out.println("How many bees would you like to sell?");
-					sell = in.nextInt();
-					if (sell <= frames[f-1].getBees())
+					for (int i = 1; i <= frameCounter; i++)
 					{
-						System.out.println("At $" + 2.50 * valueUpgrade + " per bee, that comes to $" + 2.50 * valueUpgrade * sell + ". Thank you!");
-						money = money + 2.50 * valueUpgrade * sell;
-						frames[f-1].addBees(-sell);
+						if (frames[i-1].getHid() == h && frames[i-1].getFid() == f)
+						{
+							System.out.println("What would you like to sell? Bees (b), Honey (h), or Pollen (p)?");
+							sellVar = in.next().charAt(0);
+							if (sellVar == 'b')
+							{
+								System.out.println("How many bees would you like to sell?");
+								sell = in.nextInt();
+								if (sell <= frames[f-1].getBees())
+								{
+									System.out.println("At $" + 2.50 * valueUpgrade + " per bee, that comes to $" + 2.50 * valueUpgrade * sell + ". Thank you!");
+									money = money + 2.50 * valueUpgrade * sell;
+									frames[f-1].addBees(-sell);
+								}
+								else
+								{
+									System.out.println("Not enough bees in this frame to sell");
+								}
+							}	
+							if (sellVar == 'h')
+							{
+								System.out.println("How much honey would you like to sell?");
+								sell = in.nextInt();
+								if (sell <= frames[f-1].getHoney())
+								{
+									System.out.println("At $" + 1.50 * valueUpgrade + " per mL of Honey, that comes to $" +1.50 * valueUpgrade *sell + ". Thank you!");
+									money = money + 1.50 * valueUpgrade * sell;
+									frames[f-1].addHoney(-sell);
+								}
+								else
+								{
+									System.out.println("Not enough honey in this frame to sell");
+								}
+							}		
+							if (sellVar == 'p')
+							{
+								System.out.println("How much pollen would you like to sell?");
+								sell = in.nextInt();
+								if (sell <= frames[f-1].getPollen())
+								{
+									System.out.println("At $" + 1.50 * valueUpgrade + " per unit of pollen, that comes to $" + 1.50 * valueUpgrade * sell + ". Thank you!");
+									money = money + 1.50 * valueUpgrade * sell;
+									frames[f-1].addPollen(-sell);
+								}
+								else
+								{
+									System.out.println("Not enough pollen in this frame to sell");
+								}
+							}
+							break;
+						}
 					}
-					else
-					{
-						System.out.println("Not enough bees in this frame to sell");
-					}
-				}	
-				if (sellVar == 'h')
-				{
-					System.out.println("How much honey would you like to sell?");
-					sell = in.nextInt();
-					if (sell <= frames[f-1].getHoney())
-					{
-						System.out.println("At $" + 1.50 * valueUpgrade + " per mL of Honey, that comes to $" +1.50 * valueUpgrade *sell + ". Thank you!");
-						money = money + 1.50 * valueUpgrade * sell;
-						frames[f-1].addHoney(-sell);
-					}
-					else
-					{
-						System.out.println("Not enough honey in this frame to sell");
-					}
-				}		
-				if (sellVar == 'p')
-				{
-					System.out.println("How much pollen would you like to sell?");
-					sell = in.nextInt();
-					if (sell <= frames[f-1].getPollen())
-					{
-						System.out.println("At $" + 1.50 * valueUpgrade + " per unit of pollen, that comes to $" + 1.50 * valueUpgrade * sell + ". Thank you!");
-						money = money + 1.50 * valueUpgrade * sell;
-						frames[f-1].addPollen(-sell);
-					}
-					else
-					{
-						System.out.println("Not enough pollen in this frame to sell");
-					}
-				}
-				break;	
-
+					break;
 				// Upgrade case: Can purchase upgrades to bee carrying capacity, queen fertility, and commodity value. +1 to capacity and fertility, * 1.2 to value. Cost rises by factor of 1.5 
 
 				case 'u' :
@@ -313,60 +315,67 @@ public class Buzz
 					}
 					System.out.println("Upgrade which frame?");
 					f = in.nextInt();
-					if (f.equals(null) || f > frameCounter || f <= 0)
+					if (f.equals(null) || f > hives[h-1].getFrames() || f <= 0)
 					{
 						System.out.println("Invalid selection");
 						break;
 					}
 					System.out.println("Would you like to upgrade your bees carrying capacity (c) for $" + cUpCost + ", queens generating capacity (g) for $" + gUpCost + ", or commodity value (v) for $ " + vUpCost + "?");
 					upgrade = in.next().charAt(0);
-				if (upgrade == 'c')
-				{
-					if (money < cUpCost)
+					for (int i = 1; i <= frameCounter; i++)
 					{
-						System.out.println("Not enough money");
-					}
-					else
-					{
-						money = money - cUpCost;
-						cUpCost = 1.5 * cUpCost;
-						frames[0].addBeeUpgrade();
-						System.out.println("Congratulations! Your bees can now carry " + frames[0].getBeeUpgrade() + " units of pollen and " + frames[0].getBeeUpgrade() + " mLs of honey each");
-					}
-				}
-				if (upgrade == 'g')
-				{
-					if (money < gUpCost)
-					{
-						System.out.println("Not enough money");
-					}
-					else
-					{
-						money = money - gUpCost;
-						gUpCost = 1.5 * gUpCost;
-						frames[0].addQueenUpgrade();
-						System.out.println("Congratulations! Your queen can now generate " + frames[0].getQueenUpgrade() + " bees from 1 unit of pollen and 1 mL of honey");
-					}
-				}
-				if (upgrade == 'v')
-				{
-					if (money < vUpCost)
-					{
-						System.out.println("Not enough money");
-					}
-					else
-					{
-						money = money - vUpCost;
-						vUpCost = 1.5 * vUpCost;
-						valueUpgrade = 1.2 * valueUpgrade;
-						System.out.println("Congratulations! Bees are now worth $" + 2.50 * valueUpgrade + " and 1 unit of pollen and 1 mL of honey are now worth $" + 1.50 * valueUpgrade);
-					}
-				}					
+						if (hives[i-1].getHid() == h && frames[i-1].getFid() == f)
+						{
+							if (upgrade == 'c')
+							{
+								if (money < cUpCost)
+								{
+									System.out.println("Not enough money");
+								}
+								else
+								{
+									money = money - cUpCost;
+									cUpCost = 1.5 * cUpCost;
+									frames[i-1].addBeeUpgrade();
+									System.out.println("Congratulations! Your bees can now carry " + frames[i-1].getBeeUpgrade() + " units of pollen and " + frames[i-1].getBeeUpgrade() + " mLs of honey each");
+								}
+							}
+							if (upgrade == 'g')
+							{
+								if (money < gUpCost)
+								{
+									System.out.println("Not enough money");
+								}
+								else
+								{
+									money = money - gUpCost;
+									gUpCost = 1.5 * gUpCost;
+									frames[i-1].addQueenUpgrade();
+									System.out.println("Congratulations! Your queen can now generate " + frames[i-1].getQueenUpgrade() + " bees from 1 unit of pollen and 1 mL of honey");
+								}
+							}
+							if (upgrade == 'v')
+							{
+								if (money < vUpCost)
+								{
+									System.out.println("Not enough money");
+								}
+								else
+								{
+									money = money - vUpCost;
+									vUpCost = 1.5 * vUpCost;
+									valueUpgrade = 1.2 * valueUpgrade;
+									System.out.println("Congratulations! Bees are now worth $" + 2.50 * valueUpgrade + " and 1 unit of pollen and 1 mL of honey are now worth $" + 1.50 * valueUpgrade);
+								}
+							}	
+							break;	
+						}
+					}		
 					break;
 				// Split case: Make a new hive by moving a frame
 				case 'p' :
 				System.out.println("This will move half the contents of a frame to a new frame and hive. It also costs $5000 for the materials");
-				if ( money < frameCost)
+				if (money < frameCost)
 				{
 					System.out.println("Not enough money");
 					break;
@@ -497,7 +506,6 @@ public class Buzz
 		};	
 		timer.scheduleAtFixedRate(beeTask, new Date(), time);
 	}
-
 	public static int makeNewFrame(Hive[] hive, Frame[] fr, int hcount, int fcount)
 	{
 		Scanner in = new Scanner(System.in);
@@ -520,10 +528,10 @@ public class Buzz
 		else
 		{
 			hive[hid-1].addFrames();
-			fr[fcount-1] = new Frame(true, hid, hive[hid-1].getFrames());
-			fr[fcount-1].setHoney(5);
-			fr[fcount-1].setPollen(5);
-			fr[fcount-1].setBees(1);
+			fr[fcount] = new Frame(true, hid, hive[hid-1].getFrames());
+			fr[fcount].setHoney(5);
+			fr[fcount].setPollen(5);
+			fr[fcount].setBees(1);
 			fcount++;
 			return fcount;
 		}
