@@ -3,6 +3,8 @@
 import java.io.*;
 import java.util.*;
 import java.lang.*;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 
 public class Buzz
 {
@@ -32,8 +34,8 @@ public class Buzz
 		int beeOffset = 0;
 		int hiveCounter = 1;
 		int frameCounter = 1;
-		int resourceTime = 5000;
-		int beeTime = 18000;
+		int resourceTime = 10000;
+		int beeTime = 24000;
 		Random rand = new Random();
 		int n;
 		int framesPerHive = 10;
@@ -50,10 +52,22 @@ public class Buzz
 		load = in.next().charAt(0);
 		if (load == 'y')
 		{
-			File inFile = new File("/home/tyler/Documents/Java Code/Buzz/savefile.txt");
 			try
 			{
 				// Load game variables from file; add in resource/bee amounts corresponding to elapsed time since last game
+				
+				//Create/run file selector
+				JFileChooser fileChooser = new JFileChooser();
+				fileChooser.setCurrentDirectory(new File(System.getProperty("/home/tyler/Documents/Java Code/Buzz")));
+				JFrame frame = new JFrame("FileSelect");
+				frame.setVisible(true);
+				int result = fileChooser.showOpenDialog(frame);
+				if (result == JFileChooser.APPROVE_OPTION)
+				{
+    				File inFile = fileChooser.getSelectedFile();
+    				System.out.println("Selected file: " + inFile.getAbsolutePath());
+				}
+				frame.setVisible(false);
 
 				Scanner sc = new Scanner(inFile);
 				name = sc.next();
@@ -553,7 +567,7 @@ public class Buzz
 
 	public static void saveGame(Frame[] fr, String name, double money, int fcount, int hcount)
 	{
-		File outFile = new File("/home/tyler/Documents/Java Code/Buzz/savefile.txt");
+		File outFile = new File("/home/tyler/Documents/Java Code/Buzz/" + name + ".txt");
 		Date currentDate = new Date(); 
 		try
 		{
