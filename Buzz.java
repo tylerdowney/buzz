@@ -11,14 +11,12 @@ public class Buzz
 	public static void main(String[] args)
 	{
 
-		// Initialize flag to end game, action variable, money variable, sales variable, bee variables, upgrade variables, load flag, gametime variables, off game time variable, resource/bee acquisition delays, random variable, terminal scanner object, username variable,Frame object
+		// Initialize flag to end game, action variable, money variable, sales variables, upgrade variables, load flag, gametime variables, off game time variable, resource/bee acquisition delays, hive and frame counters, resource/bee generation times, random variable, frames per hive, Hive and Frame object declarations, terminal scanner object, timer declarations, and username variable
 
 		int endflag = 0;
 		char action;
 		double money = 0;
 		char sellVar;
-		int newBees;
-		int deployBees;
 		int sell;
 		char upgrade;
 		double cUpCost = 1000;
@@ -46,28 +44,29 @@ public class Buzz
 		Timer beeTimer = new Timer();
 		String name = "";
 
-		// Enter username and explanation. Load game or new game options
+		//Load game or new game options
 
 		System.out.println("Would you like to load a saved game (y/n)?");
 		load = in.next().charAt(0);
 		if (load == 'y')
 		{
+			//Create/run file chooser
+			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+			JFrame frame = new JFrame("FileSelect");
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			frame.setVisible(true);
+			int result = fileChooser.showOpenDialog(frame);
+			File inFile = new File("");
+			if (result == JFileChooser.APPROVE_OPTION)
+			{
+    			inFile = fileChooser.getSelectedFile();
+    			System.out.println("Selected file: " + inFile.getAbsolutePath());
+			}
+			frame.setVisible(false);
 			try
 			{
 				// Load game variables from file; add in resource/bee amounts corresponding to elapsed time since last game
-				
-				//Create/run file selector
-				JFileChooser fileChooser = new JFileChooser();
-				fileChooser.setCurrentDirectory(new File(System.getProperty("/home/tyler/Documents/Java Code/Buzz")));
-				JFrame frame = new JFrame("FileSelect");
-				frame.setVisible(true);
-				int result = fileChooser.showOpenDialog(frame);
-				if (result == JFileChooser.APPROVE_OPTION)
-				{
-    				File inFile = fileChooser.getSelectedFile();
-    				System.out.println("Selected file: " + inFile.getAbsolutePath());
-				}
-				frame.setVisible(false);
 
 				Scanner sc = new Scanner(inFile);
 				name = sc.next();
@@ -117,7 +116,7 @@ public class Buzz
 			name = in.nextLine();
 			System.out.println("Welcome " + name + "! Let's get started. You will begin with a queen, 1 bee, and some pollen and honey. Collect pollen and honey to make more bees, and sell the honey for money to buy upgrades.\n");
 
-			//Initialize frame resources (bees, honey, pollen)
+			//Initialize Hive 1 Frame 1 resources (bees, honey, pollen)
 
 			hives[0] = new Hive(hiveCounter);
 			hives[0].addFrames();
@@ -227,7 +226,7 @@ public class Buzz
 					}
 					break;*/
 
-				// Sell case: Sell bees, honey, and pollen. Amounts subject to change, but 1 bee = $2.50, while 1 pollen = 1 mL honey = $1.50 
+				// Sell case: Sell bees, honey, and pollen.
 
 				case 's' :
 					for (int i = 1; i <= hiveCounter; i++)
@@ -306,6 +305,7 @@ public class Buzz
 						}
 					}
 					break;
+
 				// Upgrade case: Can purchase upgrades to bee carrying capacity, queen fertility, and commodity value. +1 to capacity and fertility, * 1.2 to value. Cost rises by factor of 1.5 
 
 				case 'u' :
@@ -387,7 +387,9 @@ public class Buzz
 						}
 					}		
 					break;
-				// Split case: Make a new hive by moving a frame
+
+				// Split case: Make a new hive by splitting a frame in half
+
 				case 'p' :
 				System.out.println("This will move half the contents of a frame to a new frame and hive. It also costs $5000 for the materials");
 				if (money < frameCost)
@@ -450,7 +452,9 @@ public class Buzz
 					System.out.println("Invalid entry");
 				}
 				break;
-				// Make new frame
+
+				// Make a new frame in the same hive
+
 				case 'f' :
 				System.out.println("This will create a new frame in the same hive. It costs $10000 for the materials");
 				if (money < frameCost)
@@ -467,6 +471,7 @@ public class Buzz
 					startResourceTimer(frames, resourceTimer, resourceTime, frameCounter);
 					startBeeTimer(frames, beeTimer, beeTime, frameCounter);	
 					break;
+
 				// Quit case: Saves and Quits game
 
 				case 'q' :
@@ -478,14 +483,15 @@ public class Buzz
 					saveGame(frames, name, money, frameCounter, hiveCounter);
 
 					break;
-				// If you enter a dumb variable, you get a dumb answer
+
+				// Bad variable handler
 
 				default: 
 					System.out.println("Invalid entry");
 					break;
 			}
 
-			// Game Over screen. Possibly deprecated?
+			// Game Over screen. DEPRECATED
 			/*if (frames[0].getBees() <= 0 )
 			{
 				// All your bees are dead. Game over
@@ -532,6 +538,8 @@ public class Buzz
 		};	
 		timer.scheduleAtFixedRate(beeTask, new Date(), time);
 	}
+
+	// Method to make a new frame in the same hive
 	public static int makeNewFrame(Hive[] hive, Frame[] fr, int hcount, int fcount)
 	{
 		Scanner in = new Scanner(System.in);
