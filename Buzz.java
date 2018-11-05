@@ -5,6 +5,7 @@ import java.util.*;
 import java.lang.*;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import java.awt.event.WindowEvent;
 
 public class Buzz
 {
@@ -33,15 +34,18 @@ public class Buzz
 		int hiveCounter = 1;
 		int frameCounter = 1;
 		int resourceTime = 10000;
-		int beeTime = 24000;
+		int consumeTime = 600000;
+		int broodTime = 5400000;
 		Random rand = new Random();
 		int n;
 		int framesPerHive = 10;
 		Hive[] hives = new Hive[1000];
 		Frame[] frames = new Frame[framesPerHive * hives.length];
 		Scanner in = new Scanner(System.in);
+		Date starttime = new Date();
+		WorldClock world = new WorldClock(starttime.getTime()/1000);
 		Timer resourceTimer = new Timer();
-		Timer beeTimer = new Timer();
+		Timer consumeTimer = new Timer();
 		String name = "";
 
 		//Load game or new game options
@@ -54,7 +58,7 @@ public class Buzz
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
 			JFrame frame = new JFrame("FileSelect");
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			frame.setVisible(true);
 			int result = fileChooser.showOpenDialog(frame);
 			File inFile = new File("");
@@ -63,7 +67,6 @@ public class Buzz
     			inFile = fileChooser.getSelectedFile();
     			System.out.println("Selected file: " + inFile.getAbsolutePath());
 			}
-			frame.setVisible(false);
 			try
 			{
 				// Load game variables from file; add in resource/bee amounts corresponding to elapsed time since last game
@@ -78,7 +81,7 @@ public class Buzz
 				offgametime = (newtime.getTime()/1000 - oldtime);
 				int intoffgametime = (int) offgametime;
 				resourceOffset = intoffgametime*1000/resourceTime;
-				beeOffset = intoffgametime*1000/beeTime;
+				beeOffset = intoffgametime*1000/consumeTime;
 
 				for (int i = 1; i <= hiveCounter; i++)
 				{
@@ -133,8 +136,8 @@ public class Buzz
 
 		//Start game timers
 
-		startResourceTimer(frames, resourceTimer, resourceTime, frameCounter);
-		startBeeTimer(frames, beeTimer, beeTime, frameCounter);	
+		world.startResourceTimer(frames, resourceTimer, resourceTime, frameCounter);
+		world.startConsumeTimer(frames, consumeTimer, consumeTime, frameCounter);	
 		
 		// Loop to determine and define actions
 
@@ -436,8 +439,8 @@ public class Buzz
 							frames[frameCounter-1].setHoney(frames[i-1].getHoney());
 							frames[frameCounter-1].setPollen(frames[i-1].getPollen());
 							frames[frameCounter-1].setBees(frames[i-1].getBees());
-							startResourceTimer(frames, resourceTimer, resourceTime, frameCounter);
-							startBeeTimer(frames, beeTimer, beeTime, frameCounter);	
+							world.startResourceTimer(frames, resourceTimer, resourceTime, frameCounter);
+							world.startConsumeTimer(frames, consumeTimer, consumeTime, frameCounter);	
 							found = 1;
 						}
 					}
@@ -468,20 +471,19 @@ public class Buzz
 				}
 					frameCounter = makeNewFrame(hives, frames, hiveCounter, frameCounter);
 					// Start new timers
-					startResourceTimer(frames, resourceTimer, resourceTime, frameCounter);
-					startBeeTimer(frames, beeTimer, beeTime, frameCounter);	
+					world.startResourceTimer(frames, resourceTimer, resourceTime, frameCounter);
+					world.startConsumeTimer(frames, consumeTimer, consumeTime, frameCounter);	
 					break;
 
 				// Quit case: Saves and Quits game
 
 				case 'q' :
 					endflag = 1;
-					beeTimer.cancel();
-					beeTimer.purge();
+					consumeTimer.cancel();
+					consumeTimer.purge();
 					resourceTimer.cancel();
 					resourceTimer.purge();
 					saveGame(frames, name, money, frameCounter, hiveCounter);
-
 					break;
 
 				// Bad variable handler
@@ -500,43 +502,6 @@ public class Buzz
 				System.out.println("You finished with " + frames[0].getHoney() + " ml of honey and " + frames[0].getPollen() + " units of pollen");
 				endflag = 1;*/
 		}	
-	}
-
-	// Method to start timer for gradually increasing resources (every 5 seconds)
-
-	public static void startResourceTimer(Frame[] frame, Timer timer, int time, int fcount)
-	{
-		TimerTask resourceTask = new TimerTask()
-		{
-			public void run()
-			{
-				for (int i = 1; i <= fcount; i++)
-				{
-					frame[i-1].setHoney(frame[i-1].getHoney() + frame[i-1].getBeeUpgrade());
-					frame[i-1].setPollen(frame[i-1].getPollen() + frame[i-1].getBeeUpgrade());
-				}
-			}
-		};
-		timer.scheduleAtFixedRate(resourceTask, new Date(), time);
-	}
-
-	// Method to start timer for gradually increasing bee quantities (every 18 seconds)
-
-	public static void startBeeTimer(Frame[] frame, Timer timer, int time, int fcount)
-	{
-		TimerTask beeTask = new TimerTask()
-		{
-			public void run()
-			{
-				for (int i = 1; i <= fcount; i++)
-				{
-					frame[i-1].setBees(frame[i-1].getBees() + frame[i-1].getQueenUpgrade());
-					frame[i-1].setHoney(frame[i-1].getHoney() - 1);
-					frame[i-1].setPollen(frame[i-1].getPollen() - 1);
-				}
-			}
-		};	
-		timer.scheduleAtFixedRate(beeTask, new Date(), time);
 	}
 
 	// Method to make a new frame in the same hive

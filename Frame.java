@@ -9,6 +9,7 @@ public class Frame
 	private int queenUpgrade;
 	private int hiveId;
 	private int frameId;
+	private int brood;
 
 	public Frame(boolean q, int hid, int fid)
 	{
@@ -21,6 +22,7 @@ public class Frame
 		age = 0;
 		queenUpgrade = 1;
 		beeUpgrade = 1;
+		brood = 0;
 	}
 
 	public double getHoney()
@@ -68,6 +70,11 @@ public class Frame
 		return queenUpgrade;
 	}
 
+	public int getBrood()
+	{
+		return brood;
+	}
+
 	public void addHoney(double h)
 	{
 		this.honey = honey + h;
@@ -91,6 +98,11 @@ public class Frame
 	public void addQueenUpgrade()
 	{
 		this.queenUpgrade = this.queenUpgrade + 1;
+	}
+
+	public void addBrood(int b)
+	{
+		this.brood = brood + b;
 	}
 
 	public void setHoney(double h)
@@ -126,5 +138,10 @@ public class Frame
 	public void setFid(int fid)
 	{
 		this.frameId = fid;
+	}
+
+	public void setBrood(int br)
+	{
+		this.brood = br;
 	}
 }
