@@ -18,7 +18,12 @@ public class WorldClock
 
 	public void setStartTime(long s)
 	{
-		starttime = s;
+		this.starttime = s;
+	}
+
+	public static void getAge(long t, String n)
+	{
+		System.out.println(n + "'s Beeverse is " + t/31536000 + " years, " + (t%31536000)/86400 + " days, " + (t%31536000%86400)/3600 + " hours, " + (t%31536000%86400%3600)/60 + " minutes, and " + t%31536000%86400%3600%60 + " seconds old");
 	}
 
 	// Method to start timer for gradually increasing bee quantities

@@ -1,7 +1,7 @@
 public class Hive
 {
 	private int frames;
-	 int id;
+	int id;
 
 	public Hive(int n)
 	{

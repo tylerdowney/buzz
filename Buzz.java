@@ -107,6 +107,7 @@ public class Buzz
 						frames[j-1].setBrood(sc.nextInt());
 						frames[j-1].setBeeUpgrade(sc.nextInt());
 						frames[j-1].setQueenUpgrade(sc.nextInt());
+						frames[j-1].setStartTime(sc.nextLong());
 						frames[j-1].setHoney(frames[j-1].getHoney() + resourceOffset * frames[j-1].getBeeUpgrade());
 						frames[j-1].setPollen(frames[j-1].getPollen() + resourceOffset * frames[j-1].getBeeUpgrade());
 						frames[j-1].setBees(frames[j-1].getBees() + beeOffset * 20 * frames[j-1].getQueenUpgrade());	
@@ -148,6 +149,7 @@ public class Buzz
 			hives[0].addFrames();
 			frames[0] = new Frame(true, hives[0].getHid(), hives[0].getFrames());
 
+			frames[0].setStartTime(begin);
 			frames[0].addBees(1);
 			frames[0].addHoney(5);
 			frames[0].addPollen(5);
@@ -169,6 +171,10 @@ public class Buzz
 		while (endflag != 1)
 		{
 
+			Date now = new Date();
+			worldAge = now.getTime()/1000L - world.getStartTime();
+			world.getAge(worldAge, name);
+
 			System.out.println("What do you want to do?\n");
 			System.out.println("Inspect (i)");
 			//System.out.println("Deploy Bees (d)");DEPRECATED
@@ -182,6 +188,7 @@ public class Buzz
 			action = in.next().charAt(0);
 			switch (action)
 			{
+
 
 				// Inspect case:  Select a hive and frame, and reveal their current honey, pollen, and bee quantities. Also reveals money.
 
@@ -214,9 +221,9 @@ public class Buzz
 						break;
 					}
 
-					Date now = new Date();
-					worldAge = now.getTime()/1000L - world.getStartTime();
-					System.out.println("Hive " + h + ", Frame " + f + " has " + frames[f-1].getHoney() + " mL of honey, " + frames[f-1].getPollen() + " units of pollen, " + frames[f-1].getBees() + " bees, and " + frames[f-1].getBrood() + " eggs. " + name + " also has $" + money + " in total. " + name + "'s Beeverse is " + worldAge/31536000 + " years, " + (worldAge%31536000)/86400 + " days, " + (worldAge%31536000%86400)/3600 + " hours, " + (worldAge%31536000%86400%3600)/60 + " minutes, and " + worldAge%31536000%86400%3600%60 + " seconds old");
+					long frameAge = now.getTime()/1000L - frames[f-1].getStartTime();
+					System.out.println("Hive " + h + ", Frame " + f + " has " + frames[f-1].getHoney() + " mL of honey, " + frames[f-1].getPollen() + " units of pollen, " + frames[f-1].getBees() + " bees, and " + frames[f-1].getBrood() + " eggs. " + name + " also has $" + money + " in total.");
+					frames[f-1].getAge(frameAge, name, h,f);
 					break;
 
 				// Deploy case: Send bees out to collect honey and pollen. 1 bee = 1 mL honey and 1 unit pollen. Bees can be killed by predators (need to work on probabilistic model). DEPRECATED
@@ -467,6 +474,8 @@ public class Buzz
 							frames[frameCounter-1].setHoney(frames[i-1].getHoney());
 							frames[frameCounter-1].setPollen(frames[i-1].getPollen());
 							frames[frameCounter-1].setBees(frames[i-1].getBees());
+							Date date = new Date();
+							frames[frameCounter-1].setStartTime(date.getTime()/1000L);
 							world.startResourceTimer(frames, resourceTimer, resourceTime, frameCounter);
 							world.startConsumeTimer(frames, consumeTimer, consumeTime, frameCounter);	
 							world.startBroodTimer(frames, broodTimer, broodTime, frameCounter);
@@ -560,6 +569,8 @@ public class Buzz
 		{
 			hive[hid-1].addFrames();
 			fr[fcount] = new Frame(true, hid, hive[hid-1].getFrames());
+			Date date = new Date();
+			fr[fcount].setStartTime(date.getTime()/1000L);
 			fr[fcount].setHoney(5);
 			fr[fcount].setPollen(5);
 			fr[fcount].setBees(1);
@@ -592,6 +603,7 @@ public class Buzz
 				out.println(fr[i-1].getBrood());
 				out.println(fr[i-1].getBeeUpgrade());
 				out.println(fr[i-1].getQueenUpgrade());
+				out.println(fr[i-1].getStartTime());
 			}
 			out.close();
 			System.out.println("Game saved");

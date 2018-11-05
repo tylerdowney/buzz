@@ -4,7 +4,7 @@ public class Frame
 	private int bees;
 	private boolean queen;
 	private double pollen;
-	private int age;
+	private long starttime;
 	private int beeUpgrade;
 	private int queenUpgrade;
 	private int hiveId;
@@ -19,7 +19,6 @@ public class Frame
 		pollen = 0;
 		hiveId = hid;
 		frameId = fid;
-		age = 0;
 		queenUpgrade = 1;
 		beeUpgrade = 1;
 		brood = 0;
@@ -45,9 +44,9 @@ public class Frame
 		return pollen;
 	}
 
-	public int getAge()
+	public long getStartTime()
 	{
-		return age;
+		return starttime;
 	}
 
 	public int getHid()
@@ -73,6 +72,11 @@ public class Frame
 	public int getBrood()
 	{
 		return brood;
+	}
+
+	public static void getAge(long t, String n, int hn, int fn)
+	{
+		System.out.println("Hive " + hn + ", Frame " + fn + " is " + t/31536000 + " years, " + (t%31536000)/86400 + " days, " + (t%31536000%86400)/3600 + " hours, " + (t%31536000%86400%3600)/60 + " minutes, and " + t%31536000%86400%3600%60 + " seconds old");
 	}
 
 	public void addHoney(double h)
@@ -143,5 +147,10 @@ public class Frame
 	public void setBrood(int br)
 	{
 		this.brood = br;
+	}
+
+	public void setStartTime(long s)
+	{
+		this.starttime = s;
 	}
 }
