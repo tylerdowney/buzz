@@ -47,6 +47,25 @@ public class WorldClock
 		timer.scheduleAtFixedRate(broodTask, new Date(), time);
 	}
 
+	public static void startLarvaeTimer(Frame[] frame, Timer timer, int time, int fcount)
+	{
+		TimerTask larvaeTask = new TimerTask()
+		{
+			public void run()
+			{
+				for (int i = 1; i <= fcount; i++)
+				{
+					if (frame[i-1].getBrood() > 0)
+					{
+						frame[i-1].setLarvae(frame[i-1].getLarvae() + 20 * frame[i-1].getQueenUpgrade());
+						frame[i-1].setBrood(frame[i-1].getBrood() - 20 * frame[i-1].getQueenUpgrade());
+					}
+				}
+			}
+		};	
+		timer.scheduleAtFixedRate(larvaeTask, new Date(), time);
+	}
+
 	public static void startBeeTimer(Frame[] frame, Timer timer, int time, int fcount)
 	{
 		TimerTask beeTask = new TimerTask()
@@ -56,10 +75,10 @@ public class WorldClock
 				int beeMax = 3000;
 				for (int i = 1; i <= fcount; i++)
 				{
-					if (frame[i-1].getBees() < beeMax)
+					if (frame[i-1].getBees() < beeMax && frame[i-1].getLarvae() > 0)
 					{
 						frame[i-1].setBees(frame[i-1].getBees() + 20 * frame[i-1].getQueenUpgrade());
-						frame[i-1].setBrood(frame[i-1].getBrood() - 20 * frame[i-1].getQueenUpgrade());
+						frame[i-1].setLarvae(frame[i-1].getLarvae() - 20 * frame[i-1].getQueenUpgrade());
 					}
 				}
 			}
@@ -77,8 +96,16 @@ public class WorldClock
 			{
 				for (int i = 1; i <= fcount; i++)
 				{
-					frame[i-1].setHoney(frame[i-1].getHoney() - frame[i-1].getBees()/100 - frame[i-1].getBrood()/50);
-					frame[i-1].setPollen(frame[i-1].getPollen() - frame[i-1].getBees()/100 - frame[i-1].getBrood()/50);
+					if (frame[i-1].getHoney() > 0)
+					{
+						frame[i-1].setHoney(frame[i-1].getHoney() - frame[i-1].getBees()/100 - frame[i-1].getBrood()/50);
+						frame[i-1].setPollen(frame[i-1].getPollen() - frame[i-1].getBees()/100 - frame[i-1].getBrood()/50);
+					}
+					else
+					{
+						System.out.println("You didn't have enough honey to feed all your bees in Hive " + frame[i-1].getHid() + ", Frame " + frame[i-1].getFid() + ", and " + frame[i-1].getBees()/10.0 + " died");
+						frame[i-1].setBees(9*frame[i-1].getBees()/10);
+					}
 				}
 			}
 		};	
