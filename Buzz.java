@@ -28,24 +28,30 @@ public class Buzz
 		char load;
 		long oldtime;
 		Date newtime;
+		long worldAge = 0;
 		long offgametime;
 		int resourceOffset = 0;
 		int beeOffset = 0;
+		int broodOffset = 0;
 		int hiveCounter = 1;
 		int frameCounter = 1;
-		int resourceTime = 10000;
-		int consumeTime = 600000;
-		int broodTime = 5400000;
+		int resourceTime = 5000; // Adjusts rate of resource accrual in milliseconds
+		int consumeTime = 60000; // Adjusts rate of resource consumption in milliseconds
+		int broodTime = 60000; // Adjusts rate of egg laying in milliseconds
+		int beeTime = 540000; // Adjusts rate of eggs hatching in milliseconds
 		Random rand = new Random();
 		int n;
 		int framesPerHive = 10;
+		int beeMax = 3000;
+		int broodMax = 2000;
 		Hive[] hives = new Hive[1000];
 		Frame[] frames = new Frame[framesPerHive * hives.length];
 		Scanner in = new Scanner(System.in);
-		Date starttime = new Date();
-		WorldClock world = new WorldClock(starttime.getTime()/1000);
+		WorldClock world = new WorldClock();
 		Timer resourceTimer = new Timer();
 		Timer consumeTimer = new Timer();
+		Timer broodTimer = new Timer();
+		Timer beeTimer = new Timer();
 		String name = "";
 
 		//Load game or new game options
@@ -77,11 +83,13 @@ public class Buzz
 				hiveCounter = sc.nextInt();
 				money = sc.nextDouble();
 				oldtime = sc.nextLong();
+				world.setStartTime(sc.nextLong());
 				newtime = new Date();
-				offgametime = (newtime.getTime()/1000 - oldtime);
+				offgametime = (newtime.getTime()/1000L - oldtime);
 				int intoffgametime = (int) offgametime;
 				resourceOffset = intoffgametime*1000/resourceTime;
-				beeOffset = intoffgametime*1000/consumeTime;
+				beeOffset = intoffgametime*1000/beeTime;
+				broodOffset = intoffgametime*1000/broodTime - intoffgametime*1000/beeTime;
 
 				for (int i = 1; i <= hiveCounter; i++)
 				{
@@ -96,11 +104,22 @@ public class Buzz
 						frames[j-1].setHoney(sc.nextDouble());
 						frames[j-1].setPollen(sc.nextDouble());
 						frames[j-1].setBees(sc.nextInt());
+						frames[j-1].setBrood(sc.nextInt());
 						frames[j-1].setBeeUpgrade(sc.nextInt());
 						frames[j-1].setQueenUpgrade(sc.nextInt());
 						frames[j-1].setHoney(frames[j-1].getHoney() + resourceOffset * frames[j-1].getBeeUpgrade());
 						frames[j-1].setPollen(frames[j-1].getPollen() + resourceOffset * frames[j-1].getBeeUpgrade());
-						frames[j-1].setBees(frames[j-1].getBees() + beeOffset * frames[j-1].getQueenUpgrade());	
+						frames[j-1].setBees(frames[j-1].getBees() + beeOffset * 20 * frames[j-1].getQueenUpgrade());	
+						frames[j-1].setBrood(frames[j-1].getBrood() + broodOffset * 20 * frames[j-1].getQueenUpgrade());	
+
+						if (frames[j-1].getBees() > beeMax)
+						{
+							frames[j-1].setBees(beeMax);
+						}
+						if (frames[j-1].getBrood() > broodMax)
+						{
+							frames[j-1].setBrood(broodMax);
+						}
 					}
 				sc.close();
 			}
@@ -119,7 +138,11 @@ public class Buzz
 			name = in.nextLine();
 			System.out.println("Welcome " + name + "! Let's get started. You will begin with a queen, 1 bee, and some pollen and honey. Collect pollen and honey to make more bees, and sell the honey for money to buy upgrades.\n");
 
-			//Initialize Hive 1 Frame 1 resources (bees, honey, pollen)
+			//Initialize Hive 1 Frame 1 resources (bees, honey, pollen. Start WorldClock
+			
+			Date starttime = new Date();
+			long begin = starttime.getTime()/1000L;
+			world.setStartTime(begin);
 
 			hives[0] = new Hive(hiveCounter);
 			hives[0].addFrames();
@@ -138,6 +161,8 @@ public class Buzz
 
 		world.startResourceTimer(frames, resourceTimer, resourceTime, frameCounter);
 		world.startConsumeTimer(frames, consumeTimer, consumeTime, frameCounter);	
+		world.startBroodTimer(frames, broodTimer, broodTime, frameCounter);
+		world.startBeeTimer(frames, beeTimer, beeTime, frameCounter);		
 		
 		// Loop to determine and define actions
 
@@ -188,7 +213,10 @@ public class Buzz
 						System.out.println("Invalid selection");
 						break;
 					}
-					System.out.println("Hive " + h + ", Frame " + f + " has " + frames[f-1].getHoney() + " mL of honey, " + frames[f-1].getPollen() + " units of pollen, and " + frames[f-1].getBees() + " bees. " + name + " also has $" + money + " in total");
+
+					Date now = new Date();
+					worldAge = now.getTime()/1000L - world.getStartTime();
+					System.out.println("Hive " + h + ", Frame " + f + " has " + frames[f-1].getHoney() + " mL of honey, " + frames[f-1].getPollen() + " units of pollen, " + frames[f-1].getBees() + " bees, and " + frames[f-1].getBrood() + " eggs. " + name + " also has $" + money + " in total. " + name + "'s Beeverse is " + worldAge/31536000 + " years, " + (worldAge%31536000)/86400 + " days, " + (worldAge%31536000%86400)/3600 + " hours, " + (worldAge%31536000%86400%3600)/60 + " minutes, and " + worldAge%31536000%86400%3600%60 + " seconds old");
 					break;
 
 				// Deploy case: Send bees out to collect honey and pollen. 1 bee = 1 mL honey and 1 unit pollen. Bees can be killed by predators (need to work on probabilistic model). DEPRECATED
@@ -441,6 +469,8 @@ public class Buzz
 							frames[frameCounter-1].setBees(frames[i-1].getBees());
 							world.startResourceTimer(frames, resourceTimer, resourceTime, frameCounter);
 							world.startConsumeTimer(frames, consumeTimer, consumeTime, frameCounter);	
+							world.startBroodTimer(frames, broodTimer, broodTime, frameCounter);
+							world.startBeeTimer(frames, beeTimer, beeTime, frameCounter);
 							found = 1;
 						}
 					}
@@ -472,7 +502,9 @@ public class Buzz
 					frameCounter = makeNewFrame(hives, frames, hiveCounter, frameCounter);
 					// Start new timers
 					world.startResourceTimer(frames, resourceTimer, resourceTime, frameCounter);
-					world.startConsumeTimer(frames, consumeTimer, consumeTime, frameCounter);	
+					world.startConsumeTimer(frames, consumeTimer, consumeTime, frameCounter);
+					world.startBroodTimer(frames, broodTimer, broodTime, frameCounter);
+					world.startBeeTimer(frames, beeTimer, beeTime, frameCounter);
 					break;
 
 				// Quit case: Saves and Quits game
@@ -483,7 +515,7 @@ public class Buzz
 					consumeTimer.purge();
 					resourceTimer.cancel();
 					resourceTimer.purge();
-					saveGame(frames, name, money, frameCounter, hiveCounter);
+					saveGame(frames, name, money, frameCounter, hiveCounter, world);
 					break;
 
 				// Bad variable handler
@@ -538,7 +570,7 @@ public class Buzz
 
 	// Method to save game variables to file for future load
 
-	public static void saveGame(Frame[] fr, String name, double money, int fcount, int hcount)
+	public static void saveGame(Frame[] fr, String name, double money, int fcount, int hcount, WorldClock world)
 	{
 		File outFile = new File("/home/tyler/Documents/Java Code/Buzz/" + name + ".txt");
 		Date currentDate = new Date(); 
@@ -549,13 +581,15 @@ public class Buzz
 			out.println(fcount);
 			out.println(hcount);
 			out.println(money);
-			out.println(currentDate.getTime()/1000);
+			out.println(currentDate.getTime()/1000L);
+			out.println(world.getStartTime());
 		for (int i = 1; i <= fcount; i++)
 			{
 				out.println(fr[i-1].getHid());
 				out.println(fr[i-1].getHoney());
 				out.println(fr[i-1].getPollen());
 				out.println(fr[i-1].getBees());
+				out.println(fr[i-1].getBrood());
 				out.println(fr[i-1].getBeeUpgrade());
 				out.println(fr[i-1].getQueenUpgrade());
 			}
