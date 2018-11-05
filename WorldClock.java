@@ -26,7 +26,7 @@ public class WorldClock
 		System.out.println(n + "'s Beeverse is " + t/31536000 + " years, " + (t%31536000)/86400 + " days, " + (t%31536000%86400)/3600 + " hours, " + (t%31536000%86400%3600)/60 + " minutes, and " + t%31536000%86400%3600%60 + " seconds old");
 	}
 
-	// Method to start timer for gradually increasing bee quantities
+	// Method to start timer for gradually increasing egg quantities as the queen lays, up to a max of 2000
 
 	public static void startBroodTimer(Frame[] frame, Timer timer, int time, int fcount)
 	{
@@ -47,6 +47,8 @@ public class WorldClock
 		timer.scheduleAtFixedRate(broodTask, new Date(), time);
 	}
 
+	// Method for gradually increasing larvae quantity as eggs hatch
+
 	public static void startLarvaeTimer(Frame[] frame, Timer timer, int time, int fcount)
 	{
 		TimerTask larvaeTask = new TimerTask()
@@ -65,6 +67,8 @@ public class WorldClock
 		};	
 		timer.scheduleAtFixedRate(larvaeTask, new Date(), time);
 	}
+
+	// Method for gradually increasing bee quantities as larvae grow into bees, up to a max of 3000
 
 	public static void startBeeTimer(Frame[] frame, Timer timer, int time, int fcount)
 	{
@@ -86,7 +90,7 @@ public class WorldClock
 		timer.scheduleAtFixedRate(beeTask, new Date(), time);
 	}
 
-	// Method to start timer to regularly consume resources 
+	// Method to start timer to regularly consume resources. If honey hits 0 in a hive, 10% of bees in hive will die
 
 	public static void startConsumeTimer(Frame[] frame, Timer timer, int time, int fcount)
 	{
@@ -112,7 +116,7 @@ public class WorldClock
 		timer.scheduleAtFixedRate(consumeTask, new Date(), time);
 	}
 
-	// Method to start timer for gradually increasing resources
+	// Method to start timer to gradually increase resources
 
 	public static void startResourceTimer(Frame[] frame, Timer timer, int time, int fcount)
 	{
