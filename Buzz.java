@@ -20,10 +20,10 @@ public class Buzz
 		char sellVar;
 		int sell;
 		char upgrade;
-		double cUpCost = 1000;
-		double gUpCost = 1000;
-		double vUpCost = 1000;
-		double frameCost = 500;
+		double cUpCost = 1000; // Cost of carrying capacity upgrade
+		double gUpCost = 1000; // Cost of queen laying upgrade
+		double vUpCost = 1000; // Cost of bee/honey/pollen values upgrade
+		double frameCost = 5000;
 		double valueUpgrade = 1;
 		char load;
 		long oldtime;
@@ -41,6 +41,7 @@ public class Buzz
 		int broodTime = 60000; // Adjusts rate of egg laying in milliseconds
 		int larvaeTime = 540000; // Adjusts rate of eggs hatching into larvae milliseconds
 		int beeTime = 720000; // Adjusts rate of larvae developing into bees in milliseconds
+		int clutterTime = 5000; // Adjusts rate of clutter build up in milliseconds
 		Random rand = new Random();
 		int n;
 		int framesPerHive = 10;
@@ -55,6 +56,7 @@ public class Buzz
 		Timer broodTimer = new Timer();
 		Timer larvaeTimer = new Timer();
 		Timer beeTimer = new Timer();
+		Timer clutterTimer = new Timer();
 		String name = "";
 
 		//Load game or new game options
@@ -73,8 +75,8 @@ public class Buzz
 			File inFile = new File("");
 			if (result == JFileChooser.APPROVE_OPTION)
 			{
-    			inFile = fileChooser.getSelectedFile();
-    			System.out.println("Selected file: " + inFile.getAbsolutePath());
+    				inFile = fileChooser.getSelectedFile();
+    				System.out.println("Selected file: " + inFile.getAbsolutePath());
 			}
 			try
 			{
@@ -510,7 +512,7 @@ public class Buzz
 				// Make a new frame in the same hive
 
 				case 'f' :
-				System.out.println("This will create a new frame in the same hive. It costs $10000 for the materials");
+				System.out.println("This will create a new frame in the same hive. It costs $1000 for the materials");
 				if (money < frameCost)
 				{
 					System.out.println("Not enough money");

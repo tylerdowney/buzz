@@ -1,3 +1,4 @@
+
 public class Frame
 {
 	private double honey;
@@ -11,6 +12,7 @@ public class Frame
 	private int frameId;
 	private int brood;
 	private int larvae;
+	private double clutter;
 
 	public Frame(boolean q, int hid, int fid)
 	{
@@ -24,7 +26,8 @@ public class Frame
 		beeUpgrade = 1;
 		brood = 0;
 		larvae = 0;
-	}
+		clutter = 0;
+}
 
 	public double getHoney()
 	{
@@ -81,6 +84,10 @@ public class Frame
 		return larvae;
 	}
 
+	public double getClutter()
+	{
+		return clutter;
+	}
 
 	public static void getAge(long t, String n, int hn, int fn)
 	{
@@ -120,6 +127,11 @@ public class Frame
 	public void addLarvae(int l)
 	{
 		this.larvae = larvae + l;
+	}
+
+	public void addCLutter(double c)
+	{
+		this.clutter = clutter + c;
 	}
 
 	public void setHoney(double h)
@@ -165,6 +177,11 @@ public class Frame
 	public void setLarvae(int lr)
 	{
 		this.larvae = lr;
+	}
+
+	public void setClutter(double cl)
+	{
+		this.clutter = cl;
 	}
 
 	public void setStartTime(long s)
