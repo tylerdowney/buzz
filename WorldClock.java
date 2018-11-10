@@ -37,7 +37,7 @@ public class WorldClock
 				int broodMax = 2000;
 				for (int i = 1; i <= fcount; i++)
 				{
-					if (frame[i-1].getBrood() < broodMax)
+					if (frame[i-1].getBrood() <= broodMax)
 					{
 						frame[i-1].setBrood(frame[i-1].getBrood() + 20 * frame[i-1].getQueenUpgrade());
 					}
@@ -51,6 +51,7 @@ public class WorldClock
 
 	public static void startLarvaeTimer(Frame[] frame, Timer timer, int time, int fcount)
 	{
+		double clutPerEgg = 0.01;
 		TimerTask larvaeTask = new TimerTask()
 		{
 			public void run()
@@ -61,12 +62,40 @@ public class WorldClock
 					{
 						frame[i-1].setLarvae(frame[i-1].getLarvae() + 20 * frame[i-1].getQueenUpgrade());
 						frame[i-1].setBrood(frame[i-1].getBrood() - 20 * frame[i-1].getQueenUpgrade());
+						frame[i-1].addClutter(20 * clutPerEgg * getQueenUpdate());
 					}
 				}
 			}
 		};	
 		timer.scheduleAtFixedRate(larvaeTask, new Date(), time);
 	}
+
+	public static void startClutterTimer(Frame[] frame, Timer timer, int time, int fcount)
+	{
+		double clutPerSec = 0.01;
+		double clutPerBee = 0.001;
+		TimerTask clutterTask = new TimerTask()
+		{
+			public void run()
+			{
+				for (int i = 1; i <= fcount; i++)
+				{
+					if (frame[i-1].getClutter() < 100)
+					{
+						frame[i-1].addClutter((time/1000) * clutPerSec));
+						frmae[i-1].addClutter(-(time/1000) * frame[i-1].getBees * clutPerBee);
+					}
+					else if (frame[i-1].getClutter() >= 100)
+					{
+						System.out.println("Your bees can't clean the hive fast enough and " + frame[i-1].getBees()/200 + " bees have died. Add more bees to clean faster, or make a new frame to replace this old one");
+						frame[i-1].setBees(frame[i-1].getBees() - frame[i-1].getBees()/200);
+					}
+			}
+		};	
+		timer.scheduleAtFixedRate(larvaeTask, new Date(), time);
+	}
+
+
 
 	// Method for gradually increasing bee quantities as larvae grow into bees, up to a max of 3000
 
@@ -79,7 +108,7 @@ public class WorldClock
 				int beeMax = 3000;
 				for (int i = 1; i <= fcount; i++)
 				{
-					if (frame[i-1].getBees() < beeMax && frame[i-1].getLarvae() > 0)
+					if (frame[i-1].getBees() <= beeMax && frame[i-1].getLarvae() > 0)
 					{
 						frame[i-1].setBees(frame[i-1].getBees() + 20 * frame[i-1].getQueenUpgrade());
 						frame[i-1].setLarvae(frame[i-1].getLarvae() - 20 * frame[i-1].getQueenUpgrade());
