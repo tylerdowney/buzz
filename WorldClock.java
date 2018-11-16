@@ -37,7 +37,7 @@ public class WorldClock
 				int broodMax = 2000;
 				for (int i = 1; i <= fcount; i++)
 				{
-					if (frame[i-1].getBrood() < broodMax)
+					if (frame[i-1].getBrood() <= broodMax)
 					{
 						frame[i-1].setBrood(frame[i-1].getBrood() + 20 * frame[i-1].getQueenUpgrade());
 					}
@@ -79,7 +79,7 @@ public class WorldClock
 				int beeMax = 3000;
 				for (int i = 1; i <= fcount; i++)
 				{
-					if (frame[i-1].getBees() < beeMax && frame[i-1].getLarvae() > 0)
+					if (frame[i-1].getBees() <= beeMax && frame[i-1].getLarvae() > 0)
 					{
 						frame[i-1].setBees(frame[i-1].getBees() + 20 * frame[i-1].getQueenUpgrade());
 						frame[i-1].setLarvae(frame[i-1].getLarvae() - 20 * frame[i-1].getQueenUpgrade());

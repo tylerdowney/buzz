@@ -20,10 +20,10 @@ public class Buzz
 		char sellVar;
 		int sell;
 		char upgrade;
-		double cUpCost = 1000;
-		double gUpCost = 1000;
-		double vUpCost = 1000;
-		double frameCost = 500;
+		double cUpCost = 1000; // Cost of carrying capacity upgrade
+		double gUpCost = 1000; // Cost of queen laying upgrade
+		double vUpCost = 1000; // Cost of bee/honey/pollen values upgrade
+		double frameCost = 5000;
 		double valueUpgrade = 1;
 		char load;
 		long oldtime;
@@ -510,7 +510,7 @@ public class Buzz
 				// Make a new frame in the same hive
 
 				case 'f' :
-				System.out.println("This will create a new frame in the same hive. It costs $10000 for the materials");
+				System.out.println("This will create a new frame in the same hive. It costs $1000 for the materials");
 				if (money < frameCost)
 				{
 					System.out.println("Not enough money");
