@@ -89,7 +89,7 @@ public class WorldClock
 		timer.scheduleAtFixedRate(beeTask, new Date(), time);
 	}
 
-	// Method to start timer to regularly consume resources. If honey hits 0 in a hive, 10% of bees in hive will die
+	// Method to start timer to regularly consume resources.
 
 	public static void startConsumeTimer(Frame[] frame, Timer timer, int time, int fcount)
 	{

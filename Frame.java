@@ -40,7 +40,12 @@ public class Frame
 		pollenCells = 0;
 		honeyCells = 0;
 		broodCells = 0;
-		cells = emptyCells + nectarCells + pollenCells + broodCells + honeyCells;
+		cells = 0;
+	}
+
+	public boolean getQueen()
+	{
+		return queen;
 	}
 
 	public double getHoney()
@@ -116,6 +121,17 @@ public class Frame
 	public int getPollenCells()
 	{
 		return pollenCells;
+	}
+
+	public int getCellMax()
+	{
+		return cellMax;
+	}
+
+	public int getCells()
+	{
+		this.cells = this.pollenCells + this.honeyCells + this.nectarCells + this.emptyCells + this.broodCells;
+		return cells;
 	}
 
 	public static void getAge(Frame[] frames, long t, String n, int hn, int fn)

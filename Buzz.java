@@ -108,7 +108,7 @@ public class Buzz
 						int tempHid = -1;
 						tempHid = sc.nextInt();
 						hives[tempHid - 1].addFrames();
-						frames[j-1] = new Frame(true, tempHid, hives[tempHid - 1].getFrames());
+						frames[j-1] = new Frame(sc.nextBoolean(), tempHid, hives[tempHid - 1].getFrames());
 						frames[j-1].setHoney(sc.nextInt());
 						frames[j-1].setPollen(sc.nextInt());
 						frames[j-1].setBees(sc.nextInt());
@@ -118,20 +118,23 @@ public class Buzz
 						frames[j-1].setBeeUpgrade(sc.nextInt());
 						frames[j-1].setQueenUpgrade(sc.nextInt());
 						frames[j-1].setStartTime(sc.nextLong());
-						frames[j-1].addHoney(resourceOffset * frames[j-1].getBeeUpgrade());
-						frames[j-1].addPollen(resourceOffset * frames[j-1].getBeeUpgrade());
-						frames[j-1].addBees(beeOffset * 20 * frames[j-1].getQueenUpgrade());	
-						frames[j-1].addLarvae(larvaeOffset * 20 * frames[j-1].getQueenUpgrade());	
-						frames[j-1].addBrood(broodOffset * 20 * frames[j-1].getQueenUpgrade());	
+						if (frames[j-1].hasQueen())
+						{
+							frames[j-1].addHoney(resourceOffset * frames[j-1].getBeeUpgrade());
+							frames[j-1].addPollen(resourceOffset * frames[j-1].getBeeUpgrade());
+							frames[j-1].addBees(beeOffset * 20 * frames[j-1].getQueenUpgrade());	
+							frames[j-1].addLarvae(larvaeOffset * 20 * frames[j-1].getQueenUpgrade());	
+							frames[j-1].addBrood(broodOffset * 20 * frames[j-1].getQueenUpgrade());	
 
-						frames[j-1].addEmptyCells(waxOffset * 20 * frames[j-1].getQueenUpgrade());
-						if (frames[j-1].getBees() > beeMax)
-						{
-							frames[j-1].setBees(beeMax);
-						}
-						if (frames[j-1].getBrood() > broodMax)
-						{
-							frames[j-1].setBrood(broodMax);
+							frames[j-1].addEmptyCells(waxOffset * 20 * frames[j-1].getQueenUpgrade());
+							if (frames[j-1].getBees() > beeMax)
+							{
+								frames[j-1].setBees(beeMax);
+							}
+							if (frames[j-1].getBrood() > broodMax)
+							{
+								frames[j-1].setBrood(broodMax);
+							}
 						}
 					}
 				sc.close();
@@ -233,7 +236,7 @@ public class Buzz
 					{
 						if (frames[i-1].getHid() == h)
 						{
-							System.out.println("Frame " + frames[i-1].getFid() + ": honey: " + frames[i-1].getHoney() + ", pollen: " + frames[i-1].getPollen() + ", bees: " + frames[i-1].getBees() + ", larvae: " + frames[i-1].getLarvae() + ", eggs: " + frames[i-1].getBrood());
+							System.out.println("Frame " + frames[i-1].getFid() + ": drawn cells: " + (frames[i-1].getCells() - frames[i-1].getEmptyCells())*100.0/frames[i-1].getCellMax() + "%, honey: " + frames[i-1].getHoney() + ", pollen: " + frames[i-1].getPollen() + ", bees: " + frames[i-1].getBees() + ", larvae: " + frames[i-1].getLarvae() + ", eggs: " + frames[i-1].getBrood());
 							long frameAge = now.getTime()/1000L - frames[i-1].getStartTime();
 							frames[i-1].getAge(frames, frameAge, name, h,i);
 						}
@@ -638,6 +641,7 @@ public class Buzz
 		for (int i = 1; i <= fcount; i++)
 			{
 				out.println(fr[i-1].getHid());
+				out.println(fr[i-1].getQueen());
 				out.println(fr[i-1].getHoneyCells());
 				out.println(fr[i-1].getPollenCells());
 				out.println(fr[i-1].getBees());
