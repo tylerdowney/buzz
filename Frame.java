@@ -12,6 +12,7 @@ public class Frame
 	private int frameId;
 	private int larvae;
 	private double clutter;
+	private double clutterMax;
 	private int cells;
 	private int cellMax;
 	private double honeyPerCell;
@@ -35,6 +36,7 @@ public class Frame
 		larvae = 0;
 		clutter = 0;
 		cellMax = 3500;
+		clutterMax = 10000;
 		honeyPerCell = 1.0;
 		pollenPerCell = 1.0;
 		emptyCells = 0;
@@ -136,6 +138,11 @@ public class Frame
 		return cellMax;
 	}
 
+	public double getClutterMax()
+	{
+		return clutterMax;
+	}
+
 	public int getCells()
 	{
 		this.cells = this.pollenCells + this.honeyCells + this.nectarCells + this.emptyCells + this.broodCells;
@@ -203,7 +210,7 @@ public class Frame
 	}
 
 
-	public void addCLutter(double c)
+	public void addClutter(double c)
 	{
 		this.clutter = clutter + c;
 	}

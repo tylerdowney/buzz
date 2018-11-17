@@ -238,7 +238,7 @@ public class Buzz
 					{
 						if (frames[i-1].getHid() == h)
 						{
-							System.out.println("Frame " + frames[i-1].getFid() + ": drawn cells: " + (frames[i-1].getCells() - frames[i-1].getEmptyCells())*100.0/frames[i-1].getCellMax() + "%, honey: " + frames[i-1].getHoney() + ", pollen: " + frames[i-1].getPollen() + ", bees: " + frames[i-1].getBees() + ", larvae: " + frames[i-1].getLarvae() + ", eggs: " + frames[i-1].getBrood());
+							System.out.println("Frame " + frames[i-1].getFid() + ": drawn cells: " + (frames[i-1].getCells() - frames[i-1].getEmptyCells())*100.0/frames[i-1].getCellMax() + "%, honey: " + frames[i-1].getHoney() + ", pollen: " + frames[i-1].getPollen() + ", bees: " + frames[i-1].getBees() + ", larvae: " + frames[i-1].getLarvae() + ", eggs: " + frames[i-1].getBrood() + ", clutter: " + frames[i-1].getClutter()*100.0/frames[i-1].getClutterMax() + "%");
 							long frameAge = now.getTime()/1000L - frames[i-1].getStartTime();
 							frames[i-1].getAge(frames, frameAge, name, h,i);
 						}

@@ -59,7 +59,7 @@ public class WorldClock
 				{
 					if (frame[i-1].hasQueen() && frame[i-1].getBrood() > 0)
 					{
-						frame[i-1].addClutter(20 * clutPerEgg * getQueenUpdate());
+						frame[i-1].addClutter(20 * clutPerEgg * frame[i-1].getQueenUpgrade());
 						frame[i-1].addLarvae(20 * frame[i-1].getQueenUpgrade());
 						frame[i-1].addBrood(-20 * frame[i-1].getQueenUpgrade());
 					}
@@ -81,17 +81,18 @@ public class WorldClock
 				{
 					if (frame[i-1].getClutter() < 100)
 					{
-						frame[i-1].addClutter((time/1000) * clutPerSec));
-						frmae[i-1].addClutter(-(time/1000) * frame[i-1].getBees * clutPerBee);
+						frame[i-1].addClutter((time/1000) * clutPerSec);
+						frame[i-1].addClutter(-(time/1000) * frame[i-1].getBees() * clutPerBee);
 					}
 					else if (frame[i-1].getClutter() >= 100)
 					{
 						System.out.println("Your bees can't clean the hive fast enough and " + frame[i-1].getBees()/200 + " bees have died. Add more bees to clean faster, or make a new frame to replace this old one");
 						frame[i-1].setBees(frame[i-1].getBees() - frame[i-1].getBees()/200);
 					}
+				}
 			}
 		};	
-		timer.scheduleAtFixedRate(larvaeTask, new Date(), time);
+		timer.scheduleAtFixedRate(clutterTask, new Date(), time);
 	}
 
 
