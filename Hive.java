@@ -2,6 +2,7 @@ public class Hive
 {
 	private int frames;
 	int id;
+	int framesMax;
 
 	public Hive(int n)
 	{
