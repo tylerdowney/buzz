@@ -462,7 +462,7 @@ public class Buzz
 				// Split case: Make a new hive by moving a full frame to a new hive
 
 				case 'p' :
-				System.out.println("This will move half the contents of a frame to a new frame and hive. It also costs $5000 for the materials");
+				System.out.println("This will move frames to a new hive, but only for completely drawn frames. It also costs $5000 for the materials");
 				if (money < frameCost)
 				{
 					System.out.println("Not enough money");
@@ -487,49 +487,60 @@ public class Buzz
 					}
 					System.out.println("How many frames would you like to move?");
 					int numSplit = in.nextInt();
-					System.out.println("Which frame(s) will you move?");
-					for (int i = 1; i <= hives[hiSplit-1].getFrames(); i++)
+					for (int j = 1; j <= numSplit; j++)
 					{
-						System.out.println("Frame " + i);
-					}
-					int found = 0;
-					for (int i = 1; i <= frameCounter; i++)
-					{
-					int frSplit = in.nextInt();
-						if (frames[i-1].getHid() == hiSplit && frames[i-1].getFid() == frSplit)
+						System.out.println("Which frame will you move?");
+						for (int i = 1; i <= hives[hiSplit-1].getFrames(); i++)
 						{
-							hives[hiveCounter] = new Hive(hiveCounter + 1);
-							hives[hiveCounter].addFrames();
-							frames[frameCounter] = new Frame(true, hives[hiveCounter].getHid(), hives[hiveCounter].getFrames());
-							hiveCounter++;
-							frameCounter++;
-							frames[i-1].setHoney(frames[i-1].getHoneyCells());
-							frames[i-1].setPollen(frames[i-1].getPollenCells());
-							frames[i-1].setBees(frames[i-1].getBees());
-							frames[i-1].setLarvae(frames[i-1].getLarvae());
-							frames[i-1].setBrood(frames[i-1].getBrood());
-							frames[frameCounter-1].setQueen(false);
-							frames[frameCounter-1].setHoney(0);
-							frames[frameCounter-1].setPollen(0);
-							frames[frameCounter-1].setBees(0);
-							frames[frameCounter-1].setLarvae(0);
-							frames[frameCounter-1].setBrood(0);
-							Date date = new Date();
-							frames[frameCounter-1].setStartTime(date.getTime()/1000L);
-							world.startResourceTimer(frames, resourceTimer, resourceTime, frameCounter);
-							world.startConsumeTimer(frames, consumeTimer, consumeTime, frameCounter);	
-							world.startBroodTimer(frames, broodTimer, broodTime, frameCounter);
-							world.startLarvaeTimer(frames, larvaeTimer, larvaeTime, frameCounter);
-							world.startBeeTimer(frames, beeTimer, beeTime, frameCounter);
-							world.startWaxTimer(frames, waxTimer, waxTime, frameCounter);
-							world.startClutterTimer(frames, clutterTimer, clutterTime, frameCounter);
-							found++;
+							System.out.println("Frame " + i);
 						}
-					}
-					if (found != numSplit)
-					{
-						System.out.println("Could not find frame");
-						frameCounter--;
+						int found = 0;
+						int frSplit = in.nextInt();
+						for (int i = 1; i <= frameCounter; i++)
+						{
+							if (frames[i-1].getHid() == hiSplit && frames[i-1].getFid() == frSplit)
+							{
+								double tol = 2.0;
+								if ((frames[i-1].getCells() - frames[i-1].getEmptyCells())*100.0/frames[i-1].getCellMax() + tol > 100.0)
+								{
+									hives[hiveCounter] = new Hive(hiveCounter + 1);
+									hives[hiveCounter].addFrames();
+									frames[frameCounter] = new Frame(true, hives[hiveCounter].getHid(), hives[hiveCounter].getFrames());
+									hiveCounter++;
+									frameCounter++;
+									frames[i-1].setHoney(frames[i-1].getHoneyCells());
+									frames[i-1].setPollen(frames[i-1].getPollenCells());
+									frames[i-1].setBees(frames[i-1].getBees());
+									frames[i-1].setLarvae(frames[i-1].getLarvae());
+									frames[i-1].setBrood(frames[i-1].getBrood());
+									frames[frameCounter-1].setQueen(false);
+									frames[frameCounter-1].setHoney(0);
+									frames[frameCounter-1].setPollen(0);
+									frames[frameCounter-1].setBees(0);
+									frames[frameCounter-1].setLarvae(0);
+									frames[frameCounter-1].setBrood(0);
+									Date date = new Date();
+									frames[frameCounter-1].setStartTime(date.getTime()/1000L);
+									world.startResourceTimer(frames, resourceTimer, resourceTime, frameCounter);
+									world.startConsumeTimer(frames, consumeTimer, consumeTime, frameCounter);	
+									world.startBroodTimer(frames, broodTimer, broodTime, frameCounter);
+									world.startLarvaeTimer(frames, larvaeTimer, larvaeTime, frameCounter);
+									world.startBeeTimer(frames, beeTimer, beeTime, frameCounter);
+									world.startWaxTimer(frames, waxTimer, waxTime, frameCounter);
+									world.startClutterTimer(frames, clutterTimer, clutterTime, frameCounter);
+									found++;
+								}
+								else
+								{
+									System.out.println("Frame " + frSplit + " is not sufficiently drawn to split");
+									found++;
+								}
+							}
+						}
+						if (found != 1)
+						{
+							System.out.println("Could not find frame");
+						}
 					}
 				}
 				catch (InputMismatchException e)
@@ -549,7 +560,7 @@ public class Buzz
 				}
 				else
 				{
-					money = money - 2 * frameCost;
+					money = money - frameCost;
 				}
 					frameCounter = makeNewFrame(hives, frames, hiveCounter, frameCounter);
 					// Start new timers
