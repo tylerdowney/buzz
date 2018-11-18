@@ -69,32 +69,37 @@ public class WorldClock
 		timer.scheduleAtFixedRate(larvaeTask, new Date(), time);
 	}
 
+	// Method for gradually increasing clutter as time goes on, and as eggs hatch. Bees clean clutter regularly
+
 	public static void startClutterTimer(Frame[] frame, Timer timer, int time, int fcount)
 	{
 		double clutPerSec = 0.01;
-		double clutPerBee = 0.001;
+		double clutPerBee = 0.0001;
 		TimerTask clutterTask = new TimerTask()
 		{
 			public void run()
 			{
 				for (int i = 1; i <= fcount; i++)
 				{
-					if (frame[i-1].getClutter() < 100)
+					if (frame[i-1].hasQueen())
 					{
 						frame[i-1].addClutter((time/1000) * clutPerSec);
-						frame[i-1].addClutter(-(time/1000) * frame[i-1].getBees() * clutPerBee);
-					}
-					else if (frame[i-1].getClutter() >= 100)
-					{
-						System.out.println("Your bees can't clean the hive fast enough and " + frame[i-1].getBees()/200 + " bees have died. Add more bees to clean faster, or make a new frame to replace this old one");
-						frame[i-1].setBees(frame[i-1].getBees() - frame[i-1].getBees()/200);
+						if (frame[i-1].getClutter() >= 0)
+						{
+							frame[i-1].addClutter(-(time/1000) * frame[i-1].getBees() * clutPerBee);
+						}
+						if (frame[i-1].getClutter() * 100.0/frame[i-1].getClutterMax() >= 100.0)
+						{
+							System.out.println("Your bees can't clean the hive fast enough and " + frame[i-1].getBees()/200 + " bees have died. Add more bees to clean faster, or make a new frame to replace this old one");
+							frame[i-1].addBees(-frame[i-1].getBees()/200);
+							frame[i-1].addClutter(-frame[i-1].getClutter()/20);
+						}
 					}
 				}
 			}
 		};	
 		timer.scheduleAtFixedRate(clutterTask, new Date(), time);
 	}
-
 
 
 	// Method for gradually increasing bee quantities as larvae grow into bees, up to a max of 3000
@@ -135,7 +140,7 @@ public class WorldClock
 					}
 					if (frame[i-1].hasQueen() && frame[i-1].getPollen() > 0)
 					{
-						frame[i-1].setPollen(-frame[i-1].getBees()/100 - frame[i-1].getBrood()/50);
+						frame[i-1].addPollen(-frame[i-1].getBees()/100 - frame[i-1].getBrood()/50);
 					}
 				}
 			}
@@ -172,10 +177,8 @@ public class WorldClock
 			{
 				for (int i = 1; i <= fcount; i++)
 				{
-					if (frame[i-1].hasQueen())
+					if (frame[i-1].hasQueen() && frame[i-1].getCells() < frame[i-1].getCellMax())
 					{
-						frame[i-1].addHoney(frame[i-1].getBeeUpgrade() * (frame[i-1].getBees()/10 + 1));
-						frame[i-1].addPollen(frame[i-1].getBeeUpgrade() * (frame[i-1].getBees()/10 + 1));
 						frame[i-1].addEmptyCells(1);
 					}
 				}

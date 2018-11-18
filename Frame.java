@@ -36,7 +36,7 @@ public class Frame
 		larvae = 0;
 		clutter = 0;
 		cellMax = 3500;
-		clutterMax = 10000;
+		clutterMax = 5000;
 		honeyPerCell = 1.0;
 		pollenPerCell = 1.0;
 		emptyCells = 0;
@@ -208,7 +208,6 @@ public class Frame
 	{
 		this.larvae = larvae + l;
 	}
-
 
 	public void addClutter(double c)
 	{

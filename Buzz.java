@@ -6,6 +6,7 @@ import java.lang.*;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import java.awt.event.WindowEvent;
+import java.text.DecimalFormat;
 
 public class Buzz
 {
@@ -23,7 +24,7 @@ public class Buzz
 		double cUpCost = 1000; // Cost of carrying capacity upgrade
 		double gUpCost = 1000; // Cost of queen laying upgrade
 		double vUpCost = 1000; // Cost of bee/honey/pollen values upgrade
-		double frameCost = 5000;
+		double frameCost = 0;
 		double valueUpgrade = 1;
 		char load;
 		long oldtime;
@@ -110,7 +111,8 @@ public class Buzz
 						int tempHid = -1;
 						tempHid = sc.nextInt();
 						hives[tempHid - 1].addFrames();
-						frames[j-1] = new Frame(sc.nextBoolean(), tempHid, hives[tempHid - 1].getFrames());
+						boolean tempQueen = sc.nextBoolean();
+						frames[j-1] = new Frame(tempQueen, tempHid, hives[tempHid - 1].getFrames());
 						frames[j-1].setHoney(sc.nextInt());
 						frames[j-1].setPollen(sc.nextInt());
 						frames[j-1].setBees(sc.nextInt());
@@ -156,7 +158,7 @@ public class Buzz
 			name = in.nextLine();
 			System.out.println("Welcome " + name + "!");
 
-			//Initialize Hive 1 Frame 1 resources (bees, honey, pollen. Start WorldClock
+			//Initialize Hive 1 Frame 1 resources (bees, honey, pollen). Start WorldClock
 			
 			Date starttime = new Date();
 			long begin = starttime.getTime()/1000L;
@@ -190,8 +192,9 @@ public class Buzz
 		world.startConsumeTimer(frames, consumeTimer, consumeTime, frameCounter);	
 		world.startBroodTimer(frames, broodTimer, broodTime, frameCounter);
 		world.startLarvaeTimer(frames, larvaeTimer, larvaeTime, frameCounter);
-		world.startBeeTimer(frames, beeTimer, beeTime, frameCounter);	
-		world.startWaxTimer(frames, waxTimer, waxTime, frameCounter);	
+		world.startBeeTimer(frames, beeTimer, beeTime, frameCounter);
+		world.startWaxTimer(frames, waxTimer, waxTime, frameCounter);
+		world.startClutterTimer(frames, clutterTimer, clutterTime, frameCounter);	
 		
 		// Loop to determine and define actions
 
@@ -222,6 +225,7 @@ public class Buzz
 				case 'i' :
 					Integer h;
 					Integer f;
+					DecimalFormat dec = new DecimalFormat("#.##");
 					for (int i = 1; i <= hiveCounter; i++)
 					{
 						System.out.println("Hive " + hives[i-1].getHid());
@@ -238,7 +242,7 @@ public class Buzz
 					{
 						if (frames[i-1].getHid() == h)
 						{
-							System.out.println("Frame " + frames[i-1].getFid() + ": drawn cells: " + (frames[i-1].getCells() - frames[i-1].getEmptyCells())*100.0/frames[i-1].getCellMax() + "%, honey: " + frames[i-1].getHoney() + ", pollen: " + frames[i-1].getPollen() + ", bees: " + frames[i-1].getBees() + ", larvae: " + frames[i-1].getLarvae() + ", eggs: " + frames[i-1].getBrood() + ", clutter: " + frames[i-1].getClutter()*100.0/frames[i-1].getClutterMax() + "%");
+							System.out.println("Frame " + frames[i-1].getFid() + ": drawn cells: " + dec.format((frames[i-1].getCells() - frames[i-1].getEmptyCells())*100.0/frames[i-1].getCellMax()) + "%, honey: " + frames[i-1].getHoney() + ", pollen: " + frames[i-1].getPollen() + ", bees: " + frames[i-1].getBees() + ", larvae: " + frames[i-1].getLarvae() + ", eggs: " + frames[i-1].getBrood() + ", clutter: " + dec.format(frames[i-1].getClutter()*100.0/frames[i-1].getClutterMax()) + "%");
 							long frameAge = now.getTime()/1000L - frames[i-1].getStartTime();
 							frames[i-1].getAge(frames, frameAge, name, h,i);
 						}
@@ -455,7 +459,7 @@ public class Buzz
 					}		
 					break;
 
-				// Split case: Make a new hive by splitting a frame in half
+				// Split case: Make a new hive by moving a full frame to a new hive
 
 				case 'p' :
 				System.out.println("This will move half the contents of a frame to a new frame and hive. It also costs $5000 for the materials");
@@ -481,15 +485,17 @@ public class Buzz
 					{
 						throw new InputMismatchException();
 					}
-					System.out.println("Which frame will you split?");
+					System.out.println("How many frames would you like to move?");
+					int numSplit = in.nextInt();
+					System.out.println("Which frame(s) will you move?");
 					for (int i = 1; i <= hives[hiSplit-1].getFrames(); i++)
 					{
 						System.out.println("Frame " + i);
 					}
-					int frSplit = in.nextInt();
 					int found = 0;
 					for (int i = 1; i <= frameCounter; i++)
 					{
+					int frSplit = in.nextInt();
 						if (frames[i-1].getHid() == hiSplit && frames[i-1].getFid() == frSplit)
 						{
 							hives[hiveCounter] = new Hive(hiveCounter + 1);
@@ -516,10 +522,11 @@ public class Buzz
 							world.startLarvaeTimer(frames, larvaeTimer, larvaeTime, frameCounter);
 							world.startBeeTimer(frames, beeTimer, beeTime, frameCounter);
 							world.startWaxTimer(frames, waxTimer, waxTime, frameCounter);
-							found = 1;
+							world.startClutterTimer(frames, clutterTimer, clutterTime, frameCounter);
+							found++;
 						}
 					}
-					if (found != 1)
+					if (found != numSplit)
 					{
 						System.out.println("Could not find frame");
 						frameCounter--;
@@ -534,7 +541,7 @@ public class Buzz
 				// Make a new frame in the same hive
 
 				case 'f' :
-				System.out.println("This will create a new frame in the same hive. It costs $1000 for the materials");
+				System.out.println("This will place a queen in a new frame in the same hive. It costs $1000 for the queen");
 				if (money < frameCost)
 				{
 					System.out.println("Not enough money");
@@ -552,6 +559,7 @@ public class Buzz
 					world.startLarvaeTimer(frames, larvaeTimer, larvaeTime, frameCounter);
 					world.startBeeTimer(frames, beeTimer, beeTime, frameCounter);
 					world.startWaxTimer(frames, waxTimer, waxTime, frameCounter);
+					world.startClutterTimer(frames, clutterTimer, clutterTime, frameCounter);
 					break;
 
 				// Quit case: Saves and Quits game
@@ -570,6 +578,8 @@ public class Buzz
 					beeTimer.purge();
 					waxTimer.cancel();
 					waxTimer.purge();
+					clutterTimer.cancel();
+					clutterTimer.purge();
 					saveGame(frames, name, money, frameCounter, hiveCounter, world);
 					break;
 
