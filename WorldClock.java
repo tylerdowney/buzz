@@ -84,7 +84,7 @@ public class WorldClock
 					if (frame[i-1].hasQueen())
 					{
 						frame[i-1].addClutter((time/1000) * clutPerSec);
-						if (frame[i-1].getClutter() >= 0)
+						if (frame[i-1].getClutter() > 0)
 						{
 							frame[i-1].addClutter(-(time/1000) * frame[i-1].getBees() * clutPerBee);
 						}
@@ -137,10 +137,12 @@ public class WorldClock
 					if (frame[i-1].hasQueen() && frame[i-1].getHoney() > 0)
 					{
 						frame[i-1].addHoney(-frame[i-1].getBees()/100 - frame[i-1].getBrood()/50);
+						frame[i-1].addEmptyCells(frame[i-1].getBees()/100 - frame[i-1].getBrood()/50);
 					}
 					if (frame[i-1].hasQueen() && frame[i-1].getPollen() > 0)
 					{
 						frame[i-1].addPollen(-frame[i-1].getBees()/100 - frame[i-1].getBrood()/50);
+						frame[i-1].addEmptyCells(frame[i-1].getBees()/100 - frame[i-1].getBrood()/50);
 					}
 				}
 			}
@@ -161,7 +163,9 @@ public class WorldClock
 					if (frame[i-1].hasQueen() && frame[i-1].getEmptyCells() > 1)
 					{
 						frame[i-1].addHoney(frame[i-1].getBeeUpgrade() * (frame[i-1].getBees()/10 + 1));
+						frame[i-1].addEmptyCells(-1);
 						frame[i-1].addPollen(frame[i-1].getBeeUpgrade() * (frame[i-1].getBees()/10 + 1));
+						frame[i-1].addEmptyCells(-1);
 					}
 				}
 			}

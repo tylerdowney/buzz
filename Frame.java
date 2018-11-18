@@ -183,20 +183,17 @@ public class Frame
 
 	public void addEmptyCells(int e)
 	{
-		if (this.emptyCells + e < this.cellMax)
-		{
-			this.emptyCells = emptyCells + e;
-		}
+		this.emptyCells = emptyCells + e;
 	}
 
 	public void addBeeUpgrade()
 	{
-		this.beeUpgrade = this.beeUpgrade + 1;
+		this.beeUpgrade = beeUpgrade + 1;
 	}
 
 	public void addQueenUpgrade()
 	{
-		this.queenUpgrade = this.queenUpgrade + 1;
+		this.queenUpgrade = queenUpgrade + 1;
 	}
 
 	public void addBrood(int b)
