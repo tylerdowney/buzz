@@ -39,6 +39,7 @@ public class WorldClock
 					if (frame[i-1].hasQueen() && frame[i-1].getBrood() <= broodMax)
 					{
 						frame[i-1].addBrood(20 * frame[i-1].getQueenUpgrade());
+						frame[i-1].addEmptyCells(-20 * frame[i-1].getQueenUpgrade());
 					}
 				}
 			}
@@ -117,6 +118,7 @@ public class WorldClock
 					{
 						frame[i-1].addBees(20 * frame[i-1].getQueenUpgrade());
 						frame[i-1].addLarvae(-20 * frame[i-1].getQueenUpgrade());
+						frame[i-1].addEmptyCells(20 * frame[i-1].getQueenUpgrade());
 					}
 				}
 			}

@@ -1,6 +1,7 @@
 public class Hive
 {
 	private int frames;
+	private int queens;
 	int id;
 	int framesMax;
 
@@ -15,6 +16,11 @@ public class Hive
 		return frames;
 	}
 
+	public int getQueens()
+	{
+		return queens;
+	}
+
 	public int getHid()
 	{
 		return id;
@@ -27,13 +33,11 @@ public class Hive
 
 	public void addFrames()
 	{
-		if (this.frames < 10)
-		{
-			this.frames = this.frames + 1;
-		}
-		else
-		{
-			System.out.println("Hive is full. Create a new hive");
-		}
+		this.frames = frames + 1;
+	}
+
+	public void addQueens()
+	{
+		this.queens = queens + 1;
 	}
 }

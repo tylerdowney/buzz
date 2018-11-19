@@ -113,6 +113,10 @@ public class Buzz
 						hives[tempHid - 1].addFrames();
 						boolean tempQueen = sc.nextBoolean();
 						frames[j-1] = new Frame(tempQueen, tempHid, hives[tempHid - 1].getFrames());
+						if (tempQueen)
+						{
+							hives[tempHid - 1].addQueens();
+						}
 						frames[j-1].setHoney(sc.nextInt());
 						frames[j-1].setPollen(sc.nextInt());
 						frames[j-1].setBees(sc.nextInt());
@@ -166,6 +170,7 @@ public class Buzz
 			hiveCounter++;
 			hives[0] = new Hive(hiveCounter);
 			hives[0].addFrames();
+			hives[0].addQueens();
 			frames[0] = new Frame(true, hives[0].getHid(), hives[0].getFrames());
 			frameCounter++;
 			frames[0].setStartTime(begin);
@@ -247,7 +252,7 @@ public class Buzz
 							frames[i-1].getAge(frames, frameAge, name, h,i);
 						}
 					}
-					System.out.println(name + " also has $" + money + " in total.");
+					System.out.println(name + " also has $" + money + " in total.\n");
 					break;
 					/*System.out.println("Which frame?"); DEPRECATED
 					f = in.nextInt();
@@ -505,6 +510,7 @@ public class Buzz
 								{
 									hives[hiveCounter] = new Hive(hiveCounter + 1);
 									hives[hiveCounter].addFrames();
+									hives[hiveCounter].addQueens();
 									frames[frameCounter] = new Frame(true, hives[hiveCounter].getHid(), hives[hiveCounter].getFrames());
 									hiveCounter++;
 									frameCounter++;
@@ -549,10 +555,10 @@ public class Buzz
 				}
 				break;
 
-				// Make a new frame in the same hive
+				// Place a queen in a frame in an established hive
 
 				case 'f' :
-				System.out.println("This will place a queen in a new frame in the same hive. It costs $1000 for the queen");
+				System.out.println("This will place a queen in a new frame in an existing hive. It costs $1000 for the queen");
 				if (money < frameCost)
 				{
 					System.out.println("Not enough money");
@@ -562,16 +568,19 @@ public class Buzz
 				{
 					money = money - frameCost;
 				}
-					frameCounter = makeNewFrame(hives, frames, hiveCounter, frameCounter);
-					// Start new timers
-					world.startResourceTimer(frames, resourceTimer, resourceTime, frameCounter);
-					world.startConsumeTimer(frames, consumeTimer, consumeTime, frameCounter);
-					world.startBroodTimer(frames, broodTimer, broodTime, frameCounter);
-					world.startLarvaeTimer(frames, larvaeTimer, larvaeTime, frameCounter);
-					world.startBeeTimer(frames, beeTimer, beeTime, frameCounter);
-					world.startWaxTimer(frames, waxTimer, waxTime, frameCounter);
-					world.startClutterTimer(frames, clutterTimer, clutterTime, frameCounter);
-					break;
+				Scanner scan = new Scanner(System.in);
+				System.out.println("Add queen to which hive?");
+				for (int i = 1; i <= hiveCounter; i++)
+				{
+					System.out.println("Hive " + hives[i-1].getHid());
+				}
+				int hid = scan.nextInt();
+				if (hid > hiveCounter)
+				{
+					System.out.println("Invalid selection");
+				}
+				frameCounter = makeNewFrame(hives, frames, hiveCounter, frameCounter, true, hid);
+				break;
 
 				// Quit case: Saves and Quits game
 
@@ -612,36 +621,33 @@ public class Buzz
 		}	
 	}
 
-	// Method to make a new frame in the same hive
-	public static int makeNewFrame(Hive[] hive, Frame[] fr, int hcount, int fcount)
+	// Method to make a new frame in the same hive (with or without a queen)
+	public static int makeNewFrame(Hive[] hive, Frame[] fr, int hcount, int fcount, boolean queen, int hid)
 	{
-		Scanner in = new Scanner(System.in);
-		System.out.println("New frame in which hive?");
-		for (int i = 1; i <= hcount; i++)
+		if (hive[hid-1].getQueens() >= 10)
 		{
-			System.out.println("Hive " + hive[i-1].getHid());
-		}
-		int hid = in.nextInt();
-		if (hid > hcount)
-		{
-			System.out.println("Invalid selection");
-			return fcount;
-		}
-		if (hive[hid-1].getFrames() >= 10)
-		{
-			System.out.println("Hive is full");
+			System.out.println("Hive is full of frames, and each frame has a queen");
 			return fcount;
 		}
 		else
 		{
-			hive[hid-1].addFrames();
-			fr[fcount] = new Frame(true, hid, hive[hid-1].getFrames());
-			Date date = new Date();
-			fr[fcount].setStartTime(date.getTime()/1000L);
-			fr[fcount].setHoney(5);
-			fr[fcount].setPollen(5);
-			fr[fcount].setBees(1);
-			fcount++;
+			if (hive[hid-1].getFrames() < 10)
+			{
+				hive[hid-1].addFrames();
+				fr[fcount] = new Frame(queen, hid, hive[hid-1].getFrames());
+				fcount++;
+			}
+			else
+			{
+				int nextQueen = (hid - 1) * 10 + hive[hid-1].getQueens();
+				fr[nextQueen].setQueen(true);
+				hive[hid-1].addQueens();
+				Date date = new Date();
+				fr[nextQueen].setStartTime(date.getTime()/1000L);
+				fr[nextQueen].setHoney(5);
+				fr[nextQueen].setPollen(5);
+				fr[nextQueen].setBees(1);
+			}
 			return fcount;
 		}
 	}
