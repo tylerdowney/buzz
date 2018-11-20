@@ -157,7 +157,7 @@ public class Frame
 		}
 		else
 		{
-			System.out.println("Hive " + hn + ", Frame " + fn + " hasn't been drawn yet");
+			System.out.println("Hive " + hn + ", Frame " + fn + " hasn't been drawn yet\n");
 		}
 	}
 

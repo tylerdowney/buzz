@@ -74,8 +74,8 @@ public class WorldClock
 
 	public static void startClutterTimer(Frame[] frame, Timer timer, int time, int fcount)
 	{
-		double clutPerSec = 0.01;
-		double clutPerBee = 0.0001;
+		double clutPerSec = 0.1;
+		double clutPerBee = 0.00001;
 		TimerTask clutterTask = new TimerTask()
 		{
 			public void run()
@@ -162,12 +162,12 @@ public class WorldClock
 			{
 				for (int i = 1; i <= fcount; i++)
 				{
-					if (frame[i-1].hasQueen() && frame[i-1].getEmptyCells() > 1)
+					if (frame[i-1].hasQueen() && frame[i-1].getEmptyCells() > 2 * frame[i-1].getBeeUpgrade() * (frame[i-1].getBees()/10 + 1))
 					{
 						frame[i-1].addHoney(frame[i-1].getBeeUpgrade() * (frame[i-1].getBees()/10 + 1));
-						frame[i-1].addEmptyCells(-1);
+						frame[i-1].addEmptyCells(frame[i-1].getBeeUpgrade() * (frame[i-1].getBees()/10 + 1));
 						frame[i-1].addPollen(frame[i-1].getBeeUpgrade() * (frame[i-1].getBees()/10 + 1));
-						frame[i-1].addEmptyCells(-1);
+						frame[i-1].addEmptyCells(frame[i-1].getBeeUpgrade() * (frame[i-1].getBees()/10 + 1));
 					}
 				}
 			}
@@ -185,7 +185,7 @@ public class WorldClock
 				{
 					if (frame[i-1].hasQueen() && frame[i-1].getCells() < frame[i-1].getCellMax())
 					{
-						frame[i-1].addEmptyCells(1);
+						frame[i-1].addEmptyCells(frame[i-1].getBees()/100 * frame[i-1].getBeeUpgrade());
 					}
 				}
 			}
