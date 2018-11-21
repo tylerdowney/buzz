@@ -36,7 +36,7 @@ public class WorldClock
 				int broodMax = 2000;
 				for (int i = 1; i <= fcount; i++)
 				{
-					if (frame[i-1].hasQueen() && frame[i-1].getBrood() <= broodMax)
+					if (frame[i-1].hasQueen() && frame[i-1].getBroodCells() <= broodMax)
 					{
 						frame[i-1].addBrood(20 * frame[i-1].getQueenUpgrade());
 						frame[i-1].addEmptyCells(-20 * frame[i-1].getQueenUpgrade());
@@ -58,7 +58,7 @@ public class WorldClock
 			{
 				for (int i = 1; i <= fcount; i++)
 				{
-					if (frame[i-1].hasQueen() && frame[i-1].getBrood() > 0)
+					if (frame[i-1].hasQueen() && frame[i-1].getBroodCells() > 0)
 					{
 						frame[i-1].addClutter(20 * clutPerEgg * frame[i-1].getQueenUpgrade());
 						frame[i-1].addLarvae(20 * frame[i-1].getQueenUpgrade());
@@ -138,13 +138,13 @@ public class WorldClock
 				{
 					if (frame[i-1].hasQueen() && frame[i-1].getHoney() > 0)
 					{
-						frame[i-1].addHoney(-frame[i-1].getBees()/100 - frame[i-1].getBrood()/50);
-						frame[i-1].addEmptyCells(frame[i-1].getBees()/100 - frame[i-1].getBrood()/50);
+						frame[i-1].addHoney(-frame[i-1].getBees()/100 - frame[i-1].getBroodCells()/50);
+						frame[i-1].addEmptyCells(frame[i-1].getBees()/100 + frame[i-1].getBroodCells()/50);
 					}
 					if (frame[i-1].hasQueen() && frame[i-1].getPollen() > 0)
 					{
-						frame[i-1].addPollen(-frame[i-1].getBees()/100 - frame[i-1].getBrood()/50);
-						frame[i-1].addEmptyCells(frame[i-1].getBees()/100 - frame[i-1].getBrood()/50);
+						frame[i-1].addPollen(-frame[i-1].getBees()/100 - frame[i-1].getBroodCells()/50);
+						frame[i-1].addEmptyCells(frame[i-1].getBees()/100 + frame[i-1].getBroodCells()/50);
 					}
 				}
 			}
@@ -165,9 +165,15 @@ public class WorldClock
 					if (frame[i-1].hasQueen() && frame[i-1].getEmptyCells() > 2 * frame[i-1].getBeeUpgrade() * (frame[i-1].getBees()/10 + 1))
 					{
 						frame[i-1].addHoney(frame[i-1].getBeeUpgrade() * (frame[i-1].getBees()/10 + 1));
-						frame[i-1].addEmptyCells(frame[i-1].getBeeUpgrade() * (frame[i-1].getBees()/10 + 1));
+						frame[i-1].addEmptyCells(-frame[i-1].getBeeUpgrade() * (frame[i-1].getBees()/10 + 1));
 						frame[i-1].addPollen(frame[i-1].getBeeUpgrade() * (frame[i-1].getBees()/10 + 1));
-						frame[i-1].addEmptyCells(frame[i-1].getBeeUpgrade() * (frame[i-1].getBees()/10 + 1));
+						frame[i-1].addEmptyCells(-frame[i-1].getBeeUpgrade() * (frame[i-1].getBees()/10 + 1));
+					}
+					if (frame[i-1].getEmptyCells() <= 2 * frame[i-1].getBeeUpgrade() * (frame[i-1].getBees()/10 + 1))
+					{
+						frame[i-1].addHoney(frame[i-1].getEmptyCells()/2);
+						frame[i-1].addPollen(frame[i-1].getEmptyCells()/2);
+						frame[i-1].setEmptyCells(0);
 					}
 				}
 			}

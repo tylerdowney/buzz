@@ -98,7 +98,7 @@ public class Frame
 		return queenUpgrade;
 	}
 
-	public int getBrood()
+	public int getBroodCells()
 	{
 		return broodCells;
 	}
@@ -107,7 +107,6 @@ public class Frame
 	{
 		return larvae;
 	}
-
 	public double getClutter()
 	{
 		return clutter;
@@ -259,6 +258,11 @@ public class Frame
 	public void setEmptyCells(int ec)
 	{
 		this.emptyCells = ec;
+	}
+
+	public void setCells(int c)
+	{
+		this.cells = c;
 	}
 
 	public void setLarvae(int lr)
