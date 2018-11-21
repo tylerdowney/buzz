@@ -38,8 +38,9 @@ public class WorldClock
 				{
 					if (frame[i-1].hasQueen() && frame[i-1].getBroodCells() <= broodMax)
 					{
-						frame[i-1].addBrood(20 * frame[i-1].getQueenUpgrade());
-						frame[i-1].addEmptyCells(-20 * frame[i-1].getQueenUpgrade());
+						int addBrood = getRandomInt(20 * frame[i-1].getQueenUpgrade());
+						frame[i-1].addBrood(addBrood);
+						frame[i-1].addEmptyCells(-addBrood);
 					}
 				}
 			}
@@ -60,9 +61,10 @@ public class WorldClock
 				{
 					if (frame[i-1].hasQueen() && frame[i-1].getBroodCells() > 0)
 					{
-						frame[i-1].addClutter(20 * clutPerEgg * frame[i-1].getQueenUpgrade());
-						frame[i-1].addLarvae(20 * frame[i-1].getQueenUpgrade());
-						frame[i-1].addBrood(-20 * frame[i-1].getQueenUpgrade());
+						int addLarvae = getRandomInt(20 * frame[i-1].getQueenUpgrade());
+						frame[i-1].addClutter(getRandomDouble(20 * clutPerEgg * frame[i-1].getQueenUpgrade()));
+						frame[i-1].addLarvae(addLarvae);
+						frame[i-1].addBrood(-addLarvae);
 					}
 				}
 			}
@@ -74,7 +76,7 @@ public class WorldClock
 
 	public static void startClutterTimer(Frame[] frame, Timer timer, int time, int fcount)
 	{
-		double clutPerSec = 0.1;
+		double clutPerSec = 1.0;
 		double clutPerBee = 0.00001;
 		TimerTask clutterTask = new TimerTask()
 		{
@@ -84,15 +86,17 @@ public class WorldClock
 				{
 					if (frame[i-1].hasQueen())
 					{
-						frame[i-1].addClutter((time/1000) * clutPerSec);
+						double addClutter = getRandomDouble((time/1000) * clutPerSec);
+						frame[i-1].addClutter(addClutter);
 						if (frame[i-1].getClutter() > 0)
 						{
-							frame[i-1].addClutter(-(time/1000) * frame[i-1].getBees() * clutPerBee);
+							double removeClutter = getRandomDouble((time/1000) * frame[i-1].getBees() * clutPerBee);
+							frame[i-1].addClutter(-removeClutter);
 						}
 						if (frame[i-1].getClutter() * 100.0/frame[i-1].getClutterMax() >= 100.0)
 						{
 							System.out.println("Your bees can't clean the hive fast enough and " + frame[i-1].getBees()/200 + " bees have died. Add more bees to clean faster, or make a new frame to replace this old one");
-							frame[i-1].addBees(-frame[i-1].getBees()/200);
+							frame[i-1].addBees(getRandomInt(-frame[i-1].getBees()/200));
 							frame[i-1].addClutter(-frame[i-1].getClutter()/20);
 						}
 					}
@@ -116,9 +120,10 @@ public class WorldClock
 				{
 					if (frame[i-1].hasQueen() && frame[i-1].getBees() <= beeMax && frame[i-1].getLarvae() > 0)
 					{
-						frame[i-1].addBees(20 * frame[i-1].getQueenUpgrade());
-						frame[i-1].addLarvae(-20 * frame[i-1].getQueenUpgrade());
-						frame[i-1].addEmptyCells(20 * frame[i-1].getQueenUpgrade());
+						int addBees = getRandomInt(20 * frame[i-1].getQueenUpgrade());
+						frame[i-1].addBees(addBees);
+						frame[i-1].addLarvae(-addBees);
+						frame[i-1].addEmptyCells(addBees);
 					}
 				}
 			}
@@ -138,13 +143,15 @@ public class WorldClock
 				{
 					if (frame[i-1].hasQueen() && frame[i-1].getHoney() > 0)
 					{
-						frame[i-1].addHoney(-frame[i-1].getBees()/100 - frame[i-1].getBroodCells()/50);
-						frame[i-1].addEmptyCells(frame[i-1].getBees()/100 + frame[i-1].getBroodCells()/50);
+						int addHoney = getRandomInt(frame[i-1].getBees()/100 - frame[i-1].getBroodCells()/50);
+						frame[i-1].addHoney(-addHoney);
+						frame[i-1].addEmptyCells(addHoney);
 					}
 					if (frame[i-1].hasQueen() && frame[i-1].getPollen() > 0)
 					{
-						frame[i-1].addPollen(-frame[i-1].getBees()/100 - frame[i-1].getBroodCells()/50);
-						frame[i-1].addEmptyCells(frame[i-1].getBees()/100 + frame[i-1].getBroodCells()/50);
+						int addPollen = getRandomInt(frame[i-1].getBees()/100 - frame[i-1].getBroodCells()/50);
+						frame[i-1].addPollen(-addPollen);
+						frame[i-1].addEmptyCells(addPollen);
 					}
 				}
 			}
@@ -164,10 +171,12 @@ public class WorldClock
 				{
 					if (frame[i-1].hasQueen() && frame[i-1].getEmptyCells() > 2 * frame[i-1].getBeeUpgrade() * (frame[i-1].getBees()/10 + 1))
 					{
-						frame[i-1].addHoney(frame[i-1].getBeeUpgrade() * (frame[i-1].getBees()/10 + 1));
-						frame[i-1].addEmptyCells(-frame[i-1].getBeeUpgrade() * (frame[i-1].getBees()/10 + 1));
-						frame[i-1].addPollen(frame[i-1].getBeeUpgrade() * (frame[i-1].getBees()/10 + 1));
-						frame[i-1].addEmptyCells(-frame[i-1].getBeeUpgrade() * (frame[i-1].getBees()/10 + 1));
+						int addHoney = getRandomInt(frame[i-1].getBeeUpgrade() * (frame[i-1].getBees()/10 + 1));
+						int addPollen = getRandomInt(frame[i-1].getBeeUpgrade() * (frame[i-1].getBees()/10 + 1));
+						frame[i-1].addHoney(addHoney);
+						frame[i-1].addEmptyCells(-addHoney);
+						frame[i-1].addPollen(addPollen);
+						frame[i-1].addEmptyCells(-addPollen);
 					}
 					if (frame[i-1].getEmptyCells() <= 2 * frame[i-1].getBeeUpgrade() * (frame[i-1].getBees()/10 + 1))
 					{
@@ -191,11 +200,28 @@ public class WorldClock
 				{
 					if (frame[i-1].hasQueen() && frame[i-1].getCells() < frame[i-1].getCellMax())
 					{
-						frame[i-1].addEmptyCells(frame[i-1].getBees()/100 * frame[i-1].getBeeUpgrade());
+						frame[i-1].addEmptyCells(getRandomInt(frame[i-1].getBees()/100 * frame[i-1].getBeeUpgrade()));
 					}
 				}
 			}
 		};
 		timer.scheduleAtFixedRate(waxTask, new Date(), time);
+	}
+
+	public static double getRandomDouble(double value)
+	{
+		double randomFactor = 0.2;
+		double lower = value - value*randomFactor;
+		double upper = value + value*randomFactor;
+		return lower + (upper - lower)*Math.random();
+	}
+
+	public static int getRandomInt(int value)
+	{
+		double randomFactor = 0.2;
+		double lower = value - value*randomFactor;
+		double upper = value + value*randomFactor;
+		Long random = Math.round(lower + (upper - lower)*Math.random());
+		return random.intValue();
 	}
 }

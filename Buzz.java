@@ -132,12 +132,12 @@ public class Buzz
 						frames[j-1].setStartTime(sc.nextLong());
 						if (frames[j-1].hasQueen())
 						{
-							frames[j-1].addHoney(resourceOffset * frames[j-1].getBeeUpgrade());
-							frames[j-1].addPollen(resourceOffset * frames[j-1].getBeeUpgrade());
-							frames[j-1].addBees(beeOffset * 20 * frames[j-1].getQueenUpgrade());	
-							frames[j-1].addLarvae(larvaeOffset * 20 * frames[j-1].getQueenUpgrade());	
-							frames[j-1].addBrood(broodOffset * 20 * frames[j-1].getQueenUpgrade());	
-							frames[j-1].addEmptyCells(waxOffset * 20 * frames[j-1].getQueenUpgrade());
+							frames[j-1].addHoney(world.getRandomInt(resourceOffset * frames[j-1].getBeeUpgrade()));
+							frames[j-1].addPollen(world.getRandomInt(resourceOffset * frames[j-1].getBeeUpgrade()));
+							frames[j-1].addBees(world.getRandomInt(beeOffset * 20 * frames[j-1].getQueenUpgrade()));	
+							frames[j-1].addLarvae(world.getRandomInt(larvaeOffset * 20 * frames[j-1].getQueenUpgrade()));	
+							frames[j-1].addBrood(world.getRandomInt(broodOffset * 20 * frames[j-1].getQueenUpgrade()));	
+							frames[j-1].addEmptyCells(world.getRandomInt(waxOffset * 20 * frames[j-1].getQueenUpgrade()));
 
 							// Disallow exceeding maximum values
 							if (frames[j-1].getBees() > beeMax)
@@ -541,13 +541,14 @@ public class Buzz
 									}
 									hives[hiveCounter-1].addFrames();
 									hives[hiveCounter-1].addQueens();
-									frames[frameCounter] = new Frame(true, hives[hiveCounter].getHid(), hives[hiveCounter-1].getFrames());
+									frames[frameCounter] = new Frame(true, hives[hiveCounter-1].getHid(), hives[hiveCounter-1].getFrames());
 									frameCounter++;
 									frames[frameCounter-1].setHoney(frames[i-1].getHoneyCells());
 									frames[frameCounter-1].setPollen(frames[i-1].getPollenCells());
 									frames[frameCounter-1].setBees(frames[i-1].getBees());
 									frames[frameCounter-1].setLarvae(frames[i-1].getLarvae());
 									frames[frameCounter-1].setBrood(frames[i-1].getBroodCells());
+									frames[frameCounter-1].setEmptyCells(frames[i-1].getEmptyCells());
 									frames[frameCounter-1].setClutter(frames[i-1].getClutter());
 									frames[i-1].setQueen(false);
 									frames[i-1].setHoney(0);
@@ -555,6 +556,7 @@ public class Buzz
 									frames[i-1].setBees(0);
 									frames[i-1].setLarvae(0);
 									frames[i-1].setBrood(0);
+									frames[i-1].setEmptyCells(0);
 									frames[i-1].setClutter(0);
 									Date date = new Date();
 									frames[frameCounter-1].setStartTime(date.getTime()/1000L);
@@ -616,10 +618,6 @@ public class Buzz
 					System.out.println("Hive " + hives[i-1].getHid());
 				}
 				int hid = scan.nextInt();
-				if (hid > hiveCounter)
-				{
-					System.out.println("Invalid selection");
-				}
 				frameCounter = makeNewFrame(hives, frames, hiveCounter, frameCounter, true, hid);
 				break;
 
@@ -665,6 +663,11 @@ public class Buzz
 	// Method to make a new frame in the same hive (with or without a queen)
 	public static int makeNewFrame(Hive[] hive, Frame[] fr, int hcount, int fcount, boolean queen, int hid)
 	{
+		if (hid > hcount)
+		{
+			System.out.println("Invalid Selection");
+			return fcount;
+		}
 		if (hive[hid-1].getQueens() >= 10)
 		{
 			System.out.println("Hive is full of frames, and each frame has a queen");
