@@ -2,12 +2,8 @@
 public class Frame
 {
 	private double honey;
-	private int bees;
-	private boolean queen;
 	private double pollen;
 	private long starttime;
-	private int beeUpgrade;
-	private int queenUpgrade;
 	private int hiveId;
 	private int frameId;
 	private int larvae;
@@ -23,16 +19,12 @@ public class Frame
 	private int broodCells;
 	private int emptyCells;
 
-	public Frame(boolean q, int hid, int fid)
+	public Frame(int hid, int fid)
 	{
 		honey = 0;
-		bees = 0;
-		queen = q;
 		pollen = 0;
 		hiveId = hid;
 		frameId = fid;
-		queenUpgrade = 1;
-		beeUpgrade = 1;
 		larvae = 0;
 		clutter = 0;
 		cellMax = 3500;
@@ -48,24 +40,9 @@ public class Frame
 		cells = 0;
 	}
 
-	public boolean getQueen()
-	{
-		return queen;
-	}
-
 	public double getHoney()
 	{
 		return honeyPerCell * honeyCells;
-	}
-
-	public int getBees()
-	{
-		return bees;
-	}
-
-	public boolean hasQueen()
-	{
-		return queen;
 	}
 
 	public double getPollen()
@@ -86,16 +63,6 @@ public class Frame
 	public int getFid()
 	{
 		return frameId;
-	}
-
-	public int getBeeUpgrade()
-	{
-		return beeUpgrade;
-	}
-
-	public int getQueenUpgrade()
-	{
-		return queenUpgrade;
 	}
 
 	public int getBroodCells()
@@ -148,26 +115,14 @@ public class Frame
 		return cells;
 	}
 
-	public static void getAge(Frame[] frames, long t, String n, int hn, int fn)
+	public static void getAge(Hive[] hives, long t, String n, int hn, int fn)
 	{
-		if (frames[fn-1].hasQueen())
-		{
-			System.out.println(t/31536000 + " yr, " + (t%31536000)/86400 + " dy, " + (t%31536000%86400)/3600 + " hr, " + (t%31536000%86400%3600)/60 + " min, " + t%31536000%86400%3600%60 + " s\n");
-		}
-		else
-		{
-			System.out.println("Hive " + hn + ", Frame " + fn + " hasn't been drawn yet\n");
-		}
+		System.out.println(t/31536000 + " yr, " + (t%31536000)/86400 + " dy, " + (t%31536000%86400)/3600 + " hr, " + (t%31536000%86400%3600)/60 + " min, " + t%31536000%86400%3600%60 + " s\n");
 	}
 
 	public void addHoney(int h)
 	{
 		this.honeyCells = honeyCells + h;
-	}
-
-	public void addBees(int b)
-	{
-		this.bees = bees + b;
 	}
 
 	public void addPollen(int p)
@@ -185,16 +140,6 @@ public class Frame
 		this.emptyCells = emptyCells + e;
 	}
 
-	public void addBeeUpgrade()
-	{
-		this.beeUpgrade = beeUpgrade + 1;
-	}
-
-	public void addQueenUpgrade()
-	{
-		this.queenUpgrade = queenUpgrade + 1;
-	}
-
 	public void addBrood(int b)
 	{
 		this.broodCells = broodCells + b;
@@ -210,11 +155,6 @@ public class Frame
 		this.clutter = clutter + c;
 	}
 
-	public void setQueen(boolean q)
-	{
-		this.queen = q;
-	}
-
 	public void setHoney(int h)
 	{
 		this.honeyCells = h;
@@ -223,21 +163,6 @@ public class Frame
 	public void setPollen(int p)
 	{
 		this.pollenCells = p;
-	}
-
-	public void setBees(int b)
-	{
-		this.bees = b;
-	}
-
-	public void setBeeUpgrade(int bu)
-	{
-		this.beeUpgrade = bu;
-	}
-
-	public void setQueenUpgrade(int qu)
-	{
-		this.queenUpgrade = qu;
 	}
 	
 	public void setHid(int hid)
@@ -263,6 +188,11 @@ public class Frame
 	public void setCells(int c)
 	{
 		this.cells = c;
+	}
+
+	public void setCellMax(int c)
+	{
+		this.cellMax = c;
 	}
 
 	public void setLarvae(int lr)

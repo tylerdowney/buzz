@@ -24,6 +24,8 @@ public class Buzz
 		double cUpCost = 1000; // Cost of carrying capacity upgrade
 		double gUpCost = 1000; // Cost of queen laying upgrade
 		double vUpCost = 1000; // Cost of bee/honey/pollen values upgrade
+		double superCost = 0; // Cost of Honey Super upgrade
+		int superIncrease = 3500;
 		double frameCost = 0;
 		double valueUpgrade = 1;
 		char load;
@@ -51,7 +53,6 @@ public class Buzz
 		Random rand = new Random();
 		int n;
 		int framesPerHive = 10;
-		int beeMax = 3000;
 		int broodMax = 2000;
 		Hive[] hives = new Hive[1000];
 		Frame[] frames = new Frame[framesPerHive * hives.length];
@@ -109,64 +110,56 @@ public class Buzz
 				for (int i = 1; i <= hiveCounter; i++)
 				{
 					hives[i-1] = new Hive(i);
-				}
-					for (int j = 1; j <= frameCounter; j++)
+					hives[i-1].setBees(sc.nextInt());
+					hives[i-1].setBeeUpgrade(sc.nextInt());
+					hives[i-1].setQueenUpgrade(sc.nextInt());
+					hives[i-1].addBees(world.getRandomInt(beeOffset * 20 * hives[i-1].getQueenUpgrade()));	
+					if (hives[i-1].getBees() > hives[i-1].getBeeMax())
 					{
-						int tempHid = -1;
-						tempHid = sc.nextInt();
-						hives[tempHid - 1].addFrames();
-						boolean tempQueen = sc.nextBoolean();
-						frames[j-1] = new Frame(tempQueen, tempHid, hives[tempHid - 1].getFrames());
-						if (tempQueen)
-						{
-							hives[tempHid - 1].addQueens();
-						}
-						frames[j-1].setHoney(sc.nextInt());
-						frames[j-1].setPollen(sc.nextInt());
-						frames[j-1].setBees(sc.nextInt());
-						frames[j-1].setLarvae(sc.nextInt());
-						frames[j-1].setBrood(sc.nextInt());
-						frames[j-1].setEmptyCells(sc.nextInt());
-						frames[j-1].setBeeUpgrade(sc.nextInt());
-						frames[j-1].setQueenUpgrade(sc.nextInt());
-						frames[j-1].setStartTime(sc.nextLong());
-						if (frames[j-1].hasQueen())
-						{
-							frames[j-1].addHoney(world.getRandomInt(resourceOffset * frames[j-1].getBeeUpgrade()));
-							frames[j-1].addPollen(world.getRandomInt(resourceOffset * frames[j-1].getBeeUpgrade()));
-							frames[j-1].addBees(world.getRandomInt(beeOffset * 20 * frames[j-1].getQueenUpgrade()));	
-							frames[j-1].addLarvae(world.getRandomInt(larvaeOffset * 20 * frames[j-1].getQueenUpgrade()));	
-							frames[j-1].addBrood(world.getRandomInt(broodOffset * 20 * frames[j-1].getQueenUpgrade()));	
-							frames[j-1].addEmptyCells(world.getRandomInt(waxOffset * 20 * frames[j-1].getQueenUpgrade()));
-
-							// Disallow exceeding maximum values
-							if (frames[j-1].getBees() > beeMax)
-							{
-								frames[j-1].setBees(beeMax);
-							}
-							if (frames[j-1].getBroodCells() > broodMax)
-							{
-								frames[j-1].setBrood(broodMax);
-							}
-							
-							// Proportionally set new values if they exceed max
-							if (frames[j-1].getCells() >= frames[j-1].getCellMax())
-							{
-
-								Long honeyFactor = Math.round((frames[j-1].getHoneyCells() * 1.0/frames[j-1].getCells()) * frames[j-1].getCellMax());
-								Long pollenFactor = Math.round((frames[j-1].getPollenCells() * 1.0/frames[j-1].getCells()) * frames[j-1].getCellMax());
-								Long larvaeFactor = Math.round((frames[j-1].getLarvae() * 1.0/frames[j-1].getCells()) * frames[j-1].getCellMax());
-								Long broodFactor = Math.round((frames[j-1].getBroodCells() * 1.0/frames[j-1].getCells()) * frames[j-1].getCellMax());
-								Long emptyFactor = Math.round((frames[j-1].getEmptyCells() * 1.0/frames[j-1].getCells()) * frames[j-1].getCellMax());
-
-								frames[j-1].setHoney(honeyFactor.intValue());
-								frames[j-1].setPollen(pollenFactor.intValue());
-								frames[j-1].setLarvae(larvaeFactor.intValue());
-								frames[j-1].setBrood(broodFactor.intValue());
-								frames[j-1].setEmptyCells(emptyFactor.intValue());
-							}
-						}
+						hives[i-1].setBees(hives[i-1].getBeeMax());
 					}
+				}
+				for (int j = 1; j <= frameCounter; j++)
+				{
+					int tempHid = -1;
+					tempHid = sc.nextInt();
+					hives[tempHid - 1].addFrames();
+					frames[j-1] = new Frame(tempHid, hives[tempHid - 1].getFrames());
+					frames[j-1].setHoney(sc.nextInt());
+					frames[j-1].setPollen(sc.nextInt());
+					frames[j-1].setLarvae(sc.nextInt());
+					frames[j-1].setBrood(sc.nextInt());
+					frames[j-1].setEmptyCells(sc.nextInt());
+					frames[j-1].setStartTime(sc.nextLong());
+					frames[j-1].addHoney(world.getRandomInt(resourceOffset * hives[j-1].getBeeUpgrade()));
+					frames[j-1].addPollen(world.getRandomInt(resourceOffset * hives[j-1].getBeeUpgrade()));
+					frames[j-1].addLarvae(world.getRandomInt(larvaeOffset * 20 * hives[j-1].getQueenUpgrade()));	
+					frames[j-1].addBrood(world.getRandomInt(broodOffset * 20 * hives[j-1].getQueenUpgrade()));	
+					frames[j-1].addEmptyCells(world.getRandomInt(waxOffset * 20 * hives[j-1].getQueenUpgrade()));
+
+					// Disallow exceeding maximum values
+					if (frames[j-1].getBroodCells() > broodMax)
+					{
+						frames[j-1].setBrood(broodMax);
+					}
+							
+					// Proportionally set new values if they exceed max
+					if (frames[j-1].getCells() >= frames[j-1].getCellMax())
+					{
+
+						Long honeyFactor = Math.round((frames[j-1].getHoneyCells() * 1.0/frames[j-1].getCells()) * frames[j-1].getCellMax());
+						Long pollenFactor = Math.round((frames[j-1].getPollenCells() * 1.0/frames[j-1].getCells()) * frames[j-1].getCellMax());
+						Long larvaeFactor = Math.round((frames[j-1].getLarvae() * 1.0/frames[j-1].getCells()) * frames[j-1].getCellMax());
+						Long broodFactor = Math.round((frames[j-1].getBroodCells() * 1.0/frames[j-1].getCells()) * frames[j-1].getCellMax());
+						Long emptyFactor = Math.round((frames[j-1].getEmptyCells() * 1.0/frames[j-1].getCells()) * frames[j-1].getCellMax());
+
+						frames[j-1].setHoney(honeyFactor.intValue());
+						frames[j-1].setPollen(pollenFactor.intValue());
+						frames[j-1].setLarvae(larvaeFactor.intValue());
+						frames[j-1].setBrood(broodFactor.intValue());
+						frames[j-1].setEmptyCells(emptyFactor.intValue());
+					}
+				}
 				sc.close();
 			}
 			catch (FileNotFoundException e)
@@ -192,21 +185,16 @@ public class Buzz
 			hiveCounter++;
 			hives[0] = new Hive(hiveCounter);
 			hives[0].addFrames();
-			hives[0].addQueens();
-			frames[0] = new Frame(true, hives[0].getHid(), hives[0].getFrames());
+			frames[0] = new Frame(hives[0].getHid(), hives[0].getFrames());
 			frameCounter++;
 			frames[0].setStartTime(begin);
 
 			for (int i = 2; i <= 10; i++)
 			{
 				hives[0].addFrames();
-				frames[i-1] = new Frame(false, hives[0].getHid(), hives[0].getFrames());
+				frames[i-1] = new Frame(hives[0].getHid(), hives[0].getFrames());
 				frameCounter++;
 			}
-
-			frames[0].addBees(1);
-			frames[0].addHoney(5);
-			frames[0].addPollen(5);
 		}
 		else
 		{
@@ -215,13 +203,13 @@ public class Buzz
 
 		//Start game timers
 
-		world.startResourceTimer(frames, resourceTimer, resourceTime, frameCounter);
-		world.startConsumeTimer(frames, consumeTimer, consumeTime, frameCounter);	
-		world.startBroodTimer(frames, broodTimer, broodTime, frameCounter);
-		world.startLarvaeTimer(frames, larvaeTimer, larvaeTime, frameCounter);
-		world.startBeeTimer(frames, beeTimer, beeTime, frameCounter);
-		world.startWaxTimer(frames, waxTimer, waxTime, frameCounter);
-		world.startClutterTimer(frames, clutterTimer, clutterTime, frameCounter);	
+		world.startResourceTimer(hives, frames, resourceTimer, resourceTime, frameCounter);
+		world.startConsumeTimer(hives, frames, consumeTimer, consumeTime, frameCounter);	
+		world.startBroodTimer(hives, frames, broodTimer, broodTime, frameCounter);
+		world.startLarvaeTimer(hives, frames, larvaeTimer, larvaeTime, frameCounter);
+		world.startBeeTimer(hives, frames, beeTimer, beeTime, hiveCounter);
+		world.startWaxTimer(hives, frames, waxTimer, waxTime, frameCounter);
+		world.startClutterTimer(hives, frames, clutterTimer, clutterTime, frameCounter);	
 		
 		// Loop to determine and define actions
 
@@ -237,7 +225,7 @@ public class Buzz
 			//System.out.println("Deploy Bees (d)"); DEPRECATED
 			//System.out.println("Make Bees (m)"); DEPRECATED
 			System.out.println("Sell (s)");
-			System.out.println("Upgrade (u)");
+			System.out.println("Buy upgrades (b)");
 			System.out.println("Split (p)");
 			System.out.println("Add Queen to Frame (f)");
 			System.out.println("Save and Quit (q)");
@@ -264,14 +252,14 @@ public class Buzz
 						System.out.println("Invalid selection");
 						break;
 					}
-					System.out.println("Hive " + h + "\n");
+					System.out.println("Hive " + h + "has " + hives[h-1].getBees() + " bees\n");
 					for (int i = 1; i <= frameCounter; i++)
 					{
 						if (frames[i-1].getHid() == h)
 						{			
-							System.out.println("Frame " + frames[i-1].getFid() + ": filled cells: " + dec.format((frames[i-1].getCells() - frames[i-1].getEmptyCells())*100.0/frames[i-1].getCellMax()) + "%, drawn cells: " + dec.format(frames[i-1].getCells()*100.0/frames[i-1].getCellMax()) + "%, honey: " + frames[i-1].getHoney() + ", pollen: " + frames[i-1].getPollen() + ", bees: " + frames[i-1].getBees() + ", larvae: " + frames[i-1].getLarvae() + ", eggs: " + frames[i-1].getBroodCells() + ", clutter: " + dec.format(frames[i-1].getClutter()*100.0/frames[i-1].getClutterMax()) + "%");
+							System.out.println("Frame " + frames[i-1].getFid() + ": filled cells: " + dec.format((frames[i-1].getCells() - frames[i-1].getEmptyCells())*100.0/frames[i-1].getCellMax()) + "%, drawn cells: " + dec.format(frames[i-1].getCells()*100.0/frames[i-1].getCellMax()) + "%, honey: " + frames[i-1].getHoney() + ", pollen: " + frames[i-1].getPollen() + ", larvae: " + frames[i-1].getLarvae() + ", eggs: " + frames[i-1].getBroodCells() + ", clutter: " + dec.format(frames[i-1].getClutter()*100.0/frames[i-1].getClutterMax()) + "%");
 							long frameAge = now.getTime()/1000L - frames[i-1].getStartTime();
-							frames[i-1].getAge(frames, frameAge, name, h,i);
+							frames[i-1].getAge(hives, frameAge, name, h,i);
 						}
 					}
 					System.out.println(name + " also has $" + money + " in total.\n");
@@ -356,17 +344,17 @@ public class Buzz
 							sellVar = in.next().charAt(0);
 							if (sellVar == 'b')
 							{
-								System.out.println("Hive " + frames[i-1].getHid() + ", Frame " + frames[i-1].getFid() + " has " + frames[i-1].getBees() + " bees. How many bees would you like to sell?");
+								System.out.println("Hive " + frames[i-1].getHid() + " has " + hives[h-1].getBees() + " bees. How many bees would you like to sell?");
 								sell = in.nextInt();
-								if (sell <= frames[i-1].getBees())
+								if (sell <= hives[h-1].getBees())
 								{
 									System.out.println("At $" + 2.50 * valueUpgrade + " per bee, that comes to $" + 2.50 * valueUpgrade * sell + ". Thank you!");
 									money = money + 2.50 * valueUpgrade * sell;
-									frames[i-1].addBees(-sell);
+									hives[h-1].addBees(-sell);
 								}
 								else
 								{
-									System.out.println("Not enough bees in this frame to sell");
+									System.out.println("Not enough bees in this hive to sell");
 								}
 							}	
 							if (sellVar == 'h')
@@ -408,7 +396,7 @@ public class Buzz
 
 				// Upgrade case: Can purchase upgrades to bee carrying capacity, queen fertility, and commodity value. +1 to capacity and fertility, * 1.2 to value. Cost rises by factor of 1.5 
 
-				case 'u' :
+				case 'b' :
 
 					for (int i = 0; i < hiveCounter; i++)
 					{
@@ -421,7 +409,7 @@ public class Buzz
 						System.out.println("Invalid selection");
 						break;
 					}
-					for (int i = 0; i < frameCounter; i++)
+					/*for (int i = 0; i < frameCounter; i++)
 					{
 						if (frames[i].getHid() == h)
 						{
@@ -434,55 +422,71 @@ public class Buzz
 					{
 						System.out.println("Invalid selection");
 						break;
-					}
-					System.out.println("Would you like to upgrade your bees carrying capacity (c) for $" + cUpCost + ", queens generating capacity (g) for $" + gUpCost + ", or commodity value (v) for $ " + vUpCost + "?");
+					} DEPRECATED*/
+					System.out.println("Would you like to upgrade your bees carrying capacity (c) for $" + cUpCost + ", queens generating capacity (g) for $" + gUpCost + ", commodity value (v) for $ " + vUpCost + ", or buy a Honey Super (h)?");
 					upgrade = in.next().charAt(0);
-					for (int i = 1; i <= frameCounter; i++)
+					if (upgrade == 'c')
 					{
-						if (hives[i-1].getHid() == h && frames[i-1].getFid() == f)
+						if (money < cUpCost)
 						{
-							if (upgrade == 'c')
+							System.out.println("Not enough money");
+						}	
+						else
+						{
+							money = money - cUpCost;
+							cUpCost = 1.5 * cUpCost;
+							hives[h-1].addBeeUpgrade();
+							System.out.println("Congratulations! Your bees can now carry " + hives[h-1].getBeeUpgrade() + " units of pollen and " + hives[h-1].getBeeUpgrade() + " mLs of honey each");
+						}
+					}
+					if (upgrade == 'g')
+					{
+						if (money < gUpCost)
+						{
+							System.out.println("Not enough money");
+						}
+						else		
+						{
+							money = money - gUpCost;
+							gUpCost = 1.5 * gUpCost;
+							hives[h-1].addQueenUpgrade();
+							System.out.println("Congratulations! Your queen can now generate " + hives[h-1].getQueenUpgrade() + " bees from 1 unit of pollen and 1 mL of honey");
+						}
+					}
+					if (upgrade == 'v')
+					{
+						if (money < vUpCost)
+						{
+							System.out.println("Not enough money");
+						}
+						else
+						{
+							money = money - vUpCost;
+							vUpCost = 1.5 * vUpCost;
+							valueUpgrade = 1.2 * valueUpgrade;
+							System.out.println("Congratulations! Bees are now worth $" + 2.50 * valueUpgrade + " and 1 unit of pollen and 1 mL of honey are now worth $" + 1.50 * valueUpgrade);
+						}
+					}
+					if (upgrade =='h')
+					{
+						System.out.println("Add a honey super to which frame?");
+						int hSuper = in.nextInt();
+						for (int i = 1; i <= frameCounter; i++)
+						{
+							if (frames[i-1].getFid() == hSuper)
 							{
-								if (money < cUpCost)
+								if (money < superCost)
 								{
 									System.out.println("Not enough money");
 								}
 								else
 								{
-									money = money - cUpCost;
-									cUpCost = 1.5 * cUpCost;
-									frames[i-1].addBeeUpgrade();
-									System.out.println("Congratulations! Your bees can now carry " + frames[i-1].getBeeUpgrade() + " units of pollen and " + frames[i-1].getBeeUpgrade() + " mLs of honey each");
+									money = money - superCost;
+									superCost = 1.5 * superCost;
+									frames[i-1].setCellMax(frames[i-1].getCellMax() + superIncrease);
+									System.out.println("Congratulations! Frame " + hSuper + "now has a maximum capacity of" + frames[i-1].getCellMax() + " cells");
 								}
 							}
-							if (upgrade == 'g')
-							{
-								if (money < gUpCost)
-								{
-									System.out.println("Not enough money");
-								}
-								else
-								{
-									money = money - gUpCost;
-									gUpCost = 1.5 * gUpCost;
-									frames[i-1].addQueenUpgrade();
-									System.out.println("Congratulations! Your queen can now generate " + frames[i-1].getQueenUpgrade() + " bees from 1 unit of pollen and 1 mL of honey");
-								}
-							}
-							if (upgrade == 'v')
-							{
-								if (money < vUpCost)
-								{
-									System.out.println("Not enough money");
-								}
-								else
-								{
-									money = money - vUpCost;
-									vUpCost = 1.5 * vUpCost;
-									valueUpgrade = 1.2 * valueUpgrade;
-									System.out.println("Congratulations! Bees are now worth $" + 2.50 * valueUpgrade + " and 1 unit of pollen and 1 mL of honey are now worth $" + 1.50 * valueUpgrade);
-								}
-							}	
 							break;	
 						}
 					}		
@@ -538,35 +542,32 @@ public class Buzz
 									{
 										hives[hiveCounter] = new Hive(hiveCounter + 1);
 										hiveCounter++;
+										hives[i-1].setBees(5);
 									}
 									hives[hiveCounter-1].addFrames();
-									hives[hiveCounter-1].addQueens();
-									frames[frameCounter] = new Frame(true, hives[hiveCounter-1].getHid(), hives[hiveCounter-1].getFrames());
+									frames[frameCounter] = new Frame(hives[hiveCounter-1].getHid(), hives[hiveCounter-1].getFrames());
 									frameCounter++;
 									frames[frameCounter-1].setHoney(frames[i-1].getHoneyCells());
 									frames[frameCounter-1].setPollen(frames[i-1].getPollenCells());
-									frames[frameCounter-1].setBees(frames[i-1].getBees());
 									frames[frameCounter-1].setLarvae(frames[i-1].getLarvae());
 									frames[frameCounter-1].setBrood(frames[i-1].getBroodCells());
 									frames[frameCounter-1].setEmptyCells(frames[i-1].getEmptyCells());
 									frames[frameCounter-1].setClutter(frames[i-1].getClutter());
-									frames[i-1].setQueen(false);
 									frames[i-1].setHoney(0);
 									frames[i-1].setPollen(0);
-									frames[i-1].setBees(0);
 									frames[i-1].setLarvae(0);
 									frames[i-1].setBrood(0);
 									frames[i-1].setEmptyCells(0);
 									frames[i-1].setClutter(0);
 									Date date = new Date();
 									frames[frameCounter-1].setStartTime(date.getTime()/1000L);
-									world.startResourceTimer(frames, resourceTimer, resourceTime, frameCounter);
-									world.startConsumeTimer(frames, consumeTimer, consumeTime, frameCounter);	
-									world.startBroodTimer(frames, broodTimer, broodTime, frameCounter);
-									world.startLarvaeTimer(frames, larvaeTimer, larvaeTime, frameCounter);
-									world.startBeeTimer(frames, beeTimer, beeTime, frameCounter);
-									world.startWaxTimer(frames, waxTimer, waxTime, frameCounter);
-									world.startClutterTimer(frames, clutterTimer, clutterTime, frameCounter);
+									world.startResourceTimer(hives, frames, resourceTimer, resourceTime, frameCounter);
+									world.startConsumeTimer(hives, frames, consumeTimer, consumeTime, frameCounter);	
+									world.startBroodTimer(hives, frames, broodTimer, broodTime, frameCounter);
+									world.startLarvaeTimer(hives, frames, larvaeTimer, larvaeTime, frameCounter);
+									world.startBeeTimer(hives, frames, beeTimer, beeTime, frameCounter);
+									world.startWaxTimer(hives, frames, waxTimer, waxTime, frameCounter);
+									world.startClutterTimer(hives, frames, clutterTimer, clutterTime, frameCounter);
 									found++;
 									moveCounter++;
 								}
@@ -587,7 +588,7 @@ public class Buzz
 						for (int i = 1; i < (framesPerHive - moveCounter); i++)
 						{
 							hives[hiveCounter - 1].addFrames();
-							frames[frameCounter] = new Frame(false, hives[hiveCounter - 1].getHid(), hives[hiveCounter - 1].getFrames());
+							frames[frameCounter] = new Frame(hives[hiveCounter - 1].getHid(), hives[hiveCounter - 1].getFrames());
 							frameCounter++;
 						}
 					}
@@ -598,7 +599,7 @@ public class Buzz
 				}
 				break;
 
-				// Place a queen in a frame in an established hive
+				/* Place a queen in a frame in an established hive DEPRECATED
 
 				case 'f' :
 				System.out.println("This will place a queen in a new frame in an existing hive. It costs $1000 for the queen");
@@ -619,7 +620,7 @@ public class Buzz
 				}
 				int hid = scan.nextInt();
 				frameCounter = makeNewFrame(hives, frames, hiveCounter, frameCounter, true, hid);
-				break;
+				break;*/
 
 				// Quit case: Saves and Quits game
 
@@ -639,7 +640,7 @@ public class Buzz
 					waxTimer.purge();
 					clutterTimer.cancel();
 					clutterTimer.purge();
-					saveGame(frames, name, money, frameCounter, hiveCounter, world);
+					saveGame(hives, frames, name, money, frameCounter, hiveCounter, world);
 					break;
 
 				// Bad variable handler
@@ -668,40 +669,24 @@ public class Buzz
 			System.out.println("Invalid Selection");
 			return fcount;
 		}
-		if (hive[hid-1].getQueens() >= 10)
+		if (hive[hid-1].getFrames() < 10)
 		{
-			System.out.println("Hive is full of frames, and each frame has a queen");
-			return fcount;
+			hive[hid-1].addFrames();
+			fr[fcount] = new Frame(hid, hive[hid-1].getFrames());
+			Date date = new Date();
+			fr[fcount].setStartTime(date.getTime()/1000L);
+			fcount++;
 		}
-		else
-		{
-			if (hive[hid-1].getFrames() < 10)
-			{
-				hive[hid-1].addFrames();
-				fr[fcount] = new Frame(queen, hid, hive[hid-1].getFrames());
-				fcount++;
-			}
-			else
-			{
-				int nextQueen = (hid - 1) * 10 + hive[hid-1].getQueens();
-				fr[nextQueen].setQueen(true);
-				hive[hid-1].addQueens();
-				Date date = new Date();
-				fr[nextQueen].setStartTime(date.getTime()/1000L);
-				fr[nextQueen].setHoney(5);
-				fr[nextQueen].setPollen(5);
-				fr[nextQueen].setBees(1);
-			}
-			return fcount;
-		}
+		return fcount;
 	}
 
 	// Method to save game variables to file for future load
 
-	public static void saveGame(Frame[] fr, String name, double money, int fcount, int hcount, WorldClock world)
+	public static void saveGame(Hive[] hv, Frame[] fr, String name, double money, int fcount, int hcount, WorldClock world)
 	{
 		File outFile = new File("/home/tyler/Documents/Java Code/Buzz/" + name + ".txt");
 		Date currentDate = new Date(); 
+
 		try
 		{
 			PrintWriter out = new PrintWriter(outFile);
@@ -711,20 +696,23 @@ public class Buzz
 			out.println(money);
 			out.println(currentDate.getTime()/1000L);
 			out.println(world.getStartTime());
+		for (int i = 1; i <= hcount; i++)
+		{
+			out.println(hv[i-1].getBees());
+			out.println(hv[i-1].getBeeUpgrade());
+			out.println(hv[i-1].getQueenUpgrade());
+		}
+			
 		for (int i = 1; i <= fcount; i++)
-			{
-				out.println(fr[i-1].getHid());
-				out.println(fr[i-1].getQueen());
-				out.println(fr[i-1].getHoneyCells());
-				out.println(fr[i-1].getPollenCells());
-				out.println(fr[i-1].getBees());
-				out.println(fr[i-1].getLarvae());
-				out.println(fr[i-1].getBroodCells());
-				out.println(fr[i-1].getEmptyCells());
-				out.println(fr[i-1].getBeeUpgrade());
-				out.println(fr[i-1].getQueenUpgrade());
-				out.println(fr[i-1].getStartTime());
-			}
+		{
+			out.println(fr[i-1].getHid());
+			out.println(fr[i-1].getHoneyCells());
+			out.println(fr[i-1].getPollenCells());
+			out.println(fr[i-1].getLarvae());
+			out.println(fr[i-1].getBroodCells());
+			out.println(fr[i-1].getEmptyCells());
+			out.println(fr[i-1].getStartTime());
+		}
 			out.close();
 			System.out.println("Game saved");
 		}

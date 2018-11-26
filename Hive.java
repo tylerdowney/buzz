@@ -1,14 +1,22 @@
 public class Hive
 {
 	private int frames;
-	private int queens;
 	int id;
 	int framesMax;
+	int beesPerFrame;
+	int beeUpgrade;
+	int queenUpgrade;
+	int bees;
 
 	public Hive(int n)
 	{
 		frames = 0;
 		id = n;
+		framesMax = 10;
+		beesPerFrame = 3500;
+		beeUpgrade = 1;
+		queenUpgrade = 1;
+		bees = 5;
 	}
 
 	public int getFrames()
@@ -16,9 +24,54 @@ public class Hive
 		return frames;
 	}
 
-	public int getQueens()
+	public int getBees()
 	{
-		return queens;
+		return bees;
+	}
+
+	public void setBees(int b)
+	{
+		this.bees = b;
+	}
+
+	public void addBees(int b)
+	{
+		this.bees = bees + b;
+	}
+
+	public int getBeeMax()
+	{
+		return frames * beesPerFrame;
+	}
+
+	public int getBeeUpgrade()
+	{
+		return beeUpgrade;
+	}
+
+	public int getQueenUpgrade()
+	{
+		return queenUpgrade;
+	}
+
+	public void addBeeUpgrade()
+	{
+		this.beeUpgrade = beeUpgrade + 1;
+	}
+
+	public void addQueenUpgrade()
+	{
+		this.queenUpgrade = queenUpgrade + 1;
+	}
+
+	public void setBeeUpgrade(int b)
+	{
+		this.beeUpgrade = beeUpgrade + b;
+	}
+
+	public void setQueenUpgrade(int q)
+	{
+		this.queenUpgrade = queenUpgrade + q;
 	}
 
 	public int getHid()
@@ -36,8 +89,8 @@ public class Hive
 		this.frames = frames + 1;
 	}
 
-	public void addQueens()
+	public int getFramesMax()
 	{
-		this.queens = queens + 1;
+		return framesMax;
 	}
 }
