@@ -18,8 +18,9 @@ public class Frame
 	private int pollenCells;
 	private int broodCells;
 	private int emptyCells;
+	private int distToCent;
 
-	public Frame(int hid, int fid)
+	public Frame(int hid, int fid, int dist)
 	{
 		honey = 0;
 		pollen = 0;
@@ -38,6 +39,7 @@ public class Frame
 		honeyCells = 0;
 		broodCells = 0;
 		cells = 0;
+		distToCent = dist;
 	}
 
 	public double getHoney()
@@ -118,6 +120,11 @@ public class Frame
 	public static void getAge(Hive[] hives, long t, String n, int hn, int fn)
 	{
 		System.out.println(t/31536000 + " yr, " + (t%31536000)/86400 + " dy, " + (t%31536000%86400)/3600 + " hr, " + (t%31536000%86400%3600)/60 + " min, " + t%31536000%86400%3600%60 + " s\n");
+	}
+
+	public int getDistToCent()
+	{
+		return distToCent;
 	}
 
 	public void addHoney(int h)
@@ -208,5 +215,10 @@ public class Frame
 	public void setStartTime(long s)
 	{
 		this.starttime = s;
+	}
+
+	public void setDistToCent(int d)
+	{
+		this.distToCent = d;
 	}
 }

@@ -3,7 +3,7 @@ public class Hive
 	private int frames;
 	int id;
 	int framesMax;
-	int beesPerFrame;
+	int beeMax;
 	int beeUpgrade;
 	int queenUpgrade;
 	int bees;
@@ -13,7 +13,7 @@ public class Hive
 		frames = 0;
 		id = n;
 		framesMax = 10;
-		beesPerFrame = 3500;
+		beeMax = 35000;
 		beeUpgrade = 1;
 		queenUpgrade = 1;
 		bees = 5;
@@ -41,7 +41,7 @@ public class Hive
 
 	public int getBeeMax()
 	{
-		return frames * beesPerFrame;
+		return beeMax;
 	}
 
 	public int getBeeUpgrade()
@@ -66,12 +66,12 @@ public class Hive
 
 	public void setBeeUpgrade(int b)
 	{
-		this.beeUpgrade = beeUpgrade + b;
+		this.beeUpgrade = b;
 	}
 
 	public void setQueenUpgrade(int q)
 	{
-		this.queenUpgrade = queenUpgrade + q;
+		this.queenUpgrade = q;
 	}
 
 	public int getHid()
