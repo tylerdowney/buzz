@@ -16,7 +16,7 @@ public class Hive
 		beeMax = 35000;
 		beeUpgrade = 1;
 		queenUpgrade = 1;
-		bees = 5;
+		bees = 20;
 	}
 
 	public int getFrames()

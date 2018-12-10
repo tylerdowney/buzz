@@ -12,6 +12,7 @@ public class Frame
 	private int cells;
 	private int cellMax;
 	private double honeyPerCell;
+	private double nectarPerCell;
 	private double pollenPerCell;
 	private int nectarCells;
 	private int honeyCells;
@@ -31,6 +32,7 @@ public class Frame
 		cellMax = 3500;
 		clutterMax = 5000;
 		honeyPerCell = 1.0;
+		nectarPerCell = 1.0;
 		pollenPerCell = 1.0;
 		emptyCells = 0;
 		nectarCells = 0;
@@ -45,6 +47,11 @@ public class Frame
 	public double getHoney()
 	{
 		return honeyPerCell * honeyCells;
+	}
+
+	public double getNectar()
+	{
+		return nectarPerCell * nectarCells;
 	}
 
 	public double getPollen()
@@ -165,6 +172,11 @@ public class Frame
 	public void setHoney(int h)
 	{
 		this.honeyCells = h;
+	}
+
+	public void setNectar(int n)
+	{
+		this.nectarCells = n;
 	}
 
 	public void setPollen(int p)

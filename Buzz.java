@@ -24,7 +24,7 @@ public class Buzz
 		double cUpCost = 1000; // Cost of carrying capacity upgrade
 		double gUpCost = 1000; // Cost of queen laying upgrade
 		double vUpCost = 1000; // Cost of bee/honey/pollen values upgrade
-		double superCost = 0; // Cost of Honey Super upgrade
+		double superCost = 5000; // Cost of Honey Super upgrade
 		int superIncrease = 3500;
 		double frameCost = 0;
 		double valueUpgrade = 1;
@@ -34,6 +34,7 @@ public class Buzz
 		long worldAge = 0;
 		long offgametime;
 		int resourceOffset = 0;
+		int honeyOffset = 0;
 		int beeOffset = 0;
 		int larvaeOffset = 0;
 		int broodOffset = 0;
@@ -41,6 +42,7 @@ public class Buzz
 		int hiveCounter = 0;
 		int frameCounter = 0;
 		Timer resourceTimer = new Timer();
+		Timer honeyTimer = new Timer();
 		Timer consumeTimer = new Timer();
 		Timer broodTimer = new Timer();
 		Timer larvaeTimer = new Timer();
@@ -48,6 +50,7 @@ public class Buzz
 		Timer waxTimer = new Timer();
 		Timer clutterTimer = new Timer();
 		int resourceTime = 10000; // Adjusts rate of resource accrual in milliseconds
+		int honeyTime = 30000; // Adjusts rate of conversion of nectar to honey in millseconds
 		int consumeTime = 40000; // Adjusts rate of resource consumption in milliseconds
 		int broodTime = 40000; // Adjusts rate of egg laying in milliseconds
 		int larvaeTime = 355000; // Adjusts rate of eggs hatching into larvae milliseconds
@@ -102,6 +105,7 @@ public class Buzz
 				offgametime = (newtime.getTime()/1000L - oldtime);
 				int intoffgametime = (int) offgametime;
 				resourceOffset = intoffgametime*1000/resourceTime;
+				honeyOffset = intoffgametime*1000/honeyTime;
 				beeOffset = intoffgametime*1000/beeTime;
 				larvaeOffset = intoffgametime*1000/larvaeTime - intoffgametime*1000/beeTime;
 				broodOffset = intoffgametime*1000/broodTime - intoffgametime*1000/larvaeTime;
@@ -128,6 +132,7 @@ public class Buzz
 
 					frames[j-1] = new Frame(tempHid, hives[tempHid - 1].getFrames(), Math.abs(6 - hives[tempHid - 1].getFrames()));
 					frames[j-1].setHoney(sc.nextInt());
+					frames[j-1].setNectar(sc.nextInt());
 					frames[j-1].setPollen(sc.nextInt());
 					frames[j-1].setLarvae(sc.nextInt());
 					frames[j-1].setBrood(sc.nextInt());
@@ -136,6 +141,7 @@ public class Buzz
 					frames[j-1].setStartTime(sc.nextLong());
 
 					int addedHoney = world.getRandomInt(resourceOffset * hives[frames[j-1].getHid()-1].getBeeUpgrade());
+					int addedNectar = world.getRandomInt(honeyOffset * hives[frames[j-1].getHid()-1].getBeeUpgrade());
 					int addedPollen = world.getRandomInt(resourceOffset * hives[frames[j-1].getHid()-1].getBeeUpgrade());
 					int addedLarvae = world.getRandomInt(larvaeOffset * 20 * hives[frames[j-1].getHid()-1].getQueenUpgrade());
 					int addedBrood = world.getRandomInt(broodOffset * 20 * hives[frames[j-1].getHid()-1].getQueenUpgrade());
@@ -144,49 +150,59 @@ public class Buzz
 					if (frames[j-1].getDistToCent() == 0 )
 					{
 						frames[j-1].addHoney(addedHoney/16);
+						frames[j-1].addNectar(addedNectar/16);
 						frames[j-1].addPollen(addedPollen/16);
 						frames[j-1].addLarvae(3*addedLarvae/16);	
 						frames[j-1].addBrood(3*addedBrood/16);	
 						frames[j-1].addEmptyCells(3*addedWax/16);
-						frames[j-1].addEmptyCells(-addedHoney/16 - addedPollen/16 - 3*addedLarvae/16 - 3*addedBrood/16); 
+						frames[j-1].addEmptyCells(-addedHoney/16 - - addedNectar/16 - addedPollen/16 - 3*addedLarvae/16 - 3*addedBrood/16); 
 						frames[j-1].addClutter(world.getRandomDouble(clutterOffset[tempHid-1] + (clutPerEgg*1000.0*intoffgametime*3*addedBrood/(16*broodTime) * 20 * hives[frames[j-1].getHid()-1].getQueenUpgrade())));	
 					}
 					else if (frames[j-1].getDistToCent() == 1 || frames[j-1].getDistToCent() == 2)
   					{
 						frames[j-1].addHoney(2*addedHoney/16);
+						frames[j-1].addNectar(2*addedNectar/16);
 						frames[j-1].addPollen(2*addedPollen/16);
 						frames[j-1].addLarvae(2*addedLarvae/16);	
 						frames[j-1].addBrood(2*addedBrood/16);	
 						frames[j-1].addEmptyCells(2*addedWax/16);
-						frames[j-1].addEmptyCells(-2*addedHoney/16 - 2*addedPollen/16 - 2*addedLarvae/16 - 2*addedBrood/16); 
+						frames[j-1].addEmptyCells(-2*addedHoney/16 - 2*addedNectar/16 -  2*addedPollen/16 - 2*addedLarvae/16 - 2*addedBrood/16); 
 						frames[j-1].addClutter(world.getRandomDouble(clutterOffset[tempHid-1] + (clutPerEgg*1000.0*intoffgametime*2*addedBrood/(16*broodTime) * 20 * hives[frames[j-1].getHid()-1].getQueenUpgrade())));	
 					}
 					else if (frames[j-1].getDistToCent() > 2)
   					{
 						frames[j-1].addHoney(3*addedHoney/16);
+						frames[j-1].addNectar(3*addedNectar/16);
 						frames[j-1].addPollen(3*addedPollen/16);
 						frames[j-1].addLarvae(addedLarvae/16);	
 						frames[j-1].addBrood(addedBrood/16);	
 						frames[j-1].addEmptyCells(addedWax/16);
-						frames[j-1].addEmptyCells(-3*addedHoney/16 - 3*addedPollen/16 - addedLarvae/16 - addedBrood/16); 
+						frames[j-1].addEmptyCells(-3*addedHoney/16 - 3*addedNectar/16 - 3*addedPollen/16 - addedLarvae/16 - addedBrood/16); 
 						frames[j-1].addClutter(world.getRandomDouble(clutterOffset[tempHid-1] + (clutPerEgg*1000.0*intoffgametime*addedBrood/(16*broodTime) * 20 * hives[frames[j-1].getHid()-1].getQueenUpgrade())));	
 					}
-						
+					
+					// Handle max and min clutter cases
 					if (frames[j-1].getClutter() > 5000)
 					{
-							frames[j-1].setClutter(5000);
+						frames[j-1].setClutter(5000);
+					}	
+					else if (frames[j-1].getClutter() < 0)
+					{
+						frames[j-1].setClutter(0);
 					}
 					// Proportionally set new values if they exceed max
 					if (frames[j-1].getCells() >= frames[j-1].getCellMax())
 					{
 
 						Long honeyFactor = Math.round((frames[j-1].getHoneyCells() * 1.0/frames[j-1].getCells()) * frames[j-1].getCellMax());
+						Long nectarFactor = Math.round((frames[j-1].getNectarCells() * 1.0/frames[j-1].getCells()) * frames[j-1].getCellMax());
 						Long pollenFactor = Math.round((frames[j-1].getPollenCells() * 1.0/frames[j-1].getCells()) * frames[j-1].getCellMax());
 						Long larvaeFactor = Math.round((frames[j-1].getLarvae() * 1.0/frames[j-1].getCells()) * frames[j-1].getCellMax());
 						Long broodFactor = Math.round((frames[j-1].getBroodCells() * 1.0/frames[j-1].getCells()) * frames[j-1].getCellMax());
 						Long emptyFactor = Math.round((frames[j-1].getEmptyCells() * 1.0/frames[j-1].getCells()) * frames[j-1].getCellMax());
 
 						frames[j-1].setHoney(honeyFactor.intValue());
+						frames[j-1].setNectar(nectarFactor.intValue());
 						frames[j-1].setPollen(pollenFactor.intValue());
 						frames[j-1].setLarvae(larvaeFactor.intValue());
 						frames[j-1].setBrood(broodFactor.intValue());
@@ -246,7 +262,6 @@ public class Buzz
 		world.startClutterTimer(hives, frames, clutterTimer, frameCounter, hiveCounter);
 		
 		// Loop to determine and define actions
-
 		while (endflag != 1)
 		{
 
@@ -291,7 +306,7 @@ public class Buzz
 					{
 						if (frames[i-1].getHid() == h)
 						{			
-							System.out.println("Frame " + frames[i-1].getFid() + ": filled cells: " + dec.format((frames[i-1].getCells() - frames[i-1].getEmptyCells())*100.0/frames[i-1].getCellMax()) + "%, drawn cells: " + dec.format(frames[i-1].getCells()*100.0/frames[i-1].getCellMax()) + "%, honey: " + frames[i-1].getHoney() + ", pollen: " + frames[i-1].getPollen() + ", larvae: " + frames[i-1].getLarvae() + ", eggs: " + frames[i-1].getBroodCells() + ", clutter: " + dec.format(frames[i-1].getClutter()*100.0/frames[i-1].getClutterMax()) + "%");
+							System.out.println("Frame " + frames[i-1].getFid() + ": filled cells: " + dec.format((frames[i-1].getCells() - frames[i-1].getEmptyCells())*100.0/frames[i-1].getCellMax()) + "%, drawn cells: " + dec.format(frames[i-1].getCells()*100.0/frames[i-1].getCellMax()) + "%, nectar: " + frames[i-1].getNectar() + ", honey: " + frames[i-1].getHoney() + ", pollen: " + frames[i-1].getPollen() + ", larvae: " + frames[i-1].getLarvae() + ", eggs: " + frames[i-1].getBroodCells() + ", clutter: " + dec.format(frames[i-1].getClutter()*100.0/frames[i-1].getClutterMax()) + "%");
 							long frameAge = now.getTime()/1000L - frames[i-1].getStartTime();
 							frames[i-1].getAge(hives, frameAge, name, h,i);
 						}
@@ -530,14 +545,16 @@ public class Buzz
 
 				case 'p' :
 				System.out.println("This will move frames to a new hive, but only for completely drawn frames. It also costs $5000 for the materials");
-				if (money < frameCost)
+				System.out.println("How many frames would you like to move?");
+				int numSplit = in.nextInt();
+				if (money < numSplit * frameCost)
 				{
 					System.out.println("Not enough money");
 					break;
 				}
 				else
 				{
-					money = money - frameCost;
+					money = money - numSplit * frameCost;
 				}
 				System.out.println("Choose a hive");
 				int hiSplit = -1;
@@ -547,15 +564,12 @@ public class Buzz
 				}
 				try
 				{
-					int numSplit;
 					int moveCounter = 0;
 					hiSplit = in.nextInt();
 					if (hiSplit > hiveCounter || hiSplit <= 0)
 					{
 						throw new InputMismatchException();
 					}
-					System.out.println("How many frames would you like to move?");
-					numSplit = in.nextInt();
 					for (int j = 1; j <= numSplit; j++)
 					{
 						System.out.println("Which frame will you move?");
@@ -576,36 +590,28 @@ public class Buzz
 									{
 										hives[hiveCounter] = new Hive(hiveCounter + 1);
 										hiveCounter++;
-										hives[i-1].setBees(5);
 									}
 									hives[hiveCounter-1].addFrames();
 									frames[frameCounter] = new Frame(hives[hiveCounter-1].getHid(), hives[hiveCounter-1].getFrames(), Math.abs(6 - hives[hiveCounter - 1].getFrames()));
 									Date starttime = new Date();
 									long begin = starttime.getTime()/1000L;
-									frames[frameCounter-1].setStartTime(begin);
 									frameCounter++;
+									frames[frameCounter-1].setStartTime(begin);
 									frames[frameCounter-1].setHoney(frames[i-1].getHoneyCells());
+									frames[frameCounter-1].setNectar(frames[i-1].getNectarCells());
 									frames[frameCounter-1].setPollen(frames[i-1].getPollenCells());
 									frames[frameCounter-1].setLarvae(frames[i-1].getLarvae());
 									frames[frameCounter-1].setBrood(frames[i-1].getBroodCells());
 									frames[frameCounter-1].setEmptyCells(frames[i-1].getEmptyCells());
 									frames[frameCounter-1].setClutter(frames[i-1].getClutter());
 									frames[i-1].setHoney(0);
+									frames[i-1].setNectar(0);
 									frames[i-1].setPollen(0);
 									frames[i-1].setLarvae(0);
 									frames[i-1].setBrood(0);
 									frames[i-1].setEmptyCells(0);
 									frames[i-1].setClutter(0);
 									Date date = new Date();
-									frames[frameCounter-1].setStartTime(date.getTime()/1000L);
-									
-									world.startResourceTimer(hives, frames, resourceTimer, frameCounter, hiveCounter);
-									world.startConsumeTimer(hives, frames, consumeTimer, frameCounter, hiveCounter);	
-									world.startBroodTimer(hives, frames, broodTimer, frameCounter, hiveCounter);
-									world.startLarvaeTimer(hives, frames, larvaeTimer, frameCounter, hiveCounter);
-									world.startBeeTimer(hives, frames, beeTimer, frameCounter, hiveCounter);
-									world.startWaxTimer(hives, frames, waxTimer, frameCounter, hiveCounter);
-									world.startClutterTimer(hives, frames, clutterTimer, frameCounter, hiveCounter);
 									found++;
 									moveCounter++;
 								}
@@ -621,17 +627,53 @@ public class Buzz
 							System.out.println("Could not find frame");
 						}
 					}
-					if (moveCounter > 0)
+					for (int i = 1; i <= (framesPerHive - moveCounter); i++)
 					{
-						for (int i = 1; i < (framesPerHive - moveCounter); i++)
-						{
-							hives[hiveCounter - 1].addFrames();
-							Date starttime = new Date();
-							frames[frameCounter] = new Frame(hives[hiveCounter - 1].getHid(), hives[hiveCounter - 1].getFrames(), Math.abs(6 - hives[hiveCounter - 1].getFrames()));
-							long begin = starttime.getTime()/1000L;
-							frames[frameCounter-1].setStartTime(begin);
-							frameCounter++;
-						}
+						hives[hiveCounter - 1].addFrames();
+						Date starttime = new Date();
+						frames[frameCounter] = new Frame(hives[hiveCounter - 1].getHid(), hives[hiveCounter - 1].getFrames(), Math.abs(6 - hives[hiveCounter - 1].getFrames()));
+						long begin = starttime.getTime()/1000L;
+						frames[frameCounter].setStartTime(begin);
+						frameCounter++;
+
+						// Cancel the old Timers
+						resourceTimer.cancel();
+						resourceTimer.purge();
+						honeyTimer.cancel();
+						honeyTimer.purge();
+						beeTimer.cancel();
+						beeTimer.purge();
+						consumeTimer.cancel();
+						consumeTimer.purge();
+						clutterTimer.cancel();
+						clutterTimer.purge();
+						broodTimer.cancel();
+						broodTimer.purge();
+						larvaeTimer.cancel();
+						larvaeTimer.purge();
+						waxTimer.cancel();
+						waxTimer.purge();
+
+						// Start the new Timers
+						resourceTimer = new Timer();
+						honeyTimer = new Timer();
+						consumeTimer = new Timer();
+						broodTimer = new Timer();
+						larvaeTimer = new Timer();
+						beeTimer = new Timer();
+						waxTimer = new Timer();
+						clutterTimer = new Timer();
+
+						Date date = new Date();
+						frames[frameCounter-1].setStartTime(date.getTime()/1000L);
+							
+						world.startResourceTimer(hives, frames, resourceTimer, frameCounter, hiveCounter);
+						world.startConsumeTimer(hives, frames, consumeTimer, frameCounter, hiveCounter);	
+						world.startBroodTimer(hives, frames, broodTimer, frameCounter, hiveCounter);
+						world.startLarvaeTimer(hives, frames, larvaeTimer, frameCounter, hiveCounter);
+						world.startBeeTimer(hives, frames, beeTimer, frameCounter, hiveCounter);
+						world.startWaxTimer(hives, frames, waxTimer, frameCounter, hiveCounter);
+						world.startClutterTimer(hives, frames, clutterTimer, frameCounter, hiveCounter);
 					}
 				}
 				catch (InputMismatchException e)
@@ -669,6 +711,8 @@ public class Buzz
 					endflag = 1;
 					resourceTimer.cancel();
 					resourceTimer.purge();
+					honeyTimer.cancel();
+					honeyTimer.purge();
 					beeTimer.cancel();
 					beeTimer.purge();
 					consumeTimer.cancel();
@@ -748,6 +792,7 @@ public class Buzz
 		{
 			out.println(fr[i-1].getHid());
 			out.println(fr[i-1].getHoneyCells());
+			out.println(fr[i-1].getNectarCells());
 			out.println(fr[i-1].getPollenCells());
 			out.println(fr[i-1].getLarvae());
 			out.println(fr[i-1].getBroodCells());

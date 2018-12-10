@@ -5,18 +5,20 @@ public class WorldClock
 	private long starttime;
 	private long worldage;
 	private int resourceTime;
+	private int honeyTime;
 	private int consumeTime;
 	private int broodTime;
 	private int larvaeTime;
 	private int beeTime;
 	private int clutterTime;
 	private int waxTime;
-	private int[] Resources = new int[7]; /* Array Layout: 0 Add Brood/Add Larvae, 1 Add Bees/Consume Larvae, 2 Consume Honey/Add Empty Cells, 3 Consume Pollen/Add Empty Cells, 4 Add Honey/Remove Empty Cells 5, Add Pollen/Remove Empty Cells, 6 Add Empty Cells.*/
+	private int[] Resources = new int[8]; /* Array Layout: 0 Add Brood/Add Larvae, 1 Add Bees/Consume Larvae, 2 Consume Nectar/Add Empty Cells, 3 Consume Pollen/Add Empty Cells, 4 Add Nectar/Remove Empty Cells 5, Add Pollen/Remove Empty Cells, 6 Add Empty Cells, 7 Add Honey/Consume Nectar*/
 	private int dist;
 		
 	public WorldClock()
 	{
 		resourceTime = 10000; // Adjusts rate of resource accrual in milliseconds
+		honeyTime= 30000; // Adjusts rate of conversion of nectar to honey in milliseconds
 		consumeTime = 40000; // Adjusts rate of resource consumption in milliseconds
 		broodTime = 40000; // Adjusts rate of egg laying in milliseconds
 		larvaeTime = 355000; // Adjusts rate of eggs hatching into larvae milliseconds
@@ -43,7 +45,6 @@ public class WorldClock
 
 	// Method to start timer for gradually increasing egg quantities as the queen lays, up to a max of 2000
 
-	//public void startWorldClock(Hive[] hive, Frame[] frame, Timer worldTimer, int fcount, int hcount)
 	public void startBroodTimer(Hive[] hive, Frame[] frame, Timer broodTimer, int fcount, int hcount)
 	{
 		TimerTask broodTask = new TimerTask()
@@ -136,6 +137,7 @@ public class WorldClock
 	{
 		double clutPerSec = 0.01;
 		double clutPerBee = 0.0001;
+		int[] clutterCounter = new int[1000];
 		TimerTask clutterTask = new TimerTask()
 		{
 			public void run()
@@ -144,19 +146,34 @@ public class WorldClock
 				{
 					int hid = frame[i-1].getHid();
 					double addClutter = getRandomDouble((clutterTime/1000) * clutPerSec);
-					if (frame[i-1].getClutter() < frame[i-1].getClutterMax())
+					if (frame[i-1].getClutter() < getSmallRandomDouble(frame[i-1].getClutterMax()))
 					{
 						frame[i-1].addClutter(addClutter);
 					}
 					else
 					{
-						// swarm code here
+						clutterCounter[hid-1]++;
 					}
 					if (frame[i-1].getClutter() > 0)
 					{
 						double removeClutter = getRandomDouble((clutterTime/1000) * hive[hid-1].getBees() * clutPerBee);
 						frame[i-1].addClutter(-removeClutter);
 					}
+					else if (frame[i-1].getClutter() < 0)
+					{
+						frame[i-1].setClutter(0);
+					}
+				}
+
+				for (int i = 1; i <= hcount; i++)
+				{
+					if (hive[i-1].getBees() > getRandomInt(15000) && clutterCounter[i-1] > 0)
+					{
+						System.out.println("Hive " + i + " is too cluttered; " + clutterCounter[i-1] * 10 + "% of your bees have left to form a new colony");
+					
+							hive[i-1].addBees(-clutterCounter[i-1] * hive[i-1].getBees()/10);
+					}
+				clutterCounter[i-1] = 0;
 				}
 			}
 		};	
@@ -228,7 +245,7 @@ public class WorldClock
 			int dist = 0;
 			public void run()
 			{
-				int addHoney = 0;
+				int addNectar = 0;
 				int addPollen = 0;
 				for (int i = 1; i <= hcount; i++)
 				{
@@ -241,28 +258,28 @@ public class WorldClock
 							dist = frame[j-1].getDistToCent();
 							if (dist == 0)
 							{
-								addHoney = Resources[2]/16 - getRandomInt(frame[j-1].getBroodCells()/50);
+								addNectar = Resources[2]/16 - getRandomInt(frame[j-1].getBroodCells()/50);
 								addPollen = Resources[3]/16 - getRandomInt(frame[j-1].getBroodCells()/50);
 							}
 							else if (dist == 1 || dist == 2)
 							{
-								addHoney = 2*Resources[2]/16 - getRandomInt(frame[j-1].getBroodCells()/50);
+								addNectar = 2*Resources[2]/16 - getRandomInt(frame[j-1].getBroodCells()/50);
 								addPollen = 2*Resources[3]/16 - getRandomInt(frame[j-1].getBroodCells()/50);
 							}
 							else if (dist > 2)
 							{
-								addHoney = 3*Resources[2]/16 - getRandomInt(frame[j-1].getBroodCells()/50);
+								addNectar = 3*Resources[2]/16 - getRandomInt(frame[j-1].getBroodCells()/50);
 								addPollen = 3*Resources[3]/16 - getRandomInt(frame[j-1].getBroodCells()/50);
 							}
-							if (frame[j-1].getHoney() >= addHoney)
+							if (frame[j-1].getNectarCells() >= addNectar)
 							{
-								frame[j-1].addHoney(-addHoney);
-								frame[j-1].addEmptyCells(addHoney);
+								frame[j-1].addNectar(-addNectar);
+								frame[j-1].addEmptyCells(addNectar);
 							}
 							else
 							{
-								frame[j-1].addEmptyCells(frame[j-1].getHoneyCells());
-								frame[j-1].setHoney(0);
+								frame[j-1].addEmptyCells(frame[j-1].getNectarCells());
+								frame[j-1].setNectar(0);
 							}
 							if (frame[j-1].getPollen() >= addPollen)
 							{
@@ -291,7 +308,7 @@ public class WorldClock
 			int dist = 0;
 			public void run()
 			{
-				int addHoney = 0;
+				int addNectar = 0;
 				int addPollen = 0;
 				for (int i = 1; i <= hcount; i++)
 				{
@@ -304,23 +321,23 @@ public class WorldClock
 							dist = frame[j-1].getDistToCent();
 							if (dist == 0)
 							{
-								addHoney = Resources[4]/16;
+								addNectar = Resources[4]/16;
 								addPollen = Resources[5]/16;
 							}
 							else if (dist == 1 || dist == 2)
 							{
-								addHoney = 2*Resources[4]/16;
+								addNectar = 2*Resources[4]/16;
 								addPollen = 2*Resources[5]/16;
 							}
 							else if (dist > 2)
 							{
-								addHoney = 3*Resources[4]/16;
+								addNectar = 3*Resources[4]/16;
 								addPollen = 3*Resources[5]/16;
 							}
-							if (frame[j-1].getEmptyCells() >= (addHoney + addPollen))
+							if (frame[j-1].getEmptyCells() >= (addNectar + addPollen))
 							{
-								frame[j-1].addHoney(addHoney);
-								frame[j-1].addEmptyCells(-addHoney);
+								frame[j-1].addNectar(addNectar);
+								frame[j-1].addEmptyCells(-addNectar);
 								frame[j-1].addPollen(addPollen);
 								frame[j-1].addEmptyCells(-addPollen);
 							}
@@ -330,6 +347,47 @@ public class WorldClock
 			}
 		};
 		resourceTimer.scheduleAtFixedRate(resourceTask, new Date(), resourceTime);
+	}
+
+	public void startHoneyTimer(Hive[] hive, Frame[] frame, Timer honeyTimer, int fcount, int hcount)
+	{
+		TimerTask honeyTask = new TimerTask()
+		{
+			int dist = 0;
+			public void run()
+			{
+				int addHoney = 0;
+				for (int i = 1; i <= hcount; i++)
+				{
+					Resources[7] = getRandomInt(hive[i-1].getBeeUpgrade() * (hive[i-1].getBees()/10 + 1));
+					for (int j = 1; j <= fcount; j++)
+					{
+						if (frame[j-1].getHid() == i)
+						{
+							dist = frame[j-1].getDistToCent();
+							if (dist == 0)
+							{
+								addHoney = Resources[7]/16;
+							}
+							else if (dist == 1 || dist == 2)
+							{
+								addHoney = 2*Resources[7]/16;
+							}
+							else if (dist > 2)
+							{
+								addHoney = 3*Resources[7]/16;
+							}
+							if (frame[j-1].getNectarCells() > addHoney)
+							{
+								frame[j-1].addHoney(addHoney);
+								frame[j-1].addNectar(-addHoney);
+							}
+						}
+					}
+				}
+			}
+		};
+		honeyTimer.scheduleAtFixedRate(honeyTask, new Date(), honeyTime);
 	}
 
 	// A Method to increase the number of empty cells
@@ -345,28 +403,32 @@ public class WorldClock
 				for (int i = 1; i <= hcount; i++)
 				{
 					Resources[6] = getRandomInt(hive[i-1].getBees() * hive[i-1].getBeeUpgrade());
+
 					for (int j = 1; j <= fcount; j++)
 					{
-						dist = frame[j-1].getDistToCent();
-						if (dist == 0)
+						if (frame[j-1].getHid() == i)
 						{
-							addWax = 3*Resources[6]/16;
-						}
-						else if (dist == 1 || dist == 2)
-						{
-							addWax = 2*Resources[6]/16;
-						}
-						else if (dist > 2)
-						{
-							addWax = Resources[6]/16;
-						}
-						if (frame[j-1].getCellMax() - frame[j-1].getCells() >= addWax)
-						{
-							frame[j-1].addEmptyCells(addWax);
-						}
-						else if (frame[j-1].getCellMax() - frame[j-1].getCells() > 0)
-						{
-							frame[j-1].addEmptyCells(frame[j-1].getCellMax() - frame[j-1].getCells());
+							dist = frame[j-1].getDistToCent();
+							if (dist == 0)
+							{
+								addWax = 3*Resources[6]/16;
+							}
+							else if (dist == 1 || dist == 2)
+							{
+								addWax = 2*Resources[6]/16;
+							}
+							else if (dist > 2)
+							{
+								addWax = Resources[6]/16;
+							}
+							if (frame[j-1].getCellMax() - frame[j-1].getCells() >= addWax)
+							{
+								frame[j-1].addEmptyCells(addWax);
+							}
+							else if (frame[j-1].getCellMax() - frame[j-1].getCells() > 0)
+							{
+								frame[j-1].addEmptyCells(frame[j-1].getCellMax() - frame[j-1].getCells());
+							}
 						}
 					}
 				}
@@ -382,6 +444,16 @@ public class WorldClock
 		double randomFactor = 0.2;
 		double lower = value - value*randomFactor;
 		double upper = value + value*randomFactor;
+		return lower + (upper - lower)*Math.random();
+	}
+
+	// Method to generate a random double within 5% of the given value
+
+	public static double getSmallRandomDouble(double value)
+	{
+		double randomFactor = 0.05;
+		double lower = value - value*randomFactor;
+		double upper = 100;
 		return lower + (upper - lower)*Math.random();
 	}
 
