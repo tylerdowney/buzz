@@ -3,21 +3,31 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
-public class HiveComponents extends JPanel{
+	public class HiveComponents extends JPanel{
+		private static Buzz buzzGame;
 		private int myTimerDelay;
 		private final Timer myTimer;
 		private ArrayList<Rectangle> hives = new ArrayList<Rectangle>();
-		public HiveComponents() {
+
+		public HiveComponents(Buzz bg) {
 			super();
+			buzzGame = bg;
 			myTimerDelay = 1000;
 			myTimer = new Timer(myTimerDelay, hiveTimer);
 			myTimer.start();
 			setBackground(new Color(0,153,0));
+			//FrameImage fi = new FrameImage();
+			//fi.makeFrameImage();
+			hiveClicker();
+			addHive();
 		}
 		public void paintComponent(Graphics g) {
 			Graphics2D g2 = (Graphics2D) g;
@@ -33,8 +43,20 @@ public class HiveComponents extends JPanel{
 		ActionListener hiveTimer = new ActionListener() {
 		@Override
 			public void actionPerformed(ActionEvent theEvent) {
-				addHive();
-				repaint();
+
 		}
 	};
+
+	public void hiveClicker() {
+        addMouseListener(new MouseAdapter() {
+      	@Override
+       	public void mouseClicked(MouseEvent me) {
+       	 	super.mouseClicked(me);
+			for (Rectangle element : hives)
+        		if (element.contains(me.getPoint())) {
+            		//makeFrameImage();
+           		 }
+			}
+        });
+    }
 }

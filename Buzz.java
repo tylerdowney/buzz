@@ -10,78 +10,82 @@ import java.text.DecimalFormat;
 
 public class Buzz
 {
-	public static void main(String[] args)
+	// Initialize flag to end game, action variable, money variable, sales variables, upgrade variables, load flag, gametime variables, off game time variable, resource/bee acquisition delays, hive and frame counters, resource/bee generation times, random variable, frames per hive, Hive and Frame object declarations, terminal scanner object, timer declarations, and username variable
+
+	private static Integer h;
+	private static Integer f;
+	private static int endflag = 0;
+	private static char action;
+	private static double money = 0;
+	private static char sellVar;
+	private static int sell;
+	private static char upgrade;
+	private static double cUpCost = 1000; // Cost of carrying capacity upgrade
+	private static double gUpCost = 1000; // Cost of queen laying upgrade
+	private static double vUpCost = 1000; // Cost of bee/honey/pollen values upgrade
+	private static double superCost = 5000; // Cost of Honey Super upgrade
+	private static int superIncrease = 3500;
+	private static double frameCost = 0;
+	private static double valueUpgrade = 1;
+	private static char load;
+	private static long oldtime;
+	private static Date newtime;
+	private static long worldAge;
+	private static long offgametime;
+	private static int resourceOffset = 0;
+	private static int honeyOffset = 0;
+	private static int beeOffset = 0;
+	private static int larvaeOffset = 0;
+	private static int broodOffset = 0;
+	private static int waxOffset = 0;
+	private static int hiveCounter = 10;
+	private static int frameCounter = 0;
+	private static Timer resourceTimer = new Timer();
+	private static Timer honeyTimer = new Timer();
+	private static Timer consumeTimer = new Timer();
+	private static Timer broodTimer = new Timer();
+	private static Timer larvaeTimer = new Timer();
+	private static Timer beeTimer = new Timer();
+	private static Timer waxTimer = new Timer();
+	private static Timer clutterTimer = new Timer();
+	private static int resourceTime = 10000; // Adjusts rate of resource accrual in milliseconds
+	private static int honeyTime = 30000; // Adjusts rate of conversion of nectar to honey in millseconds
+	private static int consumeTime = 40000; // Adjusts rate of resource consumption in milliseconds
+	private static int broodTime = 40000; // Adjusts rate of egg laying in milliseconds
+	private static int larvaeTime = 355000; // Adjusts rate of eggs hatching into larvae milliseconds
+	private static int beeTime = 475000; // Adjusts rate of larvae developing into bees in milliseconds
+	private static int clutterTime = 5000; // Adjusts rate of clutter build up in milliseconds
+	private static int waxTime = 5000; // Adjusts rate of comb development in milliseconds
+	private static double clutPerSec = 0.01;
+	private static double clutPerBee = 0.0001;
+	private static double clutPerEgg = 0.001;
+	private static Random rand = new Random();
+	private static int n;
+	private static int framesPerHive = 10;
+	private static int broodMax = 2000;
+	private static Hive[] hives = new Hive[1000];
+	private static Frame[] frames = new Frame[framesPerHive * hives.length];
+	private static WorldClock world = new WorldClock();
+	private static double[] clutterOffset = new double[1000];
+	private static Scanner in = new Scanner(System.in);
+	private static String name = "";
+
+	public Buzz()
 	{
+	}
 
-		// Initialize flag to end game, action variable, money variable, sales variables, upgrade variables, load flag, gametime variables, off game time variable, resource/bee acquisition delays, hive and frame counters, resource/bee generation times, random variable, frames per hive, Hive and Frame object declarations, terminal scanner object, timer declarations, and username variable
-
-		int endflag = 0;
-		char action;
-		double money = 0;
-		char sellVar;
-		int sell;
-		char upgrade;
-		double cUpCost = 1000; // Cost of carrying capacity upgrade
-		double gUpCost = 1000; // Cost of queen laying upgrade
-		double vUpCost = 1000; // Cost of bee/honey/pollen values upgrade
-		double superCost = 5000; // Cost of Honey Super upgrade
-		int superIncrease = 3500;
-		double frameCost = 0;
-		double valueUpgrade = 1;
-		char load;
-		long oldtime;
-		Date newtime;
-		long worldAge = 0;
-		long offgametime;
-		int resourceOffset = 0;
-		int honeyOffset = 0;
-		int beeOffset = 0;
-		int larvaeOffset = 0;
-		int broodOffset = 0;
-		int waxOffset = 0;
-		int hiveCounter = 0;
-		int frameCounter = 0;
-		Timer resourceTimer = new Timer();
-		Timer honeyTimer = new Timer();
-		Timer consumeTimer = new Timer();
-		Timer broodTimer = new Timer();
-		Timer larvaeTimer = new Timer();
-		Timer beeTimer = new Timer();
-		Timer waxTimer = new Timer();
-		Timer clutterTimer = new Timer();
-		int resourceTime = 10000; // Adjusts rate of resource accrual in milliseconds
-		int honeyTime = 30000; // Adjusts rate of conversion of nectar to honey in millseconds
-		int consumeTime = 40000; // Adjusts rate of resource consumption in milliseconds
-		int broodTime = 40000; // Adjusts rate of egg laying in milliseconds
-		int larvaeTime = 355000; // Adjusts rate of eggs hatching into larvae milliseconds
-		int beeTime = 475000; // Adjusts rate of larvae developing into bees in milliseconds
-		int clutterTime = 5000; // Adjusts rate of clutter build up in milliseconds
-		int waxTime = 5000; // Adjusts rate of comb development in milliseconds
-		double clutPerSec = 0.01;
-		double clutPerBee = 0.0001;
-		double clutPerEgg = 0.001;
-		Random rand = new Random();
-		int n;
-		int framesPerHive = 10;
-		int broodMax = 2000;
-		Hive[] hives = new Hive[1000];
-		Frame[] frames = new Frame[framesPerHive * hives.length];
-		double[] clutterOffset = new double[1000];
-		Scanner in = new Scanner(System.in);
-		WorldClock world = new WorldClock();
-		String name = "";
-
-		//Load game or new game options
-
-		System.out.println("Would you like to load a saved game (y/n)?");
+		/*System.out.println("Would you like to load a saved game (y/n)?");
 		load = in.next().charAt(0);
 		if (load == 'y')
+		{*/
+
+		public static void loadGame()
 		{
-			// Create/run file chooser
+			System.out.println(broodMax);
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
 			JFrame frame = new JFrame("FileSelect");
-			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			frame.setVisible(true);
 			int result = fileChooser.showOpenDialog(frame);
 			File inFile = new File("");
@@ -216,9 +220,9 @@ public class Buzz
 				System.out.println("Could not load file");
 			}
 		}
-		else if (load == 'n')
-		{
 
+		public void startNewGame()
+		{
 			// New game
 
 			System.out.println("Welcome! Please enter your name");
@@ -246,124 +250,50 @@ public class Buzz
 				frameCounter++;
 			}
 		}
-		else
-		{
-			System.out.println("Invalid entry");
-		}	
 
 		//Start game timers
 
-		world.startResourceTimer(hives, frames, resourceTimer, frameCounter, hiveCounter);
-		world.startConsumeTimer(hives, frames, consumeTimer, frameCounter, hiveCounter);	
-		world.startBroodTimer(hives, frames, broodTimer, frameCounter, hiveCounter);
-		world.startLarvaeTimer(hives, frames, larvaeTimer, frameCounter, hiveCounter);
-		world.startBeeTimer(hives, frames, beeTimer, hiveCounter, hiveCounter);
-		world.startWaxTimer(hives, frames, waxTimer, frameCounter, hiveCounter);
-		world.startClutterTimer(hives, frames, clutterTimer, frameCounter, hiveCounter);
-		
-		// Loop to determine and define actions
-		while (endflag != 1)
+		public static void startTimers()
 		{
+			WorldClock world = new WorldClock();
+			world.startResourceTimer(hives, frames, resourceTimer, frameCounter, hiveCounter);
+			world.startConsumeTimer(hives, frames, consumeTimer, frameCounter, hiveCounter);	
+			world.startBroodTimer(hives, frames, broodTimer, frameCounter, hiveCounter);
+			world.startLarvaeTimer(hives, frames, larvaeTimer, frameCounter, hiveCounter);
+			world.startBeeTimer(hives, frames, beeTimer, hiveCounter, hiveCounter);
+			world.startWaxTimer(hives, frames, waxTimer, frameCounter, hiveCounter);
+			world.startClutterTimer(hives, frames, clutterTimer, frameCounter, hiveCounter);
+		}
 
-			Date now = new Date();
-			worldAge = now.getTime()/1000L - world.getStartTime();
-			world.getAge(worldAge, name);
-
-			System.out.println("What do you want to do?\n");
-			System.out.println("Inspect (i)");
-			//System.out.println("Deploy Bees (d)"); DEPRECATED
-			//System.out.println("Make Bees (m)"); DEPRECATED
-			System.out.println("Sell (s)");
-			System.out.println("Buy upgrades (b)");
-			System.out.println("Split (p)");
-			//System.out.println("Add Queen to Frame (f)"); DEPRECATED
-			System.out.println("Save and Quit (q)");
-
-			action = in.next().charAt(0);
-			switch (action)
+		public static void inspectHive()
+		{
+			DecimalFormat dec = new DecimalFormat("#.##");
+			for (int i = 1; i <= hiveCounter; i++)
 			{
+				System.out.println("Hive " + hives[i-1].getHid());
+			}
+			System.out.println("Which hive?");
+			h = in.nextInt();
+			if (h.equals(null) || h > hiveCounter || h <= 0)
+			{
+				System.out.println("Invalid selection");
+			}
+			System.out.println("Hive " + h + " has " + hives[h-1].getBees() + " bees\n");
+			for (int i = 1; i <= frameCounter; i++)
+			{
+				if (frames[i-1].getHid() == h)
+				{			
+					System.out.println("Frame " + frames[i-1].getFid() + ": filled cells: " + dec.format((frames[i-1].getCells() - frames[i-1].getEmptyCells())*100.0/frames[i-1].getCellMax()) + "%, drawn cells: " + dec.format(frames[i-1].getCells()*100.0/frames[i-1].getCellMax()) + "%, nectar: " + frames[i-1].getNectar() + ", honey: " + frames[i-1].getHoney() + ", pollen: " + frames[i-1].getPollen() + ", larvae: " + frames[i-1].getLarvae() + ", eggs: " + frames[i-1].getBroodCells() + ", clutter: " + dec.format(frames[i-1].getClutter()*100.0/frames[i-1].getClutterMax()) + "%");
+					Date now = new Date();
+					long frameAge = now.getTime()/1000L - frames[i-1].getStartTime();
+					frames[i-1].getAge(hives, frameAge, name, h,i);
+				}
+			}
+			System.out.println(name + " also has $" + money + " in total.\n");
+		}
 
-
-				// Inspect case:  Select a hive, and reveal the current honey, pollen, bee, larvae, and egg quantities of the frames. Also reveals money.
-
-				case 'i' :
-					Integer h;
-					Integer f;
-					DecimalFormat dec = new DecimalFormat("#.##");
-					for (int i = 1; i <= hiveCounter; i++)
-					{
-						System.out.println("Hive " + hives[i-1].getHid());
-					}
-					System.out.println("Which hive?");
-					h = in.nextInt();
-					if (h.equals(null) || h > hiveCounter || h <= 0)
-					{
-						System.out.println("Invalid selection");
-						break;
-					}
-					System.out.println("Hive " + h + " has " + hives[h-1].getBees() + " bees\n");
-					for (int i = 1; i <= frameCounter; i++)
-					{
-						if (frames[i-1].getHid() == h)
-						{			
-							System.out.println("Frame " + frames[i-1].getFid() + ": filled cells: " + dec.format((frames[i-1].getCells() - frames[i-1].getEmptyCells())*100.0/frames[i-1].getCellMax()) + "%, drawn cells: " + dec.format(frames[i-1].getCells()*100.0/frames[i-1].getCellMax()) + "%, nectar: " + frames[i-1].getNectar() + ", honey: " + frames[i-1].getHoney() + ", pollen: " + frames[i-1].getPollen() + ", larvae: " + frames[i-1].getLarvae() + ", eggs: " + frames[i-1].getBroodCells() + ", clutter: " + dec.format(frames[i-1].getClutter()*100.0/frames[i-1].getClutterMax()) + "%");
-							long frameAge = now.getTime()/1000L - frames[i-1].getStartTime();
-							frames[i-1].getAge(hives, frameAge, name, h,i);
-						}
-					}
-					System.out.println(name + " also has $" + money + " in total.\n");
-					break;
-					/*System.out.println("Which frame?"); DEPRECATED
-					f = in.nextInt();
-					if (f.equals(null) || f > hives[h-1].getFrames() || f <= 0)
-					{
-						System.out.println("Invalid selection");
-					}
-
-					System.out.println("Frame " + f + " has " + frames[f-1].getHoney() + " mL of honey, " + frames[f-1].getPollen() + " units of pollen, " + frames[f-1].getBees() + " bees, " + frames[f-1].getLarvae() + " larvae, and " + frames[f-1].getBroodCells() + " eggs. " + name + " also has $" + money + " in total.");
-					break;*/
-
-				// Deploy case: Send bees out to collect honey and pollen. 1 bee = 1 mL honey and 1 unit pollen. Bees can be killed by predators (need to work on probabilistic model). DEPRECATED
-				/*case 'd' :
-					System.out.println("How many bees do you want to deploy?");
-					deployBees = in.nextInt();
-					if (deployBees > ronHive.getBees())
-					{
-						System.out.println("Not enough bees");
-						break;
-					}
-					System.out.println("You sent " + deployBees + " bees out into the world");
-					n = deployBees*rand.nextInt(100) + 1;
-					if (n >= 100)
-					{ 
-						deployBees = deployBees - 1; //(n-100)/100;
-						System.out.println("Only " + deployBees + " bees returned");
-						ronHive.addBees(-1);
-					}
-					System.out.println("They brought back " + deployBees * beeUpgrade + " ml of honey and " + deployBees * beeUpgrade + " units of pollen");
-					ronHive.addHoney(deployBees * beeUpgrade);
-					ronHive.addPollen(deployBees * beeUpgrade);
-					break; */
-				// Make case: Make bees from honey + pollen. 1 bee = 1mL honey + 1 unit pollen. DEPRECATED
-				/*case 'm' :
-					System.out.println("How many units of pollen and mL of honey would you like to feed your queen?");
-					newBees = in.nextInt();
-					if (newBees > Math.max(ronHive.getHoney(), ronHive.getPollen()))
-					{
-						System.out.println("Not enough resources\n");
-					}
-					else
-					{
-						ronHive.addBees(newBees * beeUpgrade);
-						ronHive.addHoney(-newBees);
-						ronHive.addPollen(-newBees);
-						System.out.println("Made " + newBees * beeUpgrade + " new bees");
-					}
-					break;*/
-
-				// Sell case: Sell bees, honey, and pollen.
-
-				case 's' :
+				public void sellResources()
+				{
 					for (int i = 1; i <= hiveCounter; i++)
 					{
 						System.out.println("Hive " + hives[i-1].getHid());
@@ -373,7 +303,6 @@ public class Buzz
 					if (h.equals(null) || h > hiveCounter || h <= 0)
 					{
 						System.out.println("Invalid selection");
-						break;
 					}
 					for (int j = 1; j <= hives[h-1].getFrames(); j++)
 					{
@@ -441,12 +370,10 @@ public class Buzz
 							break;
 						}
 					}
-					break;
+				}
 
-				// Upgrade case: Can purchase upgrades to bee carrying capacity, queen fertility, and commodity value. +1 to capacity and fertility, * 1.2 to value. Cost rises by factor of 1.5 
-
-				case 'b' :
-
+				public void getUpgrades()
+				{
 					for (int i = 0; i < hiveCounter; i++)
 					{
 						System.out.println("Hive " + hives[i].getHid());
@@ -456,22 +383,7 @@ public class Buzz
 					if (h.equals(null) || h > hiveCounter || h <= 0)
 					{
 						System.out.println("Invalid selection");
-						break;
 					}
-					/*for (int i = 0; i < frameCounter; i++)
-					{
-						if (frames[i].getHid() == h)
-						{
-							System.out.println("Frame " + frames[i].getFid());
-						}
-					}
-					System.out.println("Upgrade which frame?");
-					f = in.nextInt();
-					if (f.equals(null) || f > hives[h-1].getFrames() || f <= 0)
-					{
-						System.out.println("Invalid selection");
-						break;
-					} DEPRECATED*/
 					System.out.println("Would you like to upgrade your bees carrying capacity (c) for $" + cUpCost + ", queens generating capacity (g) for $" + gUpCost + ", commodity value (v) for $ " + vUpCost + ", or buy a Honey Super (h)?");
 					upgrade = in.next().charAt(0);
 					if (upgrade == 'c')
@@ -539,18 +451,16 @@ public class Buzz
 							break;	
 						}
 					}		
-					break;
+				}
 
-				// Split case: Make a new hive by moving a full frame to a new hive
-
-				case 'p' :
+			public void splitHive()
+			{
 				System.out.println("This will move frames to a new hive, but only for completely drawn frames. It also costs $5000 for the materials");
 				System.out.println("How many frames would you like to move?");
 				int numSplit = in.nextInt();
 				if (money < numSplit * frameCost)
 				{
 					System.out.println("Not enough money");
-					break;
 				}
 				else
 				{
@@ -680,72 +590,7 @@ public class Buzz
 				{
 					System.out.println("Invalid entry");
 				}
-				break;
-
-				/* Place a queen in a frame in an established hive DEPRECATED
-
-				case 'f' :
-				System.out.println("This will place a queen in a new frame in an existing hive. It costs $1000 for the queen");
-				if (money < frameCost)
-				{
-					System.out.println("Not enough money");
-					break;
-				}
-				else
-				{
-					money = money - frameCost;
-				}
-				Scanner scan = new Scanner(System.in);
-				System.out.println("Add queen to which hive?");
-				for (int i = 1; i <= hiveCounter; i++)
-				{
-					System.out.println("Hive " + hives[i-1].getHid());
-				}
-				int hid = scan.nextInt();
-				frameCounter = makeNewFrame(hives, frames, hiveCounter, frameCounter, true, hid);
-				break;*/
-
-				// Quit case: Saves and Quits game
-
-				case 'q' :
-					endflag = 1;
-					resourceTimer.cancel();
-					resourceTimer.purge();
-					honeyTimer.cancel();
-					honeyTimer.purge();
-					beeTimer.cancel();
-					beeTimer.purge();
-					consumeTimer.cancel();
-					consumeTimer.purge();
-					clutterTimer.cancel();
-					clutterTimer.purge();
-					broodTimer.cancel();
-					broodTimer.purge();
-					larvaeTimer.cancel();
-					larvaeTimer.purge();
-					waxTimer.cancel();
-					waxTimer.purge();
-					saveGame(hives, frames, name, money, frameCounter, hiveCounter, world);
-					break;
-
-				// Bad variable handler
-
-				default: 
-					System.out.println("Invalid entry");
-					break;
 			}
-
-			// Game Over screen. DEPRECATED
-			/*if (frames[0].getBees() <= 0 )
-			{
-				// All your bees are dead. Game over
-
-				System.out.println("All your bees have died. Your queen has died of loneliness. Game Over\n");
-				System.out.println("You finished with " + frames[0].getHoney() + " ml of honey and " + frames[0].getPollen() + " units of pollen");
-				endflag = 1;*/
-		}	
-	}
-
 	// Method to make a new frame in the same hive (with or without a queen)
 	public static int makeNewFrame(Hive[] hive, Frame[] fr, int hcount, int fcount, boolean queen, int hid)
 	{
@@ -769,6 +614,23 @@ public class Buzz
 
 	public static void saveGame(Hive[] hv, Frame[] fr, String name, double money, int fcount, int hcount, WorldClock world)
 	{
+		endflag = 1;
+		resourceTimer.cancel();
+		resourceTimer.purge();
+		honeyTimer.cancel();
+		honeyTimer.purge();
+		beeTimer.cancel();
+		beeTimer.purge();
+		consumeTimer.cancel();
+		consumeTimer.purge();
+		clutterTimer.cancel();
+		clutterTimer.purge();
+		broodTimer.cancel();
+		broodTimer.purge();
+		larvaeTimer.cancel();
+		larvaeTimer.purge();
+		waxTimer.cancel();
+		waxTimer.purge();
 		File outFile = new File("/home/tyler/Documents/Java Code/Buzz/" + name + ".txt");
 		Date currentDate = new Date(); 
 
