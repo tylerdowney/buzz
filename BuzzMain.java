@@ -6,6 +6,7 @@ public class BuzzMain {
 	private static final int FRAME_WIDTH = 600;
 	private static final int FRAME_HEIGHT = 800;
 	public static void main (String[] args) {
+		bg.startNewGame();
 		HiveComponents hc = new HiveComponents(bg);
 		JFrame frame = new JFrame();
 		frame.setSize(FRAME_WIDTH, FRAME_HEIGHT);

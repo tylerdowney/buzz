@@ -8,6 +8,7 @@ public class BuzzTester
 
 	public static void main(String[] args)
 	{
-		buzzGame.loadGame();
+		buzzGame.startNewGame();
+		buzzGame.sellResources();
 	}
 }

@@ -48,14 +48,20 @@ import java.awt.event.MouseEvent;
 	};
 
 	public void hiveClicker() {
-        addMouseListener(new MouseAdapter() {
-      	@Override
-       	public void mouseClicked(MouseEvent me) {
-       	 	super.mouseClicked(me);
-			for (Rectangle element : hives)
-        		if (element.contains(me.getPoint())) {
-            		//makeFrameImage();
-           		 }
+        addMouseListener(new MouseAdapter()
+		{
+      		@Override
+       		public void mouseClicked(MouseEvent me)
+			{
+       	 		super.mouseClicked(me);
+				for (int i = 1; i <= buzzGame.getHiveCounter(); i++)
+				{
+	       			if (hives.get(i-1).contains(me.getPoint()))
+					{
+						System.out.println("hive clicked");
+            			buzzGame.inspectHive(i);
+           		 	}
+				}
 			}
         });
     }

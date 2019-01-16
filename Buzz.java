@@ -38,7 +38,7 @@ public class Buzz
 	private static int larvaeOffset = 0;
 	private static int broodOffset = 0;
 	private static int waxOffset = 0;
-	private static int hiveCounter = 10;
+	private static int hiveCounter = 0;
 	private static int frameCounter = 0;
 	private static Timer resourceTimer = new Timer();
 	private static Timer honeyTimer = new Timer();
@@ -81,7 +81,6 @@ public class Buzz
 
 		public static void loadGame()
 		{
-			System.out.println(broodMax);
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
 			JFrame frame = new JFrame("FileSelect");
@@ -214,6 +213,7 @@ public class Buzz
 					}
 				}
 				sc.close();
+				startTimers();
 			}
 			catch (FileNotFoundException e)
 			{
@@ -221,12 +221,11 @@ public class Buzz
 			}
 		}
 
-		public void startNewGame()
+		public static void startNewGame()
 		{
 			// New game
 
 			System.out.println("Welcome! Please enter your name");
-			name = in.nextLine(); // consume white space
 			name = in.nextLine();
 			System.out.println("Welcome " + name + "!");
 
@@ -249,35 +248,26 @@ public class Buzz
 				frames[i-1].setStartTime(begin);
 				frameCounter++;
 			}
+			startTimers();
 		}
 
 		//Start game timers
 
 		public static void startTimers()
 		{
-			WorldClock world = new WorldClock();
 			world.startResourceTimer(hives, frames, resourceTimer, frameCounter, hiveCounter);
 			world.startConsumeTimer(hives, frames, consumeTimer, frameCounter, hiveCounter);	
 			world.startBroodTimer(hives, frames, broodTimer, frameCounter, hiveCounter);
 			world.startLarvaeTimer(hives, frames, larvaeTimer, frameCounter, hiveCounter);
-			world.startBeeTimer(hives, frames, beeTimer, hiveCounter, hiveCounter);
+			world.startBeeTimer(hives, frames, beeTimer, frameCounter, hiveCounter);
 			world.startWaxTimer(hives, frames, waxTimer, frameCounter, hiveCounter);
 			world.startClutterTimer(hives, frames, clutterTimer, frameCounter, hiveCounter);
 		}
 
-		public static void inspectHive()
+		public static void inspectHive(int hid)
 		{
 			DecimalFormat dec = new DecimalFormat("#.##");
-			for (int i = 1; i <= hiveCounter; i++)
-			{
-				System.out.println("Hive " + hives[i-1].getHid());
-			}
-			System.out.println("Which hive?");
-			h = in.nextInt();
-			if (h.equals(null) || h > hiveCounter || h <= 0)
-			{
-				System.out.println("Invalid selection");
-			}
+			h = hid;
 			System.out.println("Hive " + h + " has " + hives[h-1].getBees() + " bees\n");
 			for (int i = 1; i <= frameCounter; i++)
 			{
@@ -292,7 +282,7 @@ public class Buzz
 			System.out.println(name + " also has $" + money + " in total.\n");
 		}
 
-				public void sellResources()
+				public static void sellResources()
 				{
 					for (int i = 1; i <= hiveCounter; i++)
 					{
@@ -372,7 +362,7 @@ public class Buzz
 					}
 				}
 
-				public void getUpgrades()
+				public static void getUpgrades()
 				{
 					for (int i = 0; i < hiveCounter; i++)
 					{
@@ -453,7 +443,7 @@ public class Buzz
 					}		
 				}
 
-			public void splitHive()
+			public static void splitHive()
 			{
 				System.out.println("This will move frames to a new hive, but only for completely drawn frames. It also costs $5000 for the materials");
 				System.out.println("How many frames would you like to move?");
@@ -612,7 +602,9 @@ public class Buzz
 
 	// Method to save game variables to file for future load
 
-	public static void saveGame(Hive[] hv, Frame[] fr, String name, double money, int fcount, int hcount, WorldClock world)
+
+	public static void saveGame()
+	//public static void saveGame(Hive[] hv, Frame[] fr, String name, double money, int fcount, int hcount, WorldClock world)
 	{
 		endflag = 1;
 		resourceTimer.cancel();
@@ -638,29 +630,29 @@ public class Buzz
 		{
 			PrintWriter out = new PrintWriter(outFile);
 			out.println(name);
-			out.println(fcount);
-			out.println(hcount);
+			out.println(frameCounter);
+			out.println(hiveCounter);
 			out.println(money);
 			out.println(currentDate.getTime()/1000L);
 			out.println(world.getStartTime());
-		for (int i = 1; i <= hcount; i++)
+		for (int i = 1; i <= hiveCounter; i++)
 		{
-			out.println(hv[i-1].getBees());
-			out.println(hv[i-1].getBeeUpgrade());
-			out.println(hv[i-1].getQueenUpgrade());
+			out.println(hives[i-1].getBees());
+			out.println(hives[i-1].getBeeUpgrade());
+			out.println(hives[i-1].getQueenUpgrade());
 		}
 			
-		for (int i = 1; i <= fcount; i++)
+		for (int i = 1; i <= frameCounter; i++)
 		{
-			out.println(fr[i-1].getHid());
-			out.println(fr[i-1].getHoneyCells());
-			out.println(fr[i-1].getNectarCells());
-			out.println(fr[i-1].getPollenCells());
-			out.println(fr[i-1].getLarvae());
-			out.println(fr[i-1].getBroodCells());
-			out.println(fr[i-1].getEmptyCells());
-			out.println(fr[i-1].getClutter());
-			out.println(fr[i-1].getStartTime());
+			out.println(frames[i-1].getHid());
+			out.println(frames[i-1].getHoneyCells());
+			out.println(frames[i-1].getNectarCells());
+			out.println(frames[i-1].getPollenCells());
+			out.println(frames[i-1].getLarvae());
+			out.println(frames[i-1].getBroodCells());
+			out.println(frames[i-1].getEmptyCells());
+			out.println(frames[i-1].getClutter());
+			out.println(frames[i-1].getStartTime());
 		}
 			out.close();
 			System.out.println("Game saved");
@@ -669,5 +661,15 @@ public class Buzz
 		{
 			System.out.println("Could not save file");
 		}
+	}
+
+	public static int getHiveCounter()
+	{
+		return hiveCounter;
+	}
+
+	public static int getEndFlag()
+	{
+		return endflag;
 	}
 }

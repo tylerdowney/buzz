@@ -12,7 +12,8 @@ public class WorldClock
 	private int beeTime;
 	private int clutterTime;
 	private int waxTime;
-	private int[] Resources = new int[8]; /* Array Layout: 0 Add Brood/Add Larvae, 1 Add Bees/Consume Larvae, 2 Consume Nectar/Add Empty Cells, 3 Consume Pollen/Add Empty Cells, 4 Add Nectar/Remove Empty Cells 5, Add Pollen/Remove Empty Cells, 6 Add Empty Cells, 7 Add Honey/Consume Nectar*/
+	private int resTemp;
+	//private int[] Resources = new int[8]; /* Array Layout: 0 Add Brood/Add Larvae, 1 Add Bees/Consume Larvae, 2 Consume Nectar/Add Empty Cells, 3 Consume Pollen/Add Empty Cells, 4 Add Nectar/Remove Empty Cells 5, Add Pollen/Remove Empty Cells, 6 Add Empty Cells, 7 Add Honey/Consume Nectar*/
 	private int dist;
 		
 	public WorldClock()
@@ -56,7 +57,7 @@ public class WorldClock
 				int dist = 0;
 				for (int i = 1; i <= hcount; i++)
 				{
-				Resources[0] = getRandomInt(20 * hive[i-1].getQueenUpgrade());
+				resTemp = getRandomInt(20 * hive[i-1].getQueenUpgrade());
 					for (int j = 1; j <= fcount; j++)
 					{
 						if (frame[j-1].getHid() == i)
@@ -64,15 +65,15 @@ public class WorldClock
 							dist = frame[j-1].getDistToCent();
 							if (dist == 0)
 							{
-								addBrood = 3*Resources[0]/16;
+								addBrood = 3*resTemp/16;
 							}
 							else if (dist == 1 || dist == 2)
 							{
-								addBrood = 2*Resources[0]/16;
+								addBrood = 2*resTemp/16;
 							}
 							else if ( dist > 2)
 							{
-								addBrood = Resources[0]/16;
+								addBrood = resTemp/16;
 							}
 							if (frame[j-1].getBroodCells() <= broodMax && frame[j-1].getEmptyCells() > addBrood)
 							{
@@ -107,15 +108,15 @@ public class WorldClock
 							dist = frame[j-1].getDistToCent();
 							if (dist == 0)
 							{
-								addBrood = 3*Resources[0]/16;
+								addBrood = 3*resTemp/16;
 							}
 							else if (dist == 1 || dist == 2)
 							{
-								addBrood = 2*Resources[0]/16;
+								addBrood = 2*resTemp/16;
 							}
 							else if ( dist > 2)
 							{
-								addBrood = Resources[0]/16;
+								addBrood = resTemp/16;
 							}
 							if (frame[j-1].getBroodCells() > addBrood)
 							{
@@ -191,10 +192,11 @@ public class WorldClock
 			{
 				int flag;
 				int addBees = 0;
+				int tempBees;
 				for (int i = 1; i <= hcount; i++)
 				{
 					flag = 0;
-					Resources[1] = getRandomInt(20 * hive[i-1].getQueenUpgrade());
+					tempBees = getRandomInt(20 * hive[i-1].getQueenUpgrade());
 					for (int j = 1; j <= fcount; j++)
 					{
 						if (frame[j-1].getHid() == i)
@@ -202,17 +204,17 @@ public class WorldClock
 							dist = frame[j-1].getDistToCent();
 							if (dist == 0)
 							{
-								addBees = 3*Resources[1]/16;
+								addBees = 3*tempBees/16;
 								flag = flag + 3;
 							}
 							else if (dist == 1 || dist == 2)
 							{
-								addBees = 2*Resources[1]/16;
+								addBees = 2*tempBees/16;
 								flag = flag + 2;
 							}
 							else if ( dist > 2)
 							{
-								addBees = Resources[1]/16;
+								addBees = tempBees/16;
 								flag++;
 							}
 							if (frame[j-1].getLarvae() >= addBees)
@@ -224,7 +226,7 @@ public class WorldClock
 					}
 					if (hive[i-1].getBees() <= hive[i-1].getBeeMax())
 					{
-						hive[i-1].addBees(flag*Resources[1]/16);
+						hive[i-1].addBees(flag*tempBees/16);
 					}
 					else
 					{
@@ -247,10 +249,12 @@ public class WorldClock
 			{
 				int addNectar = 0;
 				int addPollen = 0;
+				int tempNectar;
+				int tempPollen;
 				for (int i = 1; i <= hcount; i++)
 				{
-					Resources[2] = getRandomInt(hive[i-1].getBees()/100);
-					Resources[3] = getRandomInt(hive[i-1].getBees()/100);
+					tempNectar= getRandomInt(hive[i-1].getBees()/100);
+					tempPollen = getRandomInt(hive[i-1].getBees()/100);
 					for (int j = 1; j <= fcount; j++)
 					{
 						if (frame[j-1].getHid() == i)
@@ -258,18 +262,18 @@ public class WorldClock
 							dist = frame[j-1].getDistToCent();
 							if (dist == 0)
 							{
-								addNectar = Resources[2]/16 - getRandomInt(frame[j-1].getBroodCells()/50);
-								addPollen = Resources[3]/16 - getRandomInt(frame[j-1].getBroodCells()/50);
+								addNectar = tempNectar/16 - getRandomInt(frame[j-1].getBroodCells()/50);
+								addPollen = tempPollen/16 - getRandomInt(frame[j-1].getBroodCells()/50);
 							}
 							else if (dist == 1 || dist == 2)
 							{
-								addNectar = 2*Resources[2]/16 - getRandomInt(frame[j-1].getBroodCells()/50);
-								addPollen = 2*Resources[3]/16 - getRandomInt(frame[j-1].getBroodCells()/50);
+								addNectar = 2*tempNectar/16 - getRandomInt(frame[j-1].getBroodCells()/50);
+								addPollen = 2*tempPollen/16 - getRandomInt(frame[j-1].getBroodCells()/50);
 							}
 							else if (dist > 2)
 							{
-								addNectar = 3*Resources[2]/16 - getRandomInt(frame[j-1].getBroodCells()/50);
-								addPollen = 3*Resources[3]/16 - getRandomInt(frame[j-1].getBroodCells()/50);
+								addNectar = 3*tempNectar/16 - getRandomInt(frame[j-1].getBroodCells()/50);
+								addPollen = 3*tempPollen/16 - getRandomInt(frame[j-1].getBroodCells()/50);
 							}
 							if (frame[j-1].getNectarCells() >= addNectar)
 							{
@@ -310,10 +314,12 @@ public class WorldClock
 			{
 				int addNectar = 0;
 				int addPollen = 0;
+				int tempAddNectar;
+				int tempAddPollen;
 				for (int i = 1; i <= hcount; i++)
 				{
-					Resources[4] = getRandomInt(hive[i-1].getBeeUpgrade() * (hive[i-1].getBees()/10 + 1));
-					Resources[5] = getRandomInt(hive[i-1].getBeeUpgrade() * (hive[i-1].getBees()/10 + 1));
+					tempAddNectar = getRandomInt(hive[i-1].getBeeUpgrade() * (hive[i-1].getBees()/10 + 1));
+					tempAddPollen = getRandomInt(hive[i-1].getBeeUpgrade() * (hive[i-1].getBees()/10 + 1));
 					for (int j = 1; j <= fcount; j++)
 					{
 						if (frame[j-1].getHid() == i)
@@ -321,18 +327,18 @@ public class WorldClock
 							dist = frame[j-1].getDistToCent();
 							if (dist == 0)
 							{
-								addNectar = Resources[4]/16;
-								addPollen = Resources[5]/16;
+								addNectar = tempAddNectar/16;
+								addPollen = tempAddPollen/16;
 							}
 							else if (dist == 1 || dist == 2)
 							{
-								addNectar = 2*Resources[4]/16;
-								addPollen = 2*Resources[5]/16;
+								addNectar = 2*tempAddNectar/16;
+								addPollen = 2*tempAddPollen/16;
 							}
 							else if (dist > 2)
 							{
-								addNectar = 3*Resources[4]/16;
-								addPollen = 3*Resources[5]/16;
+								addNectar = 3*tempAddNectar/16;
+								addPollen = 3*tempAddPollen/16;
 							}
 							if (frame[j-1].getEmptyCells() >= (addNectar + addPollen))
 							{
@@ -357,9 +363,10 @@ public class WorldClock
 			public void run()
 			{
 				int addHoney = 0;
+				int tempHoney;
 				for (int i = 1; i <= hcount; i++)
 				{
-					Resources[7] = getRandomInt(hive[i-1].getBeeUpgrade() * (hive[i-1].getBees()/10 + 1));
+					tempHoney = getRandomInt(hive[i-1].getBeeUpgrade() * (hive[i-1].getBees()/10 + 1));
 					for (int j = 1; j <= fcount; j++)
 					{
 						if (frame[j-1].getHid() == i)
@@ -367,15 +374,15 @@ public class WorldClock
 							dist = frame[j-1].getDistToCent();
 							if (dist == 0)
 							{
-								addHoney = Resources[7]/16;
+								addHoney = tempHoney /16;
 							}
 							else if (dist == 1 || dist == 2)
 							{
-								addHoney = 2*Resources[7]/16;
+								addHoney = 2*tempHoney /16;
 							}
 							else if (dist > 2)
 							{
-								addHoney = 3*Resources[7]/16;
+								addHoney = 3*tempHoney /16;
 							}
 							if (frame[j-1].getNectarCells() > addHoney)
 							{
@@ -398,11 +405,12 @@ public class WorldClock
 		{
 			int dist = 0;
 			int addWax;
+			int tempWax;
 			public void run()
 			{
 				for (int i = 1; i <= hcount; i++)
 				{
-					Resources[6] = getRandomInt(hive[i-1].getBees() * hive[i-1].getBeeUpgrade());
+					tempWax = getRandomInt(hive[i-1].getBees() * hive[i-1].getBeeUpgrade());
 
 					for (int j = 1; j <= fcount; j++)
 					{
@@ -411,15 +419,15 @@ public class WorldClock
 							dist = frame[j-1].getDistToCent();
 							if (dist == 0)
 							{
-								addWax = 3*Resources[6]/16;
+								addWax = 3*tempWax/16;
 							}
 							else if (dist == 1 || dist == 2)
 							{
-								addWax = 2*Resources[6]/16;
+								addWax = 2*tempWax/16;
 							}
 							else if (dist > 2)
 							{
-								addWax = Resources[6]/16;
+								addWax = tempWax/16;
 							}
 							if (frame[j-1].getCellMax() - frame[j-1].getCells() >= addWax)
 							{
