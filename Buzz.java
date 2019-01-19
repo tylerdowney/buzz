@@ -3,10 +3,20 @@
 import java.io.*;
 import java.util.*;
 import java.lang.*;
+import javax.swing.JTextField;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JLabel;
+import javax.swing.JButton;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Color;
 import java.awt.event.WindowEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
+import java.awt.Rectangle;
 
 public class Buzz
 {
@@ -60,6 +70,7 @@ public class Buzz
 	private static double clutPerBee = 0.0001;
 	private static double clutPerEgg = 0.001;
 	private static Random rand = new Random();
+	private static JTextField startText = new JTextField("Welcome! Please enter your name");
 	private static int n;
 	private static int framesPerHive = 10;
 	private static int broodMax = 2000;
@@ -221,13 +232,15 @@ public class Buzz
 			}
 		}
 
-		public static void startNewGame()
+		public static JFrame startNewGame(JFrame prevFrame)
 		{
 			// New game
-
-			System.out.println("Welcome! Please enter your name");
-			name = in.nextLine();
-			System.out.println("Welcome " + name + "!");
+			prevFrame.dispose();
+			JFrame textFrame = new JFrame();
+			textFrame.setSize(300,300);
+			textFrame.setVisible(true);
+			startText.addActionListener(submitTextListener);
+			textFrame.add(startText);
 
 			//Initialize Hive 1 Frame 1 resources (bees, honey, pollen). Start WorldClock
 			
@@ -249,6 +262,7 @@ public class Buzz
 				frameCounter++;
 			}
 			startTimers();
+			return textFrame;
 		}
 
 		//Start game timers
@@ -266,20 +280,13 @@ public class Buzz
 
 		public static void inspectHive(int hid)
 		{
-			DecimalFormat dec = new DecimalFormat("#.##");
-			h = hid;
-			System.out.println("Hive " + h + " has " + hives[h-1].getBees() + " bees\n");
-			for (int i = 1; i <= frameCounter; i++)
-			{
-				if (frames[i-1].getHid() == h)
-				{			
-					System.out.println("Frame " + frames[i-1].getFid() + ": filled cells: " + dec.format((frames[i-1].getCells() - frames[i-1].getEmptyCells())*100.0/frames[i-1].getCellMax()) + "%, drawn cells: " + dec.format(frames[i-1].getCells()*100.0/frames[i-1].getCellMax()) + "%, nectar: " + frames[i-1].getNectar() + ", honey: " + frames[i-1].getHoney() + ", pollen: " + frames[i-1].getPollen() + ", larvae: " + frames[i-1].getLarvae() + ", eggs: " + frames[i-1].getBroodCells() + ", clutter: " + dec.format(frames[i-1].getClutter()*100.0/frames[i-1].getClutterMax()) + "%");
-					Date now = new Date();
-					long frameAge = now.getTime()/1000L - frames[i-1].getStartTime();
-					frames[i-1].getAge(hives, frameAge, name, h,i);
-				}
-			}
-			System.out.println(name + " also has $" + money + " in total.\n");
+			int BEEFRAME_WIDTH = 600;
+			int BEEFRAME_HEIGHT = 600;
+			JFrame beeFrame = new JFrame();
+			FrameComponents fc = new FrameComponents(hives, frames, hid, framesPerHive, BEEFRAME_WIDTH, BEEFRAME_HEIGHT, frameCounter);
+			beeFrame.setSize(BEEFRAME_WIDTH, BEEFRAME_HEIGHT);
+			beeFrame.add(fc);
+			beeFrame.setVisible(true);
 		}
 
 				public static void sellResources()
@@ -663,9 +670,21 @@ public class Buzz
 		}
 	}
 
+	static ActionListener submitTextListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent theEvent) {
+			name = startText.getText();
+		}
+	};
+
 	public static int getHiveCounter()
 	{
 		return hiveCounter;
+	}
+
+	public static String getName()
+	{
+		return name;
 	}
 
 	public static int getEndFlag()

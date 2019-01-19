@@ -24,8 +24,6 @@ import java.awt.event.MouseEvent;
 			myTimer = new Timer(myTimerDelay, hiveTimer);
 			myTimer.start();
 			setBackground(new Color(0,153,0));
-			//FrameImage fi = new FrameImage();
-			//fi.makeFrameImage();
 			hiveClicker();
 			addHive();
 		}
@@ -58,7 +56,6 @@ import java.awt.event.MouseEvent;
 				{
 	       			if (hives.get(i-1).contains(me.getPoint()))
 					{
-						System.out.println("hive clicked");
             			buzzGame.inspectHive(i);
            		 	}
 				}
