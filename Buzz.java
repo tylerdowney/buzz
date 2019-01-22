@@ -90,8 +90,9 @@ public class Buzz
 		if (load == 'y')
 		{*/
 
-		public static void loadGame()
+		public static void loadGame(JFrame prevFrame)
 		{
+			prevFrame.dispose();
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
 			JFrame frame = new JFrame("FileSelect");
@@ -102,7 +103,6 @@ public class Buzz
 			if (result == JFileChooser.APPROVE_OPTION)
 			{
     				inFile = fileChooser.getSelectedFile();
-    				System.out.println("Selected file: " + inFile.getAbsolutePath());
 			}
 			try
 			{
@@ -228,7 +228,26 @@ public class Buzz
 			}
 			catch (FileNotFoundException e)
 			{
-				System.out.println("Could not load file");
+				JFrame notLoadFrame = new JFrame();
+				notLoadFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				notLoadFrame.setSize(200,200);
+				JPanel notLoadPanel = new JPanel();
+				JLabel notLoadLabel = new JLabel("Could not load file");
+				JButton notLoadButton = new JButton("Okay");
+				notLoadLabel.setBounds(100, 0, 200, 200);
+				notLoadPanel.add(notLoadLabel);
+				notLoadPanel.add(notLoadButton);
+				notLoadFrame.add(notLoadPanel);
+				notLoadFrame.setVisible(true);
+
+				ActionListener notLoadListener = new ActionListener()
+				{
+					@Override
+					public void actionPerformed(ActionEvent theEvent)
+					{
+						notLoadFrame.dispose();
+					}
+				};
 			}
 		}
 
@@ -280,7 +299,7 @@ public class Buzz
 
 		public static void inspectHive(int hid)
 		{
-			int BEEFRAME_WIDTH = 600;
+			int BEEFRAME_WIDTH = 800;
 			int BEEFRAME_HEIGHT = 600;
 			JFrame beeFrame = new JFrame();
 			FrameComponents fc = new FrameComponents(hives, frames, hid, framesPerHive, BEEFRAME_WIDTH, BEEFRAME_HEIGHT, frameCounter);
@@ -680,6 +699,11 @@ public class Buzz
 	public static int getHiveCounter()
 	{
 		return hiveCounter;
+	}
+
+	public static Hive[] getHiveArray()
+	{
+		return hives;
 	}
 
 	public static String getName()

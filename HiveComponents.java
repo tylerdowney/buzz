@@ -5,6 +5,7 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JLabel;
 import javax.swing.Timer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,7 +16,8 @@ import java.awt.event.MouseEvent;
 		private static Buzz buzzGame;
 		private int myTimerDelay;
 		private final Timer myTimer;
-		private ArrayList<Rectangle> hives = new ArrayList<Rectangle>();
+		private ArrayList<Rectangle> hiveImage = new ArrayList<Rectangle>();
+		private ArrayList<JLabel> beeLabel = new ArrayList<JLabel>();
 
 		public HiveComponents(Buzz bg) {
 			super();
@@ -31,12 +33,18 @@ import java.awt.event.MouseEvent;
 			Graphics2D g2 = (Graphics2D) g;
 			super.paintComponent(g2);
 			g2.setColor(Color.YELLOW);
-			for (Rectangle element : hives) {
-				g2.fill(element);
+			for (int i = 1; i <= hiveImage.size(); i++)
+			{
+				g2.fill(hiveImage.get(i-1));
+				beeLabel.get(i-1).setText("Hive " + (i-1) + " has " + buzzGame.getHiveArray()[i-1].getBees() + " bees");
+				beeLabel.get(i-1).setBounds(10, (int) (hiveImage.get(i-1).getY() + hiveImage.get(i-1).getHeight() + 10), 200, 10);
+				add(beeLabel.get(i-1));
 			}
+			//System.out.println(name + " has $" + money + " in total.\n");
 		}
 		public void addHive() {
-			hives.add(new Rectangle(20, 100 * hives.size(), 80, 80));
+			hiveImage.add(new Rectangle(20, 35 + 120 * hiveImage.size(), 80, 80));
+			beeLabel.add(new JLabel());
 		}
 		ActionListener hiveTimer = new ActionListener() {
 		@Override
@@ -54,7 +62,7 @@ import java.awt.event.MouseEvent;
        	 		super.mouseClicked(me);
 				for (int i = 1; i <= buzzGame.getHiveCounter(); i++)
 				{
-	       			if (hives.get(i-1).contains(me.getPoint()))
+	       			if (hiveImage.get(i-1).contains(me.getPoint()))
 					{
             			buzzGame.inspectHive(i);
            		 	}

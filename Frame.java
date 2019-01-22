@@ -124,9 +124,9 @@ public class Frame
 		return cells;
 	}
 
-	public static void getAge(Hive[] hives, long t, String n, int hn, int fn)
+	public static String getAge(Hive[] hives, long t, int hn, int fn)
 	{
-		System.out.println(t/31536000 + " yr, " + (t%31536000)/86400 + " dy, " + (t%31536000%86400)/3600 + " hr, " + (t%31536000%86400%3600)/60 + " min, " + t%31536000%86400%3600%60 + " s\n");
+		return "Frame Age: " + t/31536000 + " yr, " + (t%31536000)/86400 + " dy, " + (t%31536000%86400)/3600 + " hr, " + (t%31536000%86400%3600)/60 + " min, " + t%31536000%86400%3600%60 + " s\n";
 	}
 
 	public int getDistToCent()

@@ -8,9 +8,8 @@ public class SellListener implements ActionListener {
 	private static final int FRAME_WIDTH = 225;
 	private static final  int FRAME_HEIGHT = 200;
 
-	public SellListener(Buzz bg)
+	public SellListener()
 	{
-		buzzGame = bg;
 	}
 	
 	public void actionPerformed(ActionEvent event) {

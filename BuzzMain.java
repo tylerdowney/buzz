@@ -7,27 +7,15 @@ public class BuzzMain {
 	private static Buzz bg = new Buzz();
 	private static JFrame startFrame = new JFrame();
 	private static JFrame textFrame = new JFrame();
-	private static final int FRAME_WIDTH = 600;
+	private static final int FRAME_WIDTH = 800;
 	private static final int FRAME_HEIGHT = 800;
 	public static void main (String[] args) {
 		gameStart();
 		HiveComponents hc = new HiveComponents(bg);
 		JFrame frame = new JFrame();
 		frame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
-
-		JButton sellButton = new JButton("Sell");
-		SellListener sl = new SellListener(bg);
-		sellButton.addActionListener(sl);
-		hc.add(sellButton);
-		JButton upgradeButton = new JButton("Buy Upgrades");
-		UpgradeListener ul = new UpgradeListener(bg);
-		upgradeButton.addActionListener(ul);
-		hc.add(upgradeButton);
-		JButton splitButton = new JButton("Split Hives");
-		hc.add(splitButton);
 		JButton sqButton = new JButton("Save and Quit");
 		hc.add(sqButton);
-
 		frame.add(hc);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
@@ -69,7 +57,7 @@ public class BuzzMain {
 	static ActionListener loadGameListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent theEvent) {
-			bg.loadGame();
+			bg.loadGame(startFrame);
 		}
 	};
 } 

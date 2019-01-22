@@ -8,9 +8,8 @@ public class UpgradeListener implements ActionListener {
 	private static final int FRAME_WIDTH = 475;
 	private static final  int FRAME_HEIGHT = 200;
 
-	public UpgradeListener(Buzz bg)
+	public UpgradeListener()
 	{
-		buzzGame = bg;
 	}
 	
 	public void actionPerformed(ActionEvent event) {
