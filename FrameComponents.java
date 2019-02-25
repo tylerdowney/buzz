@@ -37,6 +37,7 @@ public class FrameComponents extends JPanel
 	private static JButton splitButton = new JButton("Split Hives");
 	private static SellListener sl = new SellListener();
 	private static UpgradeListener ul = new UpgradeListener();
+	private static SplitListener spl = new SplitListener();
 
 	public FrameComponents(Hive[] hives, Frame[] frames, int hid, int fph, int w, int height, int fc)
 	{
@@ -58,6 +59,7 @@ public class FrameComponents extends JPanel
 		splitButton.setBounds(250,BEEFRAME_HEIGHT/(3*framesPerHive) + (framesPerHive) * BEEFRAME_HEIGHT/(framesPerHive+2), 150,30);
 		sellButton.addActionListener(sl);
 		upgradeButton.addActionListener(ul);
+		splitButton.addActionListener(spl);
 		add(sellButton);
 		add(upgradeButton);
 		add(splitButton);
@@ -102,8 +104,8 @@ public class FrameComponents extends JPanel
 				ageList.add(frameImageCounter, new JLabel());
 				labelList.get(frameImageCounter).setText("Frame " + frames[i-1].getFid() + ": filled cells: " + dec.format((frames[i-1].getCells() - frames[i-1].getEmptyCells())*100.0/frames[i-1].getCellMax()) + "%, drawn cells: " + dec.format(frames[i-1].getCells()*100.0/frames[i-1].getCellMax()) + "%, nectar: " + frames[i-1].getNectar() + ", honey: " + frames[i-1].getHoney() + ", pollen: " + frames[i-1].getPollen() + ", larvae: " + frames[i-1].getLarvae() + ", eggs: " + frames[i-1].getBroodCells() + ", clutter: " + dec.format(frames[i-1].getClutter()*100.0/frames[i-1].getClutterMax()) + "%");
 				ageList.get(frameImageCounter).setText(frames[i-1].getAge(hives,frameAge, h, i));
-				labelList.get(frameImageCounter).setBounds(0, -10 + BEEFRAME_HEIGHT/(3*framesPerHive) + BEEFRAME_HEIGHT*(i-1)/(framesPerHive+2), BEEFRAME_WIDTH, 40);
-				ageList.get(frameImageCounter).setBounds(0, BEEFRAME_HEIGHT/(3*framesPerHive) + BEEFRAME_HEIGHT*(i-1)/(framesPerHive+2) + 10, BEEFRAME_WIDTH, 40);
+				labelList.get(frameImageCounter).setBounds(0, -10 + BEEFRAME_HEIGHT/(3*framesPerHive) + BEEFRAME_HEIGHT*((i-1) % framesPerHive)/(framesPerHive+2), BEEFRAME_WIDTH, 40);
+				ageList.get(frameImageCounter).setBounds(0, BEEFRAME_HEIGHT/(3*framesPerHive) + BEEFRAME_HEIGHT*((i-1) % framesPerHive)/(framesPerHive+2) + 10, BEEFRAME_WIDTH, 40);
 				frameImageCounter++;
 			}
 		}	

@@ -3,6 +3,8 @@
 import java.io.*;
 import java.util.*;
 import java.lang.*;
+import java.awt.Rectangle;
+import javax.swing.BoxLayout;
 import javax.swing.JTextField;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -71,24 +73,27 @@ public class Buzz
 	private static double clutPerEgg = 0.001;
 	private static Random rand = new Random();
 	private static JTextField startText = new JTextField("Welcome! Please enter your name");
+	private static JFrame noMoneyFrame = new JFrame();
+	private static JFrame notDrawnFrame = new JFrame();
 	private static int n;
+	private static int BEEFRAME_WIDTH = 800;
+	private static int BEEFRAME_HEIGHT = 600;
+	private static int noMoneyFlag = 0;
+	private static int notDrawnFlag = 0;
 	private static int framesPerHive = 10;
 	private static int broodMax = 2000;
 	private static Hive[] hives = new Hive[1000];
 	private static Frame[] frames = new Frame[framesPerHive * hives.length];
 	private static WorldClock world = new WorldClock();
 	private static double[] clutterOffset = new double[1000];
+	private static ArrayList<Rectangle> hiveImage = new ArrayList<Rectangle>();
+	private static ArrayList<JLabel> beeLabel = new ArrayList<JLabel>();
 	private static Scanner in = new Scanner(System.in);
 	private static String name = "";
 
 	public Buzz()
 	{
 	}
-
-		/*System.out.println("Would you like to load a saved game (y/n)?");
-		load = in.next().charAt(0);
-		if (load == 'y')
-		{*/
 
 		public static void loadGame(JFrame prevFrame)
 		{
@@ -299,8 +304,6 @@ public class Buzz
 
 		public static void inspectHive(int hid)
 		{
-			int BEEFRAME_WIDTH = 800;
-			int BEEFRAME_HEIGHT = 600;
 			JFrame beeFrame = new JFrame();
 			FrameComponents fc = new FrameComponents(hives, frames, hid, framesPerHive, BEEFRAME_WIDTH, BEEFRAME_HEIGHT, frameCounter);
 			beeFrame.setSize(BEEFRAME_WIDTH, BEEFRAME_HEIGHT);
@@ -469,145 +472,180 @@ public class Buzz
 					}		
 				}
 
-			public static void splitHive()
+			public static void splitHive(ArrayList<Integer> framesToSplit)
 			{
-				System.out.println("This will move frames to a new hive, but only for completely drawn frames. It also costs $5000 for the materials");
-				System.out.println("How many frames would you like to move?");
-				int numSplit = in.nextInt();
+				int numSplit = framesToSplit.size();
 				if (money < numSplit * frameCost)
 				{
-					System.out.println("Not enough money");
+					noMoneyFlag = 0;
+					ActionListener noMoneyListener = new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent theEvent) {
+							noMoneyFrame.dispose();
+							noMoneyFlag = 1;
+						}
+					};
+
+					JPanel noMoneyPanel = new JPanel();
+					JLabel noMoneyLabel = new JLabel("Not enough money");
+					JButton noMoneyButton = new JButton("Okay");
+					noMoneyButton.addActionListener(noMoneyListener);
+					noMoneyFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+					noMoneyFrame.setSize(BEEFRAME_WIDTH/2, BEEFRAME_HEIGHT/2);
+					noMoneyPanel.add(noMoneyLabel);
+					noMoneyPanel.add(noMoneyButton);
+					noMoneyFrame.add(noMoneyPanel);
+					noMoneyFrame.setVisible(true);
 				}
 				else
 				{
 					money = money - numSplit * frameCost;
-				}
-				System.out.println("Choose a hive");
-				int hiSplit = -1;
-				for (int i = 1; i <= hiveCounter; i++)
-				{
-					System.out.println("Hive " + hives[i-1].getHid());
-				}
-				try
-				{
-					int moveCounter = 0;
-					hiSplit = in.nextInt();
-					if (hiSplit > hiveCounter || hiSplit <= 0)
+					try
 					{
-						throw new InputMismatchException();
-					}
-					for (int j = 1; j <= numSplit; j++)
-					{
-						System.out.println("Which frame will you move?");
-						for (int i = 1; i <= hives[hiSplit-1].getFrames(); i++)
+						int moveCounter = 0;
+						for (int j = 1; j <= numSplit; j++)
 						{
-							System.out.println("Frame " + i);
-						}
-						int found = 0;
-						int frSplit = in.nextInt();
-						for (int i = 1; i <= frameCounter; i++)
-						{
-							if (frames[i-1].getHid() == hiSplit && frames[i-1].getFid() == frSplit)
+							int frSplit = framesToSplit.get(j-1)+1;
+							int hiSplit = frames[frSplit - 1].getHid();
+							double tol = 2.0;
+							if ((frames[frSplit-1].getCells()*100.0/frames[frSplit-1].getCellMax()) + tol < 100.0)
 							{
-								double tol = 2.0;
-								if ((frames[i-1].getCells()*100.0/frames[i-1].getCellMax()) + tol > 100.0)
+								if (moveCounter < 1)
 								{
-									if (moveCounter < 1)
-									{
-										hives[hiveCounter] = new Hive(hiveCounter + 1);
-										hiveCounter++;
+									hives[hiveCounter] = new Hive(hiveCounter + 1);
+									addHive();
+									hiveCounter++;
+								}
+								hives[hiveCounter-1].addFrames();
+								frames[frameCounter] = new Frame(hives[hiveCounter-1].getHid(), hives[hiveCounter-1].getFrames(), Math.abs(6 - hives[hiveCounter - 1].getFrames()));
+								Date starttime = new Date();
+								long begin = starttime.getTime()/1000L;
+								frameCounter++;
+								frames[frameCounter-1].setStartTime(begin);
+								frames[frameCounter-1].setHoney(frames[frSplit-1].getHoneyCells());
+								frames[frameCounter-1].setNectar(frames[frSplit-1].getNectarCells());
+								frames[frameCounter-1].setPollen(frames[frSplit-1].getPollenCells());
+								frames[frameCounter-1].setLarvae(frames[frSplit-1].getLarvae());
+								frames[frameCounter-1].setBrood(frames[frSplit-1].getBroodCells());
+								frames[frameCounter-1].setEmptyCells(frames[frSplit-1].getEmptyCells());
+								frames[frameCounter-1].setClutter(frames[frSplit-1].getClutter());
+								frames[frSplit-1].setHoney(0);
+								frames[frSplit-1].setNectar(0);
+								frames[frSplit-1].setPollen(0);
+								frames[frSplit-1].setLarvae(0);
+								frames[frSplit-1].setBrood(0);
+								frames[frSplit-1].setEmptyCells(0);
+								frames[frSplit-1].setClutter(0);
+								Date date = new Date();
+								moveCounter++;
+							}
+							else
+							{
+								notDrawnFlag = 0;
+								ActionListener notDrawnListener = new ActionListener() {
+									@Override
+									public void actionPerformed(ActionEvent theEvent) {
+										notDrawnFrame.dispose();
+										notDrawnFlag = 1;
 									}
-									hives[hiveCounter-1].addFrames();
-									frames[frameCounter] = new Frame(hives[hiveCounter-1].getHid(), hives[hiveCounter-1].getFrames(), Math.abs(6 - hives[hiveCounter - 1].getFrames()));
-									Date starttime = new Date();
-									long begin = starttime.getTime()/1000L;
-									frameCounter++;
-									frames[frameCounter-1].setStartTime(begin);
-									frames[frameCounter-1].setHoney(frames[i-1].getHoneyCells());
-									frames[frameCounter-1].setNectar(frames[i-1].getNectarCells());
-									frames[frameCounter-1].setPollen(frames[i-1].getPollenCells());
-									frames[frameCounter-1].setLarvae(frames[i-1].getLarvae());
-									frames[frameCounter-1].setBrood(frames[i-1].getBroodCells());
-									frames[frameCounter-1].setEmptyCells(frames[i-1].getEmptyCells());
-									frames[frameCounter-1].setClutter(frames[i-1].getClutter());
-									frames[i-1].setHoney(0);
-									frames[i-1].setNectar(0);
-									frames[i-1].setPollen(0);
-									frames[i-1].setLarvae(0);
-									frames[i-1].setBrood(0);
-									frames[i-1].setEmptyCells(0);
-									frames[i-1].setClutter(0);
-									Date date = new Date();
-									found++;
-									moveCounter++;
-								}
-								else
-								{
-									System.out.println("Frame " + frSplit + " is not sufficiently drawn to split");
-									found++;
-								}
+								};
+								JPanel notDrawnPanel = new JPanel();
+								JLabel notDrawnLabel = new JLabel("Frame " + frSplit + " is not sufficiently drawn to split");
+								JButton notDrawnButton = new JButton("Okay");
+								notDrawnButton.addActionListener(notDrawnListener);
+								notDrawnFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+								notDrawnFrame.setSize(BEEFRAME_WIDTH/2, BEEFRAME_HEIGHT/2);
+								notDrawnPanel.add(notDrawnLabel);
+								notDrawnPanel.add(notDrawnButton);
+								notDrawnFrame.add(notDrawnPanel);
+								notDrawnFrame.setVisible(true);
+							}
+							/*if (found != 1) DEPRECATED
+							{
+								notFoundFlag = 0;
+								ActionListener notFoundListener = new ActionListener() {
+									@Override
+									public void actionPerformed(ActionEvent theEvent) {
+										notFoundFrame.dispose();
+										notFoundFlag = 1;
+									}
+								};
+								JPanel notFoundPanel = new JPanel();
+								JLabel notFoundLabel = new JLabel("Frame " + frSplit + " was not found");
+								JButton notFoundButton = new JButton("Okay");
+								notFoundButton.addActionListener(notFoundListener);
+								notFoundFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+								notFoundFrame.setSize(BEEFRAME_WIDTH/2, BEEFRAME_HEIGHT/2);
+								notFoundPanel.add(notFoundLabel);
+								notFoundPanel.add(notFoundButton);
+								notFoundFrame.add(notFoundPanel);
+								notFoundFrame.setVisible(true);
+							}*/
+							for (int i = 1; i <= (framesPerHive - moveCounter); i++)
+							{
+								hives[hiveCounter - 1].addFrames();
+								Date starttime = new Date();
+								frames[frameCounter] = new Frame(hives[hiveCounter - 1].getHid(), hives[hiveCounter - 1].getFrames(), Math.abs(6 - hives[hiveCounter - 1].getFrames()));
+								long begin = starttime.getTime()/1000L;
+								frames[frameCounter].setStartTime(begin);
+								frameCounter++;
+
+								// Cancel the old Timers
+								resourceTimer.cancel();
+								resourceTimer.purge();
+								honeyTimer.cancel();
+								honeyTimer.purge();
+								beeTimer.cancel();
+								beeTimer.purge();
+								consumeTimer.cancel();
+								consumeTimer.purge();
+								clutterTimer.cancel();
+								clutterTimer.purge();
+								broodTimer.cancel();
+								broodTimer.purge();
+								larvaeTimer.cancel();
+								larvaeTimer.purge();
+								waxTimer.cancel();
+								waxTimer.purge();
+
+								// Start the new Timers
+								resourceTimer = new Timer();
+								honeyTimer = new Timer();
+								consumeTimer = new Timer();
+								broodTimer = new Timer();
+								larvaeTimer = new Timer();
+								beeTimer = new Timer();
+								waxTimer = new Timer();
+								clutterTimer = new Timer();
+
+								Date date = new Date();
+								frames[frameCounter-1].setStartTime(date.getTime()/1000L);
+											
+								world.startResourceTimer(hives, frames, resourceTimer, frameCounter, hiveCounter);
+								world.startConsumeTimer(hives, frames, consumeTimer, frameCounter, hiveCounter);	
+								world.startBroodTimer(hives, frames, broodTimer, frameCounter, hiveCounter);
+								world.startLarvaeTimer(hives, frames, larvaeTimer, frameCounter, hiveCounter);
+								world.startBeeTimer(hives, frames, beeTimer, frameCounter, hiveCounter);
+								world.startWaxTimer(hives, frames, waxTimer, frameCounter, hiveCounter);
+								world.startClutterTimer(hives, frames, clutterTimer, frameCounter, hiveCounter);
 							}
 						}
-						if (found != 1)
-						{
-							System.out.println("Could not find frame");
-						}
+						JFrame successFrame = new JFrame();
+						JPanel successPanel = new JPanel();
+						JLabel successLabel = new JLabel("Frames successfully moved");
+						successPanel.add(successLabel);
+						successFrame.add(successPanel);
+						successFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+						successFrame.setSize(BEEFRAME_WIDTH/2, BEEFRAME_HEIGHT/2);
+						successFrame.setVisible(true);
 					}
-					for (int i = 1; i <= (framesPerHive - moveCounter); i++)
+					catch (InputMismatchException e)
 					{
-						hives[hiveCounter - 1].addFrames();
-						Date starttime = new Date();
-						frames[frameCounter] = new Frame(hives[hiveCounter - 1].getHid(), hives[hiveCounter - 1].getFrames(), Math.abs(6 - hives[hiveCounter - 1].getFrames()));
-						long begin = starttime.getTime()/1000L;
-						frames[frameCounter].setStartTime(begin);
-						frameCounter++;
-
-						// Cancel the old Timers
-						resourceTimer.cancel();
-						resourceTimer.purge();
-						honeyTimer.cancel();
-						honeyTimer.purge();
-						beeTimer.cancel();
-						beeTimer.purge();
-						consumeTimer.cancel();
-						consumeTimer.purge();
-						clutterTimer.cancel();
-						clutterTimer.purge();
-						broodTimer.cancel();
-						broodTimer.purge();
-						larvaeTimer.cancel();
-						larvaeTimer.purge();
-						waxTimer.cancel();
-						waxTimer.purge();
-
-						// Start the new Timers
-						resourceTimer = new Timer();
-						honeyTimer = new Timer();
-						consumeTimer = new Timer();
-						broodTimer = new Timer();
-						larvaeTimer = new Timer();
-						beeTimer = new Timer();
-						waxTimer = new Timer();
-						clutterTimer = new Timer();
-
-						Date date = new Date();
-						frames[frameCounter-1].setStartTime(date.getTime()/1000L);
-							
-						world.startResourceTimer(hives, frames, resourceTimer, frameCounter, hiveCounter);
-						world.startConsumeTimer(hives, frames, consumeTimer, frameCounter, hiveCounter);	
-						world.startBroodTimer(hives, frames, broodTimer, frameCounter, hiveCounter);
-						world.startLarvaeTimer(hives, frames, larvaeTimer, frameCounter, hiveCounter);
-						world.startBeeTimer(hives, frames, beeTimer, frameCounter, hiveCounter);
-						world.startWaxTimer(hives, frames, waxTimer, frameCounter, hiveCounter);
-						world.startClutterTimer(hives, frames, clutterTimer, frameCounter, hiveCounter);
+						System.out.println("Invalid entry");
 					}
-				}
-				catch (InputMismatchException e)
-				{
-					System.out.println("Invalid entry");
 				}
 			}
-	// Method to make a new frame in the same hive (with or without a queen)
+	// Method to make a new frame in the same hive
 	public static int makeNewFrame(Hive[] hive, Frame[] fr, int hcount, int fcount, boolean queen, int hid)
 	{
 		if (hid > hcount)
@@ -714,5 +752,25 @@ public class Buzz
 	public static int getEndFlag()
 	{
 		return endflag;
+	}
+
+	public static int getFramesPerHive()
+	{
+		return framesPerHive;
+	}
+
+	public static ArrayList<Rectangle> getHiveImage()
+	{
+		return hiveImage;
+	}
+
+	public static ArrayList<JLabel> getBeeLabel()
+	{
+		return beeLabel;
+	}
+
+	public static void addHive() {
+		hiveImage.add(new Rectangle(20, 35 + 120 * hiveImage.size(), 80, 80));
+		beeLabel.add(new JLabel());
 	}
 }

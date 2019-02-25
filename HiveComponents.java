@@ -14,42 +14,37 @@ import java.awt.event.MouseEvent;
 
 	public class HiveComponents extends JPanel{
 		private static Buzz buzzGame;
-		private int myTimerDelay;
-		private final Timer myTimer;
-		private ArrayList<Rectangle> hiveImage = new ArrayList<Rectangle>();
-		private ArrayList<JLabel> beeLabel = new ArrayList<JLabel>();
+		private int hiveTimerDelay;
+		private final Timer hiveTimer;
 
 		public HiveComponents(Buzz bg) {
 			super();
 			buzzGame = bg;
-			myTimerDelay = 1000;
-			myTimer = new Timer(myTimerDelay, hiveTimer);
-			myTimer.start();
+			hiveTimerDelay = 1000;
+			hiveTimer = new Timer(hiveTimerDelay, hivePainter);
+			hiveTimer.start();
 			setBackground(new Color(0,153,0));
 			hiveClicker();
-			addHive();
+			buzzGame.addHive();
 		}
 		public void paintComponent(Graphics g) {
 			Graphics2D g2 = (Graphics2D) g;
 			super.paintComponent(g2);
 			g2.setColor(Color.YELLOW);
-			for (int i = 1; i <= hiveImage.size(); i++)
+			for (int i = 1; i <= buzzGame.getHiveImage().size(); i++)
 			{
-				g2.fill(hiveImage.get(i-1));
-				beeLabel.get(i-1).setText("Hive " + (i-1) + " has " + buzzGame.getHiveArray()[i-1].getBees() + " bees");
-				beeLabel.get(i-1).setBounds(10, (int) (hiveImage.get(i-1).getY() + hiveImage.get(i-1).getHeight() + 10), 200, 10);
-				add(beeLabel.get(i-1));
+				g2.fill(buzzGame.getHiveImage().get(i-1));
+				buzzGame.getBeeLabel().get(i-1).setText("Hive " + i + " has " + buzzGame.getHiveArray()[i-1].getBees() + " bees");
+				buzzGame.getBeeLabel().get(i-1).setBounds(10, (int) (buzzGame.getHiveImage().get(i-1).getY() + buzzGame.getHiveImage().get(i-1).getHeight() + 10), 200, 10);
+				add(buzzGame.getBeeLabel().get(i-1));
 			}
 			//System.out.println(name + " has $" + money + " in total.\n");
 		}
-		public void addHive() {
-			hiveImage.add(new Rectangle(20, 35 + 120 * hiveImage.size(), 80, 80));
-			beeLabel.add(new JLabel());
-		}
-		ActionListener hiveTimer = new ActionListener() {
+
+		ActionListener hivePainter = new ActionListener() {
 		@Override
 			public void actionPerformed(ActionEvent theEvent) {
-
+				repaint();
 		}
 	};
 
@@ -62,7 +57,7 @@ import java.awt.event.MouseEvent;
        	 		super.mouseClicked(me);
 				for (int i = 1; i <= buzzGame.getHiveCounter(); i++)
 				{
-	       			if (hiveImage.get(i-1).contains(me.getPoint()))
+	       			if (buzzGame.getHiveImage().get(i-1).contains(me.getPoint()))
 					{
             			buzzGame.inspectHive(i);
            		 	}
