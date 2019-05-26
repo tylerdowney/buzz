@@ -44,7 +44,11 @@ import java.awt.event.MouseEvent;
 		ActionListener hivePainter = new ActionListener() {
 		@Override
 			public void actionPerformed(ActionEvent theEvent) {
+			for (int i = 1; i <= buzzGame.getHiveImage().size(); i++)
+			{	
+				buzzGame.getBeeLabel().get(i-1).setText("Hive " + i + " has " + buzzGame.getHiveArray()[i-1].getBees() + " bees");
 				repaint();
+			}
 		}
 	};
 
@@ -59,6 +63,7 @@ import java.awt.event.MouseEvent;
 				{
 	       			if (buzzGame.getHiveImage().get(i-1).contains(me.getPoint()))
 					{
+				Buzz.hiveSelected = i;
             			buzzGame.inspectHive(i);
            		 	}
 				}

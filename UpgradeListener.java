@@ -17,22 +17,49 @@ public class UpgradeListener implements ActionListener {
 		JPanel upgradePanel = new JPanel();
 		JLabel upgradeLabel = new JLabel("What would you like to upgrade?");
 		JButton eggButton = new JButton("Egg Production");
+		eggButton.addActionListener(eggListener);
 		JButton resourceButton = new JButton("Resource Collection");
+		resourceButton.addActionListener(resourceListener);
 		JButton commodityButton = new JButton("Commodity Value");
+		commodityButton.addActionListener(commodityListener);
+		JButton honeyButton = new JButton("Honey Supers");
+		honeyButton.addActionListener(honeyListener);
 		BoxLayout upgradeLayout = new BoxLayout(upgradePanel, BoxLayout.X_AXIS);
 		upgradePanel.setLayout(upgradeLayout);
 		upgradePanel.add(eggButton);
 		upgradePanel.add(resourceButton);
 		upgradePanel.add(commodityButton);
+		upgradePanel.add(honeyButton);
 		upgradeFrame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
 		upgradeFrame.add(upgradePanel);
 		upgradeFrame.setTitle("What would you like to upgrade?");
 		upgradeFrame.setVisible(true);
 	}
 
+	ActionListener resourceListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent theEvent) {
+		buzzGame.upgradeResources();
+		}
+	};
+
+	ActionListener eggListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent theEvent) {
+		buzzGame.upgradeEggs();
+		}
+	};
+
+	ActionListener commodityListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent theEvent) {
+		buzzGame.upgradeCommodities();
+		}
+	};
 	ActionListener honeyListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent theEvent) {
+		buzzGame.upgradeHoneySuper();
 		}
 	};
 }

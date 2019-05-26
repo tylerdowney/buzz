@@ -8,7 +8,9 @@ import javax.swing.BoxLayout;
 import javax.swing.JTextField;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JRadioButton;
 import javax.swing.JPanel;
+import javax.swing.JOptionPane;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 import java.awt.Graphics;
@@ -24,6 +26,7 @@ public class Buzz
 {
 	// Initialize flag to end game, action variable, money variable, sales variables, upgrade variables, load flag, gametime variables, off game time variable, resource/bee acquisition delays, hive and frame counters, resource/bee generation times, random variable, frames per hive, Hive and Frame object declarations, terminal scanner object, timer declarations, and username variable
 
+	public static int hiveSelected;
 	private static Integer h;
 	private static Integer f;
 	private static int endflag = 0;
@@ -311,35 +314,35 @@ public class Buzz
 			beeFrame.setVisible(true);
 		}
 
-				public static void sellResources()
+				public static void sellHoney(int sell)
 				{
-					for (int i = 1; i <= hiveCounter; i++)
-					{
-						System.out.println("Hive " + hives[i-1].getHid());
-					}
-					System.out.println("Sell from which hive?");
-					h = in.nextInt();
-					if (h.equals(null) || h > hiveCounter || h <= 0)
-					{
-						System.out.println("Invalid selection");
-					}
-					for (int j = 1; j <= hives[h-1].getFrames(); j++)
-					{
-						System.out.println("Frame " + j);
-					}
-					System.out.println("Sell from which frame?");
-					f = in.nextInt();
-					if (f.equals(null) || f > hives[h-1].getFrames() || f <= 0)
-					{
-						System.out.println("Invalid selection");
-					}
+					h = hiveSelected;
+					int sellHoney;
+
 					for (int i = 1; i <= frameCounter; i++)
 					{
-						if (frames[i-1].getHid() == h && frames[i-1].getFid() == f)
+						if (frames[i-1].getHid() == h && frames[i-1].getFid() == sell)
 						{
-							System.out.println("What would you like to sell? Bees (b), Honey (h), or Pollen (p)?");
-							sellVar = in.next().charAt(0);
-							if (sellVar == 'b')
+							JFrame amountFrame = new JFrame();
+							JPanel amountPanel = new JPanel();
+							JLabel amountlabel = new JLabel("Hive " + frames[i-1].getHid() + ", Frame " + frames[i-1].getFid() + " has " + frames[i-1].getHoney() + " mL of honey.");
+							String temp = JOptionPane.showInputDialog("How much honey would you like to sell?");
+							sellHoney = Integer.parseInt(temp);
+								if (sellHoney <= frames[i-1].getHoney())
+								{
+									displayCongratsFrame("At $" + 1.50 * valueUpgrade + " per mL of Honey, that comes to $" +1.50 * valueUpgrade * sellHoney + ". Thank you!");
+									money = money + 1.50 * valueUpgrade * sellHoney;
+									frames[i-1].addHoney(-sellHoney);
+									frames[i-1].addEmptyCells(sellHoney);
+								}
+								else
+								{
+									displayNotEnoughFrame("Not enough honey in this frame to sell");
+								}
+							}
+						}
+					}
+							/*if (sellVar == 'b')
 							{
 								System.out.println("Hive " + frames[i-1].getHid() + " has " + hives[h-1].getBees() + " bees. How many bees would you like to sell?");
 								sell = in.nextInt();
@@ -353,23 +356,7 @@ public class Buzz
 								{
 									System.out.println("Not enough bees in this hive to sell");
 								}
-							}	
-							if (sellVar == 'h')
-							{
-								System.out.println("Hive " + frames[i-1].getHid() + ", Frame " + frames[i-1].getFid() + " has " + frames[i-1].getHoney() + " mL of honey. How much honey would you like to sell?");
-								sell = in.nextInt();
-								if (sell <= frames[i-1].getHoney())
-								{
-									System.out.println("At $" + 1.50 * valueUpgrade + " per mL of Honey, that comes to $" +1.50 * valueUpgrade *sell + ". Thank you!");
-									money = money + 1.50 * valueUpgrade * sell;
-									frames[i-1].addHoney(-sell);
-									frames[i-1].addEmptyCells(sell);
-								}
-								else
-								{
-									System.out.println("Not enough honey in this frame to sell");
-								}
-							}		
+							}			
 							if (sellVar == 'p')
 							{
 								System.out.println("Hive " + frames[i-1].getHid() + ", Frame " + frames[i-1].getFid() + " has " + frames[i-1].getPollen() + ". units of pollen. How much pollen would you like to sell?");
@@ -389,89 +376,78 @@ public class Buzz
 							break;
 						}
 					}
+				}*/
+
+				public static void upgradeResources()
+				{
+					h = hiveSelected;	
+					if (money < cUpCost)
+					{
+						displayNotEnoughFrame("Not enough money");
+					}	
+					else
+					{
+						money = money - cUpCost;
+						cUpCost = 1.5 * cUpCost;
+						hives[h-1].addBeeUpgrade();
+						displayCongratsFrame("Congratulations! Your bees can now carry " + hives[h-1].getBeeUpgrade() + " units of pollen and " + hives[h-1].getBeeUpgrade() + " mLs of honey each");
+					}
 				}
 
-				public static void getUpgrades()
+				public static void upgradeEggs()
 				{
-					for (int i = 0; i < hiveCounter; i++)
+					h = hiveSelected;
+					if (money < gUpCost)
 					{
-						System.out.println("Hive " + hives[i].getHid());
+						displayNotEnoughFrame("Not enough money");
 					}
-					System.out.println("Select a hive");
-					h = in.nextInt();
-					if (h.equals(null) || h > hiveCounter || h <= 0)
+					else		
 					{
-						System.out.println("Invalid selection");
+						money = money - gUpCost;
+						gUpCost = 1.5 * gUpCost;
+						hives[h-1].addQueenUpgrade();
+						displayCongratsFrame("Congratulations! Your queen can now generate " + hives[h-1].getQueenUpgrade() + " bees from 1 unit of pollen and 1 mL of honey");
 					}
-					System.out.println("Would you like to upgrade your bees carrying capacity (c) for $" + cUpCost + ", queens generating capacity (g) for $" + gUpCost + ", commodity value (v) for $ " + vUpCost + ", or buy a Honey Super (h)?");
-					upgrade = in.next().charAt(0);
-					if (upgrade == 'c')
+				}
+
+				public static void upgradeCommodities()
+				{
+					h = hiveSelected;
+					if (money < vUpCost)
 					{
-						if (money < cUpCost)
-						{
-							System.out.println("Not enough money");
-						}	
-						else
-						{
-							money = money - cUpCost;
-							cUpCost = 1.5 * cUpCost;
-							hives[h-1].addBeeUpgrade();
-							System.out.println("Congratulations! Your bees can now carry " + hives[h-1].getBeeUpgrade() + " units of pollen and " + hives[h-1].getBeeUpgrade() + " mLs of honey each");
-						}
+						displayNotEnoughFrame("Not enough money");
 					}
-					if (upgrade == 'g')
+					else
 					{
-						if (money < gUpCost)
-						{
-							System.out.println("Not enough money");
-						}
-						else		
-						{
-							money = money - gUpCost;
-							gUpCost = 1.5 * gUpCost;
-							hives[h-1].addQueenUpgrade();
-							System.out.println("Congratulations! Your queen can now generate " + hives[h-1].getQueenUpgrade() + " bees from 1 unit of pollen and 1 mL of honey");
-						}
+						money = money - vUpCost;
+						vUpCost = 1.5 * vUpCost;
+						valueUpgrade = 1.2 * valueUpgrade;
+						displayCongratsFrame("Congratulations! Bees are now worth $" + 2.50 * valueUpgrade + " and 1 unit of pollen and 1 mL of honey are now worth $" + 1.50 * valueUpgrade);
 					}
-					if (upgrade == 'v')
+				}
+
+				public static void upgradeHoneySuper()
+				{
+					h = hiveSelected;
+					if (money < superCost)
 					{
-						if (money < vUpCost)
-						{
-							System.out.println("Not enough money");
-						}
-						else
-						{
-							money = money - vUpCost;
-							vUpCost = 1.5 * vUpCost;
-							valueUpgrade = 1.2 * valueUpgrade;
-							System.out.println("Congratulations! Bees are now worth $" + 2.50 * valueUpgrade + " and 1 unit of pollen and 1 mL of honey are now worth $" + 1.50 * valueUpgrade);
-						}
+						displayNotEnoughFrame("Not enough money");
 					}
-					if (upgrade =='h')
+					else
 					{
-						System.out.println("Add a honey super to which frame?");
-						int hSuper = in.nextInt();
+						money = money - superCost;
+						superCost = 1.5 * superCost;
 						for (int i = 1; i <= frameCounter; i++)
 						{
-							if (frames[i-1].getFid() == hSuper)
+							if (frames[i-1].getHid() == h)
 							{
-								if (money < superCost)
-								{
-									System.out.println("Not enough money");
-								}
-								else
-								{
-									money = money - superCost;
-									superCost = 1.5 * superCost;
-									frames[i-1].setCellMax(frames[i-1].getCellMax() + superIncrease);
-									System.out.println("Congratulations! Frame " + hSuper + "now has a maximum capacity of" + frames[i-1].getCellMax() + " cells");
-								}
+								frames[i-1].setCellMax(frames[i-1].getCellMax() + superIncrease/10);
 							}
-							break;	
 						}
-					}		
+						displayCongratsFrame("Congratulations! Your hive can now hold an additional " + superIncrease + " cells!");
+					}
 				}
-
+	
 			public static void splitHive(ArrayList<Integer> framesToSplit)
 			{
 				int numSplit = framesToSplit.size();
@@ -486,16 +462,7 @@ public class Buzz
 						}
 					};
 
-					JPanel noMoneyPanel = new JPanel();
-					JLabel noMoneyLabel = new JLabel("Not enough money");
-					JButton noMoneyButton = new JButton("Okay");
-					noMoneyButton.addActionListener(noMoneyListener);
-					noMoneyFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-					noMoneyFrame.setSize(BEEFRAME_WIDTH/2, BEEFRAME_HEIGHT/2);
-					noMoneyPanel.add(noMoneyLabel);
-					noMoneyPanel.add(noMoneyButton);
-					noMoneyFrame.add(noMoneyPanel);
-					noMoneyFrame.setVisible(true);
+						displayNotEnoughFrame("Not enough money");
 				}
 				else
 				{
@@ -733,6 +700,28 @@ public class Buzz
 			name = startText.getText();
 		}
 	};
+
+	public static void displayCongratsFrame(String label)
+	{
+		JFrame congratsFrame = new JFrame();
+		JPanel congratsPanel = new JPanel();
+		JLabel congratsText = new JLabel(label);
+		congratsPanel.add(congratsText);
+		congratsFrame.add(congratsPanel);
+		congratsFrame.setSize(750,300);
+		congratsFrame.setVisible(true);
+	}
+
+	public static void displayNotEnoughFrame(String label)
+	{
+		JFrame congratsFrame = new JFrame();
+		JPanel congratsPanel = new JPanel();
+		JLabel congratsText = new JLabel(label);
+		congratsPanel.add(congratsText);
+		congratsFrame.add(congratsPanel);
+		congratsFrame.setSize(300,300);
+		congratsFrame.setVisible(true);
+	}
 
 	public static int getHiveCounter()
 	{

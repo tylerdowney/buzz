@@ -88,6 +88,7 @@ public class FrameComponents extends JPanel
 		for (int i = 1; i <= framesPerHive; i++)
 		{
 			rectList.add(i-1, new Rectangle(0, BEEFRAME_HEIGHT/(3*framesPerHive) + BEEFRAME_HEIGHT*(i-1)/(framesPerHive+2), BEEFRAME_WIDTH, 40));
+			
 		} 
 	}	
 
@@ -116,7 +117,14 @@ public class FrameComponents extends JPanel
 	@Override
 		public void actionPerformed(ActionEvent theEvent)
 		{
-			repaint();
+			DecimalFormat dec = new DecimalFormat("#.##");
+			Date now = new Date();
+			for (int i = 1; i <= labelList.size(); i++)
+			{
+				long frameAge = now.getTime()/1000L - frames[i-1].getStartTime();
+				labelList.get(i-1).setText("Frame " + frames[i-1].getFid() + ": filled cells: " + dec.format((frames[i-1].getCells() - frames[i-1].getEmptyCells())*100.0/frames[i-1].getCellMax()) + "%, drawn cells: " + dec.format(frames[i-1].getCells()*100.0/frames[i-1].getCellMax()) + "%, nectar: " + frames[i-1].getNectar() + ", honey: " + frames[i-1].getHoney() + ", pollen: " + frames[i-1].getPollen() + ", larvae: " + frames[i-1].getLarvae() + ", eggs: " + frames[i-1].getBroodCells() + ", clutter: " + dec.format(frames[i-1].getClutter()*100.0/frames[i-1].getClutterMax()) + "%");
+				ageList.get(i-1).setText(frames[i-1].getAge(hives,frameAge, h, i));
+			}
 		}
 	};
 }

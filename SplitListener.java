@@ -12,20 +12,20 @@ public class SplitListener implements ActionListener {
 	private static final  int FRAME_HEIGHT = 200;
 	private static ArrayList<JCheckBox> frameSelector = new ArrayList<JCheckBox>();
 	private static ArrayList<Integer> framesToSplit = new ArrayList<Integer>();
+	private static JPanel splitPanel = new JPanel();
+	private static JLabel splitLabel = new JLabel("It costs $5000/frame for the materials. Which of the above frames would you like to split?");
+	private static JButton okayButton = new JButton("Okay");
+	private static JButton cancelButton = new JButton("Cancel");
 	
 	public void actionPerformed(ActionEvent event) {
-		JPanel splitPanel = new JPanel();
-		JLabel splitLabel = new JLabel("It costs $5000/frame for the materials. Which frames would you like to split?:");
-		JButton okayButton = new JButton("Okay");
-		okayButton.addActionListener(okayListener);
-		JButton cancelButton = new JButton("Cancel");
-		cancelButton.addActionListener(cancelListener);
-		splitPanel.add(splitLabel);
 		for (int i = 1; i <= bg.getFramesPerHive(); i++)
 		{
 			frameSelector.add(new JCheckBox("Frame " + i));
 			splitPanel.add(frameSelector.get(i-1));
 		}
+		okayButton.addActionListener(okayListener);
+		cancelButton.addActionListener(cancelListener);
+		splitPanel.add(splitLabel);
 		splitPanel.add(okayButton);
 		splitPanel.add(cancelButton);
 		splitFrame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
