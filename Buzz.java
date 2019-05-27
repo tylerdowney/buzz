@@ -41,6 +41,9 @@ public class Buzz
 	private static double superCost = 5000; // Cost of Honey Super upgrade
 	private static int superIncrease = 3500;
 	private static double frameCost = 0;
+	private static double honeyPrice = 1.50;
+	private static double pollenPrice = 1.50;
+	private static double beePrice = 3.50;
 	private static double valueUpgrade = 1;
 	private static char load;
 	private static long oldtime;
@@ -330,8 +333,8 @@ public class Buzz
 							sellHoney = Integer.parseInt(temp);
 								if (sellHoney <= frames[i-1].getHoney())
 								{
-									displayCongratsFrame("At $" + 1.50 * valueUpgrade + " per mL of Honey, that comes to $" +1.50 * valueUpgrade * sellHoney + ". Thank you!");
-									money = money + 1.50 * valueUpgrade * sellHoney;
+									displayCongratsFrame("At $" + honeyPrice * valueUpgrade + " per mL of Honey, that comes to $" +honeyPrice * valueUpgrade * sellHoney + ". Thank you!");
+									money = money + honeyPrice * valueUpgrade * sellHoney;
 									frames[i-1].addHoney(-sellHoney);
 									frames[i-1].addEmptyCells(sellHoney);
 								}
@@ -342,41 +345,53 @@ public class Buzz
 							}
 						}
 					}
-							/*if (sellVar == 'b')
-							{
-								System.out.println("Hive " + frames[i-1].getHid() + " has " + hives[h-1].getBees() + " bees. How many bees would you like to sell?");
-								sell = in.nextInt();
-								if (sell <= hives[h-1].getBees())
+				
+				public static void sellPollen(int sell)
+				{
+					h = hiveSelected;
+					int sellPollen;
+
+					for (int i = 1; i <= frameCounter; i++)
+					{
+						if (frames[i-1].getHid() == h && frames[i-1].getFid() == sell)
+						{
+							JFrame amountFrame = new JFrame();
+							JPanel amountPanel = new JPanel();
+							JLabel amountlabel = new JLabel("Hive " + frames[i-1].getHid() + ", Frame " + frames[i-1].getFid() + " has " + frames[i-1].getHoney() + " mL of honey.");
+							String temp = JOptionPane.showInputDialog("How much pollen would you like to sell?");
+							sellPollen = Integer.parseInt(temp);
+								if (sellPollen <= frames[i-1].getPollen())
 								{
-									System.out.println("At $" + 2.50 * valueUpgrade + " per bee, that comes to $" + 2.50 * valueUpgrade * sell + ". Thank you!");
-									money = money + 2.50 * valueUpgrade * sell;
-									hives[h-1].addBees(-sell);
+									displayCongratsFrame("At $" + pollenPrice * valueUpgrade + " per g of pollen, that comes to $" + pollenPrice * valueUpgrade * sellPollen + ". Thank you!");
+									money = money + pollenPrice * valueUpgrade * sellPollen;
+									frames[i-1].addPollen(-sellPollen);
+									frames[i-1].addEmptyCells(sellPollen);
 								}
 								else
 								{
-									System.out.println("Not enough bees in this hive to sell");
-								}
-							}			
-							if (sellVar == 'p')
-							{
-								System.out.println("Hive " + frames[i-1].getHid() + ", Frame " + frames[i-1].getFid() + " has " + frames[i-1].getPollen() + ". units of pollen. How much pollen would you like to sell?");
-								sell = in.nextInt();
-								if (sell <= frames[i-1].getPollen())
-								{
-									System.out.println("At $" + 1.50 * valueUpgrade + " per unit of pollen, that comes to $" + 1.50 * valueUpgrade * sell + ". Thank you!");
-									money = money + 1.50 * valueUpgrade * sell;
-									frames[i-1].addPollen(-sell);
-									frames[i-1].addEmptyCells(sell);
-								}
-								else
-								{
-									System.out.println("Not enough pollen in this frame to sell");
+									displayNotEnoughFrame("Not enough pollen in this frame to sell");
 								}
 							}
-							break;
 						}
 					}
-				}*/
+					public static void sellBees()
+					{
+						h = hiveSelected;
+						int sellBees;
+			
+						String temp = JOptionPane.showInputDialog("How many bees would you like to sell?");
+						sellBees = Integer.parseInt(temp);
+						if (sellBees <= hives[h-1].getBees())
+						{
+							displayCongratsFrame("At $" + beePrice * valueUpgrade + " per bee, that comes to $" + beePrice * valueUpgrade * sellBees + ". Thank you!");
+							money = money + beePrice * valueUpgrade * sellBees;
+							hives[h-1].addBees(-sellBees);
+						}
+						else
+						{
+							displayNotEnoughFrame("Not enough bees in this hive to sell");
+						}
+					}		 
 
 				public static void upgradeResources()
 				{
