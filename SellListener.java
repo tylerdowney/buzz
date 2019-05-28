@@ -15,6 +15,9 @@ public class SellListener implements ActionListener {
 	private static boolean go = false;
 	private static int sell;
 	private static JFrame sellFrame = new JFrame();
+	private static JButton honeyButton = new JButton("Honey");
+	private static JButton pollenButton = new JButton("Pollen");
+	private static JButton beeButton = new JButton("Bees");
 	private static JButton okayButton = new JButton("Okay");
 	private static JButton cancelButton = new JButton("Cancel");
 	private static JPanel sellPanel = new JPanel();
@@ -27,15 +30,15 @@ public class SellListener implements ActionListener {
 
 	public SellListener()
 	{
+		okayButton.addActionListener(okayListener);
+		cancelButton.addActionListener(cancelListener);
+		honeyButton.addActionListener(honeyListener);
+		pollenButton.addActionListener(pollenListener);
+		beeButton.addActionListener(beeListener);
 	}
 	
 	public void actionPerformed(ActionEvent event) {
-		JButton honeyButton = new JButton("Honey");
-		honeyButton.addActionListener(honeyListener);
-		JButton pollenButton = new JButton("Pollen");
-		pollenButton.addActionListener(pollenListener);
-		JButton beeButton = new JButton("Bees");
-		beeButton.addActionListener(beeListener);
+
 		BoxLayout sellLayout = new BoxLayout(sellPanel, BoxLayout.X_AXIS);
 		sellPanel.setLayout(sellLayout);
 		sellPanel.add(honeyButton);
@@ -45,12 +48,7 @@ public class SellListener implements ActionListener {
 		sellFrame.add(sellPanel);
 		sellFrame.setTitle("What would you like to sell?");
 		sellFrame.setVisible(true);
-	}
 
-	ActionListener honeyListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent theEvent) {
-			sellFlag = 'h';
 			// This works but I hate it. Maybe a better solution later?
 			JRadioButton frame1 = new JRadioButton("Frame 1");
 			frameSelector.add(frame1);
@@ -82,7 +80,12 @@ public class SellListener implements ActionListener {
 			JRadioButton frame10 = new JRadioButton("Frame 10");
 			frameSelector.add(frame10);
 			bGroup.add(frame10);
-			
+	}
+
+	ActionListener honeyListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent theEvent) {
+			sellFlag = 'h';
 			for (int i = 1; i <=buzzGame.getFramesPerHive(); i++)
 			{
 				hpPanel.add(frameSelector.get(i-1));
@@ -103,16 +106,10 @@ public class SellListener implements ActionListener {
 			@Override
 			public void actionPerformed(ActionEvent theEvent) {
 				sellFlag = 'p';
-				for (int i = 1; i <= buzzGame.getFramesPerHive(); i++)
-				{
-					frameSelector.add(new JRadioButton("Frame " + i));
-				}
 				for (int i = 1; i <=buzzGame.getFramesPerHive(); i++)
 				{
 					hpPanel.add(frameSelector.get(i-1));
 				}
-				okayButton.addActionListener(okayListener);
-				cancelButton.addActionListener(cancelListener);
 				hpPanel.add(hpLabel);
 				hpPanel.add(okayButton);
 				hpPanel.add(cancelButton);
