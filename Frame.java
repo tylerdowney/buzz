@@ -127,6 +127,7 @@ public class Frame
 	public static String getAge(Hive[] hives, long t, int hn, int fn)
 	{
 		return "Frame Age: " + t/31536000 + " yr, " + (t%31536000)/86400 + " dy, " + (t%31536000%86400)/3600 + " hr, " + (t%31536000%86400%3600)/60 + " min, " + t%31536000%86400%3600%60 + " s\n";
+
 	}
 
 	public int getDistToCent()

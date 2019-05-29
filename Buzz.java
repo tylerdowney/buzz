@@ -35,10 +35,10 @@ public class Buzz
 	private static char sellVar;
 	private static int sell;
 	private static char upgrade;
-	private static double cUpCost = 1000; // Cost of carrying capacity upgrade
-	private static double gUpCost = 1000; // Cost of queen laying upgrade
-	private static double vUpCost = 1000; // Cost of bee/honey/pollen values upgrade
-	private static double superCost = 5000; // Cost of Honey Super upgrade
+	private static double cUpCost = 0; // Cost of carrying capacity upgrade
+	private static double gUpCost = 0; // Cost of queen laying upgrade
+	private static double vUpCost = 0; // Cost of bee/honey/pollen values upgrade
+	private static double superCost = 0; // Cost of Honey Super upgrade
 	private static int superIncrease = 3500;
 	private static double frameCost = 0;
 	private static double honeyPrice = 1.50;
@@ -274,8 +274,8 @@ public class Buzz
 
 			//Initialize Hive 1 Frame 1 resources (bees, honey, pollen). Start WorldClock
 			
-			Date starttime = new Date();
-			long begin = starttime.getTime()/1000L;
+			Date newtime = new Date();
+			long begin = newtime.getTime()/1000L;
 			world.setStartTime(begin);
 			hiveCounter++;
 			hives[0] = new Hive(hiveCounter);
@@ -500,8 +500,8 @@ public class Buzz
 								}
 								hives[hiveCounter-1].addFrames();
 								frames[frameCounter] = new Frame(hives[hiveCounter-1].getHid(), hives[hiveCounter-1].getFrames(), Math.abs(6 - hives[hiveCounter - 1].getFrames()));
-								Date starttime = new Date();
-								long begin = starttime.getTime()/1000L;
+								Date splittime = new Date();
+								long begin = splittime.getTime()/1000L;
 								frameCounter++;
 								frames[frameCounter-1].setStartTime(begin);
 								frames[frameCounter-1].setHoney(frames[frSplit-1].getHoneyCells());

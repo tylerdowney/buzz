@@ -35,19 +35,6 @@ public class SellListener implements ActionListener {
 		honeyButton.addActionListener(honeyListener);
 		pollenButton.addActionListener(pollenListener);
 		beeButton.addActionListener(beeListener);
-	}
-	
-	public void actionPerformed(ActionEvent event) {
-
-		BoxLayout sellLayout = new BoxLayout(sellPanel, BoxLayout.X_AXIS);
-		sellPanel.setLayout(sellLayout);
-		sellPanel.add(honeyButton);
-		sellPanel.add(pollenButton);
-		sellPanel.add(beeButton);
-		sellFrame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
-		sellFrame.add(sellPanel);
-		sellFrame.setTitle("What would you like to sell?");
-		sellFrame.setVisible(true);
 
 			// This works but I hate it. Maybe a better solution later?
 			JRadioButton frame1 = new JRadioButton("Frame 1");
@@ -81,6 +68,19 @@ public class SellListener implements ActionListener {
 			frameSelector.add(frame10);
 			bGroup.add(frame10);
 	}
+	
+	public void actionPerformed(ActionEvent event) {
+
+		BoxLayout sellLayout = new BoxLayout(sellPanel, BoxLayout.X_AXIS);
+		sellPanel.setLayout(sellLayout);
+		sellPanel.add(honeyButton);
+		sellPanel.add(pollenButton);
+		sellPanel.add(beeButton);
+		sellFrame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
+		sellFrame.add(sellPanel);
+		sellFrame.setTitle("What would you like to sell?");
+		sellFrame.setVisible(true);
+	}
 
 	ActionListener honeyListener = new ActionListener() {
 		@Override
@@ -90,8 +90,6 @@ public class SellListener implements ActionListener {
 			{
 				hpPanel.add(frameSelector.get(i-1));
 			}
-			okayButton.addActionListener(okayListener);
-			cancelButton.addActionListener(cancelListener);
 			hpPanel.add(hpLabel);
 			hpPanel.add(okayButton);
 			hpPanel.add(cancelButton);
